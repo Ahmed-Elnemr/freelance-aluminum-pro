@@ -5,13 +5,17 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SettingResource\Pages;
 use App\Filament\Resources\SettingResource\RelationManagers;
 use App\Models\Setting;
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Storage;
 
 class SettingResource extends Resource
 {
@@ -24,7 +28,7 @@ class SettingResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('key')
                 ->required()
-                ->reactive(), // عشان تتفاعل مع أي تغير لو حبيت تضيف حاجة حسب key
+                ->disabled(fn($record) => $record !== null),
 
             Forms\Components\Select::make('type')
                 ->options([
@@ -32,35 +36,49 @@ class SettingResource extends Resource
                     'textarea' => 'Textarea',
                     'image' => 'Image',
                     'number' => 'Number',
-                    'boolean' => 'Boolean',
                 ])
                 ->required()
-                ->reactive(),
+                ->reactive()
+                ->disabled(fn($record) => $record !== null),
 
             Forms\Components\Group::make([
+                // Text Field
                 Forms\Components\TextInput::make('value')
                     ->label('Value (Text)')
-                    ->visible(fn ($get) => $get('type') === 'text'),
+                    ->visible(fn($get) => $get('type') === 'text')
+                    ->required(fn($get) => $get('type') === 'text'),
 
+                // Textarea Field
                 Forms\Components\Textarea::make('value')
                     ->label('Value (Textarea)')
-                    ->visible(fn ($get) => $get('type') === 'textarea'),
+                    ->visible(fn($get) => $get('type') === 'textarea')
+                    ->required(fn($get) => $get('type') === 'textarea'),
 
+                // Number Field
                 Forms\Components\TextInput::make('value')
                     ->label('Value (Number)')
                     ->numeric()
-                    ->visible(fn ($get) => $get('type') === 'number'),
+                    ->visible(fn($get) => $get('type') === 'number')
+                    ->required(fn($get) => $get('type') === 'number'),
 
+                // Boolean Field
                 Forms\Components\Toggle::make('value')
                     ->label('Value (Boolean)')
-                    ->visible(fn ($get) => $get('type') === 'boolean')
+                    ->visible(fn($get) => $get('type') === 'boolean')
                     ->default(false),
 
-                Forms\Components\FileUpload::make('value')
-                    ->label('Value (Image)')
-                    ->directory('settings')
-                    ->image()
-                    ->visible(fn ($get) => $get('type') === 'image'),
+                // Image Field
+                Forms\Components\FileUpload::make('image')
+                    ->label('File Upload')
+                    ->visible(fn($get) => $get('type') === 'image')
+                    ->required(fn($get) => $get('type') === 'image')
+                    ->acceptedFileTypes(['image/*']) // السماح لجميع الصور
+                    ->directory('settings-temp')
+                    ->preserveFilenames()
+                    ->getUploadedFileNameForStorageUsing(fn($file) => $file->getClientOriginalName())
+                    ->dehydrated(false)
+                    ->multiple(false),
+
             ])
                 ->columnSpanFull()
                 ->reactive(),
@@ -68,13 +86,28 @@ class SettingResource extends Resource
     }
 
 
-
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('value')
+                    ->label('Value')
+                    ->getStateUsing(function (Setting $record) {
+                        if ($record->type === 'image') {
+                            return $record->getFirstMediaUrl('settings');
+                        }
+                        return $record->value;
+                    })
+                    ->formatStateUsing(function ($state, $record) {
+                        if ($record->type === 'image') {
+                            return '<img src="' . $state . '" width="100">';
+                        }
+                        return $state;
+                    })
+                    ->html(),
             ])
+
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])

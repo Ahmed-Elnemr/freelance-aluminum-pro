@@ -9,4 +9,22 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateSetting extends CreateRecord
 {
     protected static string $resource = SettingResource::class;
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        // Remove image before saving to DB
+        unset($data['image']);
+        return $data;
+    }
+
+    protected function afterCreate(): void
+    {
+        if ($this->data['type'] === 'image' && $this->data['image']) {
+            $imagePath = reset($this->data['image']);
+
+            $this->record
+                ->addMedia(public_path('storage/' . $imagePath))
+                ->preservingOriginal()
+                ->toMediaCollection('settings');
+        }
+    }
 }
