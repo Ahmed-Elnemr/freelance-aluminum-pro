@@ -8,6 +8,7 @@ use App\Models\Setting;
 use Closure;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\ImageColumn;
@@ -16,16 +17,30 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
-
+use Filament\Forms\Set;
 class SettingResource extends Resource
 {
+    use Translatable;
     protected static ?string $model = Setting::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
+    public static function getTranslatableLocales(): array
+    {
+        return ['ar','en' ];
+    }
     public static function form(Form $form): Form
     {
         return $form->schema([
+
+            Forms\Components\TextInput::make('name.en')
+                ->label('Name (English)')
+                ->required()
+                ->maxLength(255),
+
+            Forms\Components\TextInput::make('name.ar')
+                ->label('Name (Arabic)')
+                ->required()
+                ->maxLength(255),
             Forms\Components\TextInput::make('key')
                 ->required()
                 ->disabled(fn($record) => $record !== null),
@@ -39,7 +54,11 @@ class SettingResource extends Resource
                 ])
                 ->required()
                 ->reactive()
-                ->disabled(fn($record) => $record !== null),
+                ->disabled(fn($record) => $record !== null)
+                ->afterStateUpdated(function (Set $set) {
+                    $set('value', null);
+                }),
+
 
             Forms\Components\Group::make([
                 // Text Field
@@ -65,7 +84,7 @@ class SettingResource extends Resource
                 Forms\Components\Toggle::make('value')
                     ->label('Value (Boolean)')
                     ->visible(fn($get) => $get('type') === 'boolean')
-                    ->default(false),
+                    ,
 
                 // Image Field
                 Forms\Components\FileUpload::make('image')
@@ -90,6 +109,10 @@ class SettingResource extends Resource
     {
         return $table
             ->columns([
+
+                Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+
                 Tables\Columns\TextColumn::make('value')
                     ->label('Value')
                     ->getStateUsing(function (Setting $record) {

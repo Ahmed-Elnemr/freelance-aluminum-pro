@@ -8,13 +8,26 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateSetting extends CreateRecord
 {
+
+//    use CreateRecord\Concerns\Translatable;
     protected static string $resource = SettingResource::class;
+
+//    protected function getHeaderActions(): array
+//    {
+//        return [
+//            Actions\LocaleSwitcher::make(),
+//            // ...
+//        ];
+//    }
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+
         // Remove image before saving to DB
         unset($data['image']);
         return $data;
     }
+
+
 
     protected function afterCreate(): void
     {

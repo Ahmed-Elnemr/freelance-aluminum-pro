@@ -14,8 +14,9 @@ return [
 
 
     'available_locales' => [
-        ['code' => 'en', 'name' => 'English', 'flag' => 'gb'],
         ['code' => 'ar', 'name' => 'العربية', 'flag' =>'sa'],
+        ['code' => 'en', 'name' => 'English', 'flag' => 'gb'],
+
     ],
     /*
     |--------------------------------------------------------------------------
