@@ -5,5 +5,4 @@ return [
     'active_locale' => [
         'label' => 'اللغة',
     ],
-
 ];
