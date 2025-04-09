@@ -29,6 +29,10 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandName('ALUMINUM PRO')
+            ->favicon(getSettingMediaUrl('logo','settings',))
+//            ->brandLogo(getSettingMediaUrl('logo','settings',))
+            ->brandLogoHeight('3rem')
             ->colors([
                 'primary' => Color::Amber,
             ])
