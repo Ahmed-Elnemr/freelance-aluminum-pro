@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enum\CategoryEnum;
 use App\Traits\HasActiveScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -16,6 +17,8 @@ class Service extends Model implements HasMedia
     use InteractsWithMedia, HasTranslations,  SoftDeletes , HasActiveScope;
 
     public array $translatable = ['name', 'content'];
+    protected $fillable = [ 'category_service_id','category','name', 'content', 'price', 'discount', 'is_active'];
+
     protected $casts = [
         'category' =>CategoryEnum::class,
     ];
@@ -25,11 +28,15 @@ class Service extends Model implements HasMedia
     {
         $this->addMediaCollection('services');
     }
-    protected $fillable = [ 'category_service_id','category','name', 'content', 'price', 'discount', 'is_active'];
     //todo:relation
     public function categoryService(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(CategoryService::class, 'category_service_id');
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany( Order::class);
     }
     //todo: # end relation  #
 }

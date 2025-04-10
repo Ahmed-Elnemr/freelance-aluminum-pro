@@ -25,6 +25,8 @@ return [
     'maintenance_types'=>'Maintenance Types',
     'maintenance_type'=>'Maintenance Type',
     'activation' => 'Activation',
+    'current' => 'Current',
+    'expired' => 'Expired',
 
 
 ];

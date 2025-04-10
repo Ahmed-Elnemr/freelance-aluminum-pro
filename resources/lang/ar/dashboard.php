@@ -25,6 +25,8 @@ return [
     'maintenance_types' => 'انواع الصيانة',
     'maintenance_type' => 'نوع الصيانة',
     'activation' => 'التفعيل',
+    'current' => 'الحالية',
+    'expired' => 'المنتهية',
 
 
 
