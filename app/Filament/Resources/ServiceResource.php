@@ -48,6 +48,21 @@ class ServiceResource extends Resource
     {
         return $form
             ->schema([
+
+                Forms\Components\FileUpload::make('images')
+                    ->label(__('dashboard.images'))
+                    ->multiple()
+                    ->image()
+                    ->imageEditor()
+                    ->directory('services')
+                    ->reorderable()
+                    ->appendFiles()
+                    ->downloadable()
+                    ->openable()
+                    ->preserveFilenames()
+                    ->columnSpanFull(),
+
+
                 Forms\Components\Select::make('category_service_id')
                     ->label(__('dashboard.category_service'))
                     ->options(
@@ -150,6 +165,12 @@ class ServiceResource extends Resource
                     ->options(CategoryEnum::options())
                     ->searchable()
                     ->native(false),
+                Tables\Filters\SelectFilter::make('is_active')
+                    ->label(__('dashboard.activation'))
+                    ->options([
+                        1 => __('dashboard.active'),
+                        0 => __('dashboard.inactive'),
+                    ]),
 
 
                 Tables\Filters\TrashedFilter::make(),

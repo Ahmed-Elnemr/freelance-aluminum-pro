@@ -21,7 +21,10 @@ return [
     'price'=>'السعر',
     'discount'=>'الخصم',
     'arabic_content'=>'الوصف بالعربية',
-    'english_content'=>'الوصف بالانجليزية'
+    'english_content'=>'الوصف بالانجليزية',
+    'maintenance_types' => 'انواع الصيانة',
+    'maintenance_type' => 'نوع الصيانة',
+    'activation' => 'التفعيل',
 
 
 

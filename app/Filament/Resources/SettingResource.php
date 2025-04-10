@@ -104,7 +104,7 @@ class SettingResource extends Resource
                     ->label(trans('nmr'))
                     ->visible(fn($get) => $get('type') === 'image')
                     ->required(fn($get) => $get('type') === 'image')
-                    ->acceptedFileTypes(['image/*']) // السماح لجميع الصور
+                    ->acceptedFileTypes(['image/*'])
                     ->directory('settings-temp')
                     ->preserveFilenames()
                     ->getUploadedFileNameForStorageUsing(fn($file) => $file->getClientOriginalName())

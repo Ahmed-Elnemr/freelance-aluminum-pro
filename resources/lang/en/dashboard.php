@@ -21,6 +21,10 @@ return [
     'price'=>'Price',
     'discount'=>'Discount',
     'arabic_content'=>'Arabic Content',
-    'english_content'=>'English Content'
+    'english_content'=>'English Content',
+    'maintenance_types'=>'Maintenance Types',
+    'maintenance_type'=>'Maintenance Type',
+    'activation' => 'Activation',
+
 
 ];
