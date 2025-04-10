@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasActiveScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
@@ -10,7 +11,7 @@ use Spatie\Translatable\HasTranslations;
 
 class CategoryService extends Model  implements HasMedia
 {
-    use InteractsWithMedia, HasTranslations,  SoftDeletes;
+    use InteractsWithMedia, HasTranslations,  SoftDeletes, HasActiveScope;
 
     public array $translatable = ['name'];
     protected $fillable = ['name', 'is_active'];
