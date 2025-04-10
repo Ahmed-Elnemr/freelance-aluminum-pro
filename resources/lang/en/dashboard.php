@@ -39,6 +39,7 @@ return [
     'arabic_description' => 'Arabic Description',
     'english_description' => 'English Description',
     'address_name' => 'Address Name',
+    'location_url' => 'Location Url',
 
 
 ];

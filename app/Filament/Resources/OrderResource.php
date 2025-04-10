@@ -9,7 +9,10 @@ use App\Models\MaintenanceType;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\User;
+use App\Service\GoogleMapsUrlInput;
 use Filament\Forms;
+use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -27,6 +30,8 @@ class OrderResource extends Resource
         return __('dashboard.orders');
     }
 
+
+
     public static function getModelLabel(): string
     {
         return __('dashboard.order');
@@ -41,6 +46,8 @@ class OrderResource extends Resource
 
     public static function form(Form $form): Form
     {
+
+
         return $form
             ->schema([
                 Section::make(__('dashboard.order_information'))
@@ -65,23 +72,19 @@ class OrderResource extends Resource
                             ->required(),
                     ])->columns(3),
 
-                Section::make(__('dashboard.location_data'))
+
+                Section::make(__('dashboard.location_url'))
                     ->schema([
-                        Forms\Components\TextInput::make('location_data.latitude')
-                            ->label(__('dashboard.latitude'))
-                            ->numeric()
+                        GoogleMapsUrlInput::make('google_maps_url')
+                            ->label(__('dashboard.location_url'))
+                            ->placeholder('https://maps.app.goo.gl/...')
+                            ->locationDataField('location_data')
                             ->required(),
 
-                        Forms\Components\TextInput::make('location_data.longitude')
-                            ->label(__('dashboard.longitude'))
-                            ->numeric()
-                            ->required(),
-
-                        Forms\Components\TextInput::make('location_data.address')
-                            ->label(__('dashboard.address_name'))
-                            ->maxLength(255),
-                    ])->columns(3),
-
+                        Hidden::make('location_data')
+                            ->default([])
+                            ->dehydrateStateUsing(fn ($state) => $state ?? [])
+                    ]),
                 Section::make(__('dashboard.additional_info'))
                     ->schema([
                         Forms\Components\Textarea::make('description.ar')
