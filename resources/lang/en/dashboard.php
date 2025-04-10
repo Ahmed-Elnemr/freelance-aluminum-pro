@@ -27,6 +27,18 @@ return [
     'activation' => 'Activation',
     'current' => 'Current',
     'expired' => 'Expired',
+    'order' => 'Order',
+    'orders' => 'Orders',
+    'status' => 'Status',
+    'user' => 'User',
+    'users' => 'Users',
+    'order_information' => 'Order Information',
+    'location_data' => 'Location Data',
+    'longitude' => 'Longitude',
+    'additional_info' => 'Additional Info',
+    'arabic_description' => 'Arabic Description',
+    'english_description' => 'English Description',
+    'address_name' => 'Address Name',
 
 
 ];

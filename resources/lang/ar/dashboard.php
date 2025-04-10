@@ -27,6 +27,19 @@ return [
     'activation' => 'التفعيل',
     'current' => 'الحالية',
     'expired' => 'المنتهية',
+    'order' => 'الطلب',
+    'orders' => 'الطلبات',
+    'status' => 'الحالة',
+    'user' => 'المستخدم',
+    'users' => 'المستخدمين',
+    'order_information' => 'معلومات الطلب',
+    'location_data' => 'معلومات الموقع',
+    'latitude' => 'خط العرض',
+    'longitude' => 'خط الطول',
+    'additional_info' => 'معلومات اضافية',
+    'arabic_description' => 'وصف بالعربية',
+    'english_description' => 'وصف بالانجليزية',
+    'address_name' => 'اسم العنوان',
 
 
 
