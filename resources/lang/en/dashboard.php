@@ -40,6 +40,8 @@ return [
     'english_description' => 'English Description',
     'address_name' => 'Address Name',
     'location_url' => 'Location Url',
+    'location_name' => 'Location Name',
+
 
 
 ];

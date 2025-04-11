@@ -135,10 +135,15 @@ class OrderResource extends Resource
                     ->sortable()
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('location_data.address')
-                    ->label(__('dashboard.address'))
+                Tables\Columns\TextColumn::make('location_data.location_name')
+                    ->label(__('dashboard.location_name'))
+                    ->formatStateUsing(function ($state, $record) {
+                        return rtrim($state, '،');
+                    })
                     ->limit(30)
-                    ->tooltip(fn ($record) => $record->location_data['address'] ?? ''),
+                    ->tooltip(function ($record) {
+                        return $record->location_data['location_name'] ?? '';
+                    }),
 
                 Tables\Columns\BooleanColumn::make('is_active')
                     ->label(__('dashboard.active'))

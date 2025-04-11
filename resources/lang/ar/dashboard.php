@@ -41,6 +41,7 @@ return [
     'english_description' => 'وصف بالانجليزية',
     'address_name' => 'اسم العنوان',
     'location_url' => 'رابط الموقع',
+    'location_name' => 'اسم الموقع',
 
 
 
