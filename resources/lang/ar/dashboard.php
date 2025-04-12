@@ -1,7 +1,6 @@
 <?php
 
 return [
-    'nmr' => 'ar',
     'home' => 'الصفحة الرئيسية',
     'settings' => 'الاعدادات',
     'setting' => 'الاعداد',
@@ -42,6 +41,16 @@ return [
     'address_name' => 'اسم العنوان',
     'location_url' => 'رابط الموقع',
     'location_name' => 'اسم الموقع',
+    'expired_orders' => 'الطلبات المنتهية',
+    'current_orders' => 'الطلبات الحالية',
+    'maintenance_services' => 'خدمات الصيانة',
+    'products_services' => 'خدمات المنتجات',
+    'increase' => 'زيادة',
+    'decrease' => 'انخفاض',
+    'Timeline of in-app customer growth rate' => 'رسم زمني توضيحي لمعدل نمو العملاء داخل التطبيق',
+    'clients' => 'العملاء',
+    'Timeline of request types' => 'رسم زمني توضيحي لأنواع الطلبات',
+    'orders_by_type' => 'طلبات بنوع',
 
 
 

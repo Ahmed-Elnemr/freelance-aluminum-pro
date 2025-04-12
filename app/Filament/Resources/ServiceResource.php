@@ -22,6 +22,7 @@ class ServiceResource extends Resource
 
     protected static ?string $model = Service::class;
 
+
     public static function getNavigationLabel(): string
     {
         return __('dashboard.services');

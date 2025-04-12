@@ -1,7 +1,6 @@
 <?php
 
 return [
-    'nmr' => 'eng',
     'home' => 'Home',
     'settings' => 'Settings',
     'setting' => 'Setting',
@@ -41,7 +40,15 @@ return [
     'address_name' => 'Address Name',
     'location_url' => 'Location Url',
     'location_name' => 'Location Name',
-
-
+    'expired_orders' => 'Expired Orders',
+    'current_orders' => 'Current Orders',
+    'maintenance_services' => 'Maintenance Services',
+    'products_services' => 'Products Services',
+    'increase' => 'Increase',
+    'decrease' => 'Decrease',
+    'Timeline of in-app customer growth rate' => 'Timeline of in-app customer growth rate',
+    'clients' => 'Clients',
+    'Timeline of request types' => 'Timeline of request types',
+    'orders_by_type' => 'Orders By Type',
 
 ];
