@@ -1,16 +1,23 @@
 <?php
 
-use App\Models\Setting;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\App;
 
 if (! function_exists('getSettingMediaUrl')) {
     function getSettingMediaUrl(string $key, string $collection = 'default', string $conversion = ''): ?string
     {
-        $setting = Setting::where('key', $key)->first();
-
-        if ($setting && $setting->hasMedia($collection)) {
-            return $setting->getFirstMediaUrl($collection, $conversion);
+        if (App::runningInConsole()) {
+            return null;
         }
 
-        return null; // or a default image URL
+        if (Schema::hasTable('settings')) {
+            $setting = \App\Models\Setting::where('key', $key)->first();
+
+            if ($setting && $setting->hasMedia($collection)) {
+                return $setting->getFirstMediaUrl($collection, $conversion);
+            }
+        }
+
+        return null;
     }
 }
