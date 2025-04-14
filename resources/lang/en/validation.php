@@ -201,5 +201,10 @@ return [
     'device_token_required' => 'Device token is required.',
     'device_type_required' => 'Device type is required.',
     'device_type_string' => 'Device type must be a string.',
+    'Activation code is not correct'=>'Activation code is not correct',
+    'Your account activated successfully'=>'Your account activated successfully',
+    'Activation code is expired'=>'Activation code is expired',
+    'code_required' => 'OTP code is required.',
+    'code_digits' => 'OTP code must be exactly 4 digits.',
 
 ];

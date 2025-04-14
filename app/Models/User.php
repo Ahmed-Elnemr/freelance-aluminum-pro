@@ -9,11 +9,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasActiveScope,SoftDeletes;
+    use HasFactory, Notifiable, HasActiveScope,SoftDeletes,HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -74,6 +75,11 @@ class User extends Authenticatable
     public function otps(): HasMany
     {
         return $this->hasMany(Otp::class);
+    }
+
+    public function loginActivities(): HasMany
+    {
+        return $this->hasMany(LoginActivity::class);
     }
     public function orders(): HasMany
     {

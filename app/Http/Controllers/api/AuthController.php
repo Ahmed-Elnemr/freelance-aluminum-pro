@@ -4,8 +4,10 @@ namespace App\Http\Controllers\api;
 
 use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\auth\StoreUserNameRequest;
 use App\Http\Requests\auth\UserLoginRequest;
 use App\Http\Requests\auth\UserRegisterRequest;
+use App\Http\Resources\user\UserResource;
 use App\Models\User;
 use App\Service\ConfirmationController;
 use App\Service\UserService;
@@ -19,27 +21,25 @@ class AuthController extends Controller
         $this->userService = $userService;
     }
 
-    //todo:register
-    public function register(UserRegisterRequest $request): \Illuminate\Http\JsonResponse
-    {
-        $validatedData = $request->validated();
-        $user = User::create([
-            'mobile' => $validatedData['mobile'],
-            'name' => $validatedData['name'],
-            'status' => 0,
-        ]);
-        $code = ConfirmationController::sendCode($user);
-        return ApiResponder::created([
-            'mobile' => $user->mobile,
-            'code' => $code
-        ], __('auth.Verification code sent to your mobile'), 302);
-    }
+
 
     //todo:login
     public function login(UserLoginRequest $request)
     {
+        $validatedData = $request->validated();
         $user = User::whereMobile($request->mobile)->first();
-        throw_if(!$user, ValidationException::withMessages(['msg' => __('auth.you are not allowed to do this action')]));
+        if (!$user) {
+            $user = User::create([
+                'mobile' => $validatedData['mobile'],
+                'status' => 0,
+            ]);
+            $code = ConfirmationController::sendCode($user);
+            return ApiResponder::created([
+                'mobile' => $user->mobile,
+                'code' => $code,
+                'is_new' => true
+            ], __('auth.Verification code sent to your mobile'), 302);
+        }
         if ($user->is_active == 0) {
             return ApiResponder::failed(__('auth.Your account is blocked'));
         }
@@ -47,8 +47,22 @@ class AuthController extends Controller
         $this->userService->addDevice($user);
         return ApiResponder::created([
             'mobile' => $user->mobile,
-            'code' => $code
+            'code' => $code,
+            'is_new' => false
+
         ], __('auth.Verification code sent to your mobile'), 302);
+    }
+
+//todo::storeName
+    public function storeName(StoreUserNameRequest $request)
+    {
+        $user = auth()->user();
+        $user->update([
+            'name' => $request->name
+        ]);
+        return ApiResponder::success([
+            'user' => UserResource::make($user),
+        ], __('auth.Name created successfully'));
     }
 
     public function logout(Request $request)

@@ -23,7 +23,8 @@ return [
             'max' => 'Name cannot be longer than 25 characters',
             'min' => 'Name must be at least 5 characters',
             'format' => 'Name can only contain Arabic letters, English letters, and spaces'
-        ]
+        ],
+
     ],
 
     // Response Messages
@@ -44,5 +45,7 @@ return [
         'back' => 'Back',
         'next' => 'Next',
         'submit' => 'Submit'
-    ]
+    ],
+
+
 ];

@@ -199,4 +199,10 @@ return [
     'device_token_required' => 'رمز الجهاز مطلوب.',
     'device_type_required' => 'نوع الجهاز مطلوب.',
     'device_type_string' => 'نوع الجهاز يجب أن يكون نصاً.',
+    'Activation code is not correct'=>'كود التفعيل غير صحيح',
+    'Your account activated successfully'=>'تم تفعيل حسابك بنجاح',
+    'Activation code is expired'=>'تم انتهاء صلاحية كود التفعيل',
+    'code_required' => 'رمز التحقق مطلوب.',
+    'code_digits' => 'رمز التحقق يجب أن يتكون من 4 أرقام.',
+
 ];

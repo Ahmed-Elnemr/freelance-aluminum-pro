@@ -175,8 +175,13 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+        'mobile' => [
+            'required' => 'The mobile number is required.',
+            'exists' => 'This mobile number is not registered.',
+        ],
+        'code' => [
+            'required' => 'The verification code is required.',
+            'digits' => 'The verification code must be 4 digits.',
         ],
     ],
 
@@ -191,6 +196,9 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'mobile' => 'mobile number',
+        'code' => 'verification code',
+    ],
 
 ];

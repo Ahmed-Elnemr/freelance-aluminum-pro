@@ -20,6 +20,7 @@ return [
     'you are not allowed to do this action'=>'you are not allowed to do this action',
     'Your account is blocked'=>'Your account is blocked',
     'Verification code sent to your mobile'=>'Verification code sent to your mobile',
-    'Logged out successfully'=>'Logged out successfully'
+    'Logged out successfully'=>'Logged out successfully',
+    'Name created successfully'=>'Name created successfully',
 
 ];

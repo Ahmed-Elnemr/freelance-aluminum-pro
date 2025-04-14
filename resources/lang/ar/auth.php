@@ -21,5 +21,6 @@ return [
     'you are not allowed to do this action'=>'لا يجوز لك القيام بهذا الفعل',
     'Your account is blocked'=>'تم حظر حسابك',
     'Verification code sent to your mobile'=>'تم إرسال رمز التحقق إلى هاتفك المحمول',
-    'Logged out successfully'=>'تم تسجيل الخروج بنجاح'
+    'Logged out successfully'=>'تم تسجيل الخروج بنجاح',
+    'Name created successfully'=>'تم انشاء الاسم بنجاح',
 ];

@@ -5,6 +5,9 @@ namespace App\Service;
 //use App\Events\UserOnline;
 use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\auth\CheckMobileOtpRequest;
+use App\Http\Resources\user\UserResource;
+use App\Models\Otp;
 use App\Models\User;
 use Carbon\Carbon;
 //use Modules\User\Models\Otp;
@@ -56,27 +59,28 @@ class ConfirmationController extends Controller
 //        return $code;
 //    }
 //
-//    public function activate(CheckMobileOtpRequest $request)
-//    {
-//        $token = Otp::where('otp', $request->code)->where('status', false)
-//            ->whereRelation('user', 'mobile', '=', $request->mobile)->latest()
-//            ->first();
-//        throw_if(!$token, ValidationException::withMessages(['msg' => __('Activation code is not correct')]));
-//        throw_if($token->expired_at < Carbon::now()->format('Y-m-d H:i:s'), ValidationException::withMessages(['msg' => __('Activation code is expired')]));
-//
-//        $user = $token->user;
-//        $user->loginActivities()->updateOrCreate([
-//            'user_id' => $user->id,
-//            'date' => Carbon::now()->format('Y-m-d'),
-//        ]);
-//        $token->update(['status' => true]);
-//        $user->update(['status' => true,'online' => true]);
-//        $access_token = $user->createToken('authToken')->plainTextToken;
-//        return ApiResponder::loaded([
-//            'user' => UserResource::make($user),
-//            'access_token' => $access_token,
-//        ],200,'Your account activated successfully');
-//    }
+    public function activate(CheckMobileOtpRequest $request)
+    {
+        $token = Otp::where('otp', $request->code)->where('status', false)
+            ->whereRelation('user', 'mobile', '=', $request->mobile)->latest()
+            ->first();
+        throw_if(!$token, ValidationException::withMessages(['msg' => __('validation.Activation code is not correct')]));
+        throw_if($token->expired_at < Carbon::now()->format('Y-m-d H:i:s'),
+            ValidationException::withMessages(['msg' => __('validation.Activation code is expired')]));
+
+        $user = $token->user;
+        $user->loginActivities()->updateOrCreate([
+            'user_id' => $user->id,
+            'date' => Carbon::now()->format('Y-m-d'),
+        ]);
+        $token->update(['status' => true]);
+        $user->update(['status' => true,'online' => true]);
+        $access_token = $user->createToken('authToken')->plainTextToken;
+        return ApiResponder::loaded([
+            'user' => UserResource::make($user),
+            'access_token' => $access_token,
+        ],200,'validation.Your account activated successfully');
+    }
 
 //    public function resend_code(SendEmailOtpRequest $request)
 //    {
@@ -97,7 +101,7 @@ class ConfirmationController extends Controller
         }
         $user->otps()->whereStatus(true)->delete();
         $user->otps()->updateOrCreate(['user_id' => $user['id'],'status'=>false], [
-            'expired_at' => Carbon::now()->addMinutes(2),
+            'expired_at' => Carbon::now()->addMinutes(5),
             'otp' => $code,
         ]);
         $message = __("Your confirmation code is : ") . $code;

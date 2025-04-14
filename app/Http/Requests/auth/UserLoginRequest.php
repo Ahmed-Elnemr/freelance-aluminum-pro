@@ -3,6 +3,7 @@
 namespace App\Http\Requests\auth;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UserLoginRequest extends FormRequest
 {
@@ -21,8 +22,13 @@ class UserLoginRequest extends FormRequest
      */
     public function rules(): array
     {
+
         return [
-            'mobile' => 'required|exists:users,mobile,deleted_at,NULL',
+            'mobile' => [
+                'required',
+                'regex:/^05\d{8}$/',
+                'max:15',
+            ],
             'uuid' => 'required|string',
             'device_token' => 'required',
             'device_type' => 'required|string',
@@ -33,7 +39,7 @@ class UserLoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'mobile.required' => __('validation.mobile_required'),
+            'mobile_required' => __('validation.mobile_required'),
             'mobile.exists' => __('validation.mobile_exists'),
             'uuid.required' => __('validation.uuid_required'),
             'uuid.string' => __('validation.uuid_string'),
