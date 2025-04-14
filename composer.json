@@ -13,6 +13,7 @@
         "guzzlehttp/guzzle": "^7.9",
         "kenepa/translation-manager": "^4.0",
         "laravel/framework": "^11.31",
+        "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "spatie/laravel-medialibrary": "^11.12"
     },
@@ -37,7 +38,10 @@
             "Tests\\": "tests/"
         },
         "files": [
-            "app/helpers.php"
+            "app/Helpers/helpers.php",
+            "app/Helpers/Response/ApiResponder.php",
+            "app/Helpers/Response/Paginator.php",
+            "app/Helpers/Response/ApiResponder.php"
         ]
     },
     "scripts": {

@@ -193,4 +193,13 @@ return [
 
     'attributes' => [],
 
+
+    'mobile_required' => 'Mobile number is required.',
+    'mobile_exists' => 'This mobile number is not registered.',
+    'uuid_required' => 'Device UUID is required.',
+    'uuid_string' => 'Device UUID must be a string.',
+    'device_token_required' => 'Device token is required.',
+    'device_type_required' => 'Device type is required.',
+    'device_type_string' => 'Device type must be a string.',
+
 ];

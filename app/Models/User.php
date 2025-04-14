@@ -6,13 +6,14 @@ namespace App\Models;
 use App\Traits\HasActiveScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasActiveScope;
+    use HasFactory, Notifiable, HasActiveScope,SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +22,8 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'status',
+        'mobile',
         'email',
         'password',
         'type',
@@ -49,8 +52,29 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    //todo:scope
+    public function isClient(): bool
+    {
+        return $this->type === 'client';
+    }
+
+    // Check if the user is a provider
+    public function isAdmin(): bool
+    {
+        return $this->type === 'admin';
+    }
+    //todo:scope # end
+
 
     //todo:relation
+    public function devices(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(UserDevice::class, 'user', 'user_type', 'user_id')->latest();
+    }
+    public function otps(): HasMany
+    {
+        return $this->hasMany(Otp::class);
+    }
     public function orders(): HasMany
     {
         return $this->hasMany( Order::class);

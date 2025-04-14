@@ -192,5 +192,11 @@ return [
     */
 
     'attributes' => [],
-
+    'mobile_required' => 'رقم الجوال مطلوب.',
+    'mobile_exists' => 'رقم الجوال غير مسجل.',
+    'uuid_required' => 'معرف الجهاز مطلوب.',
+    'uuid_string' => 'معرف الجهاز يجب أن يكون نصاً.',
+    'device_token_required' => 'رمز الجهاز مطلوب.',
+    'device_type_required' => 'نوع الجهاز مطلوب.',
+    'device_type_string' => 'نوع الجهاز يجب أن يكون نصاً.',
 ];
