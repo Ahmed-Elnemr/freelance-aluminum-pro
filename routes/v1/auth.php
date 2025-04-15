@@ -9,6 +9,8 @@ Route::group(['prefix' => 'user-auth'], function () {
     Route::post('activate', [ConfirmationController::class, 'activate']);
     Route::post('store-name', [AuthController::class, 'storeName'])
         ->middleware('auth:sanctum');
+        Route::post('resend-code', [ConfirmationController::class, 'resendCode']);
+
 });
 //Route::group(['namespace' => 'Api', 'middleware' => 'api'], function () {
 //    Route::post('client/signup', [AuthController::class,'clientSignup']);

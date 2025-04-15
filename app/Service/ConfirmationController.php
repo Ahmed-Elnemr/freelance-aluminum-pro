@@ -6,6 +6,7 @@ namespace App\Service;
 use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\auth\CheckMobileOtpRequest;
+use App\Http\Requests\auth\SendMobileOtpRequest;
 use App\Http\Resources\user\UserResource;
 use App\Models\Otp;
 use App\Models\User;
@@ -18,6 +19,7 @@ use Carbon\Carbon;
 //use Modules\User\Resources\UserResource;
 //use Modules\User\Services\UserService;
 //use MshMsh\Helpers\ApiResponder;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 class ConfirmationController extends Controller
@@ -92,6 +94,16 @@ class ConfirmationController extends Controller
 //            'code' => $code
 //        ],200,$message);
 //    }
+    public function resendCode(SendMobileOtpRequest $request) : \Illuminate\Http\JsonResponse
+    {
+        $user = User::where('mobile', $request->mobile)->first();
+        $code = self::sendCode($user);
+        $message = __('Confirmation code resent to your mobile');
+        return ApiResponder::loaded([
+            'mobile' => $user->mobile,
+            'code' => $code
+        ], 200, $message);
+    }
 
     public static function sendCode($user,$new_mobile = null)
     {

@@ -1,0 +1,10 @@
+{
+    "Confirmation code resent to your mobile": "تم إعادة إرسال كود التفعيل إلى رقم الهاتف",
+    "Your confirmation code is : ": "كود التفعيل الخاص بك هو : ",
+    "Your account activated successfully": "تم تفعيل حسابك بنجاح",
+    "Activation code is not correct": "كود التفعيل غير صحيح",
+    "Activation code is expired": "انتهت صلاحية كود التفعيل",
+    "validation.required": "حقل :attribute مطلوب.",
+    "validation.exists": "الحقل :attribute غير موجود في سجلاتنا.",
+    "mobile": "رقم الهاتف"
+}
