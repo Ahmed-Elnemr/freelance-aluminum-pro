@@ -29,5 +29,7 @@
     "Activation code is not correct": "كود التفعيل غير صحيح",
     "Activation code is expired": "انتهت صلاحية كود التفعيل",
     "Mobile number updated successfully": "تم تحديث رقم الهاتف بنجاح",
-    "Your account has been successfully deleted": "تم حذف حسابك بنجاح"
+    "Your account has been successfully deleted": "تم حذف حسابك بنجاح",
+    "introduction": "مقدمة",
+    "internal": "داخلي"
 }
