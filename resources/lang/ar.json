@@ -6,5 +6,28 @@
     "Activation code is expired": "انتهت صلاحية كود التفعيل",
     "validation.required": "حقل :attribute مطلوب.",
     "validation.exists": "الحقل :attribute غير موجود في سجلاتنا.",
-    "mobile": "رقم الهاتف"
+    "mobile": "رقم الهاتف",
+    "name": "الاسم",
+    "Verification code sent to your mobile": "تم إرسال كود التفعيل إلى رقم الهاتف",
+    "validation.mobile_regex": "رقم الجوال يجب ان يبدا ب 05",
+    "validation.name_regex": "الاسم يجب ان يبدا بحرف كبيرة",
+    "mobile": "رقم الهاتف",
+    "name": "الاسم",
+
+    "validation.mobile_regex": "رقم الهاتف يجب أن يبدأ بـ 05 ويتكون من 10 أرقام.",
+    "validation.name_regex": "الاسم يجب أن يحتوي فقط على حروف عربية أو إنجليزية ومسافات.",
+
+    "validation.required": "حقل :attribute مطلوب.",
+    "validation.unique": "قيمة :attribute مستخدمة من قبل.",
+    "validation.regex": "تنسيق :attribute غير صالح.",
+    "validation.max.string": "يجب ألا يتجاوز :attribute :max حرفًا.",
+    "validation.min.string": "يجب ألا يقل :attribute عن :min حروف.",
+
+    "attributes.mobile": "رقم الهاتف",
+    "attributes.name": "الاسم",
+    "code": "كود التفعيل",
+    "Activation code is not correct": "كود التفعيل غير صحيح",
+    "Activation code is expired": "انتهت صلاحية كود التفعيل",
+    "Mobile number updated successfully": "تم تحديث رقم الهاتف بنجاح",
+    "Your account has been successfully deleted": "تم حذف حسابك بنجاح"
 }
