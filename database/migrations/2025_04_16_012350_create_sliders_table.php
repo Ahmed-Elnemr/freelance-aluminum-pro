@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('sliders', function (Blueprint $table) {
             $table->id();
-            $table->json('name');
-            $table->json('content');
+            $table->json('name')->nullable();
+            $table->json('content')->nullable();
             $table->string('type');
             $table->tinyInteger('is_active')->default(1);
             $table->softDeletes();

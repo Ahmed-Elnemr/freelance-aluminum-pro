@@ -48,20 +48,20 @@ class SliderResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('name.ar')
                     ->label(__('arabic name'))
-                    ->required(),
+                    ->nullable(),
 
                 Forms\Components\TextInput::make('name.en')
                     ->label(__('english name'))
-                    ->required(),
+                    ->nullable(),
 
                 Forms\Components\Textarea::make('content.ar')
                     ->label(__('arabic content'))
-                    ->required()
+                    ->nullable()
                     ->columnSpanFull(),
 
                 Forms\Components\Textarea::make('content.en')
                     ->label(__('english content'))
-                    ->required()
+                    ->nullable()
                     ->columnSpanFull(),
 
                 Forms\Components\Select::make('type')
@@ -74,6 +74,7 @@ class SliderResource extends Resource
                 Forms\Components\FileUpload::make('slider_image')
                     ->label(__('image'))
                     ->image()
+                    ->required()
                     ->imageEditor()
                     ->directory('sliders')
                     ->preserveFilenames()
