@@ -31,5 +31,18 @@
     "Mobile number updated successfully": "تم تحديث رقم الهاتف بنجاح",
     "Your account has been successfully deleted": "تم حذف حسابك بنجاح",
     "introduction": "مقدمة",
-    "internal": "داخلي"
+    "internal": "داخلي",
+    "arabic name": "الاسم بالعربية",
+    "english name": "الاسم بالانجليزية",
+    "arabic description": "الوصف بالعربية",
+    "english description": "الوصف بالانجليزية",
+    "english content": "الوصف بالانجليزية",
+    "arabic content": "الوصف بالعربية",
+    "type": "النوع",
+    "image": "الصورة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "activation": "التفعيل",
+    "slider": "السلايدر",
+    "sliders": "السلايدرات"
 }

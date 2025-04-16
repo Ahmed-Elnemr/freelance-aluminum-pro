@@ -11,8 +11,8 @@ enum SliderTypeEnum :string
     public function label(): string
     {
         return match ($this) {
-            self::INTRODUCTION => __('dashboard.introduction'),
-            self::INTERNAL => __('dashboard.internal'),
+            self::INTRODUCTION => __('introduction'),
+            self::INTERNAL => __('internal'),
 
         };
     }
