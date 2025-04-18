@@ -13,4 +13,5 @@ Route::group(['prefix' => 'v1'], function () {
     require __DIR__ . '/v1/slider.php';
     require __DIR__ . '/v1/home.php';
     require __DIR__ . '/v1/service.php';
+    require __DIR__ . '/v1/order.php';
 });

@@ -36,6 +36,16 @@ class Service extends Model implements HasMedia
     {
         $this->addMediaCollection('services');
     }
+    //todo:scope
+    public function similar()
+    {
+        return self::active()
+            ->where('id', '!=', $this->id)
+            ->where('category_service_id', $this->category_service_id)
+            ->where('category', $this->category)
+            ->latest()
+            ->get();
+    }
 
     //todo:relation
     public function categoryService(): \Illuminate\Database\Eloquent\Relations\BelongsTo

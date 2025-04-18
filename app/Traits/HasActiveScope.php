@@ -22,4 +22,12 @@ trait HasActiveScope
         return $query->where('is_active', false);
     }
 
+    /**
+     * Check if the model instance is inactive.
+     */
+    public function isInactive(): bool
+    {
+        return $this->is_active == true;
+    }
+
 }
