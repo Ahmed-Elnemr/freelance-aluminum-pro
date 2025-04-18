@@ -14,13 +14,21 @@ use Spatie\Translatable\HasTranslations;
 
 class Service extends Model implements HasMedia
 {
-    use InteractsWithMedia, HasTranslations,  SoftDeletes , HasActiveScope;
+    use InteractsWithMedia, HasTranslations, SoftDeletes, HasActiveScope;
 
     public array $translatable = ['name', 'content'];
-    protected $fillable = [ 'category_service_id','category','name', 'content', 'price', 'discount', 'is_active'];
+    protected $fillable = [
+        'category_service_id',
+        'category',
+        'name',
+        'content',
+        'price',
+        'final_price',
+        'is_active'
+    ];
 
     protected $casts = [
-        'category' =>CategoryEnum::class,
+        'category' => CategoryEnum::class,
     ];
 
 
@@ -28,6 +36,7 @@ class Service extends Model implements HasMedia
     {
         $this->addMediaCollection('services');
     }
+
     //todo:relation
     public function categoryService(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -36,7 +45,7 @@ class Service extends Model implements HasMedia
 
     public function orders(): HasMany
     {
-        return $this->hasMany( Order::class);
+        return $this->hasMany(Order::class);
     }
     //todo: # end relation  #
 }

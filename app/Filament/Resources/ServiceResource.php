@@ -105,12 +105,12 @@ class ServiceResource extends Resource
                     ->required()
                     ->prefix('$'),
 
-                Forms\Components\TextInput::make('discount')
-                    ->label(__('dashboard.discount'))
+                Forms\Components\TextInput::make('final_price')
+                    ->label(__('final price'))
                     ->numeric()
-                    ->minValue(0)
-                    ->maxValue(100)
-                    ->suffix('%'),
+                    ->required()
+                    ->prefix('$'),
+
 
                 Forms\Components\Toggle::make('is_active')
                     ->label(__('dashboard.active'))
@@ -147,9 +147,9 @@ class ServiceResource extends Resource
                     ->money('USD')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('discount')
-                    ->label(__('dashboard.discount'))
-                    ->suffix('%')
+                Tables\Columns\TextColumn::make('final_price')
+                    ->label(__('final price'))
+                    ->money('USD')
                     ->sortable(),
 
                 Tables\Columns\BooleanColumn::make('is_active')

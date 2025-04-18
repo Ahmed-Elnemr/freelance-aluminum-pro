@@ -74,7 +74,7 @@ class SliderResource extends Resource
                 Forms\Components\FileUpload::make('slider_image')
                     ->label(__('image'))
                     ->image()
-                    ->required()
+//                    ->required()
                     ->imageEditor()
                     ->directory('sliders')
                     ->preserveFilenames()

@@ -20,4 +20,16 @@ if (! function_exists('getSettingMediaUrl')) {
 
         return null;
     }
+
+
+    if (! function_exists('getDefaultImageUrl')) {
+        function getDefaultImageUrl(?string $path, string $default = 'defaultImage/ChatGPTImageApr18, 2025, 07_07_18 PM.png', string $disk = 'public'): string
+        {
+            if ($path && Storage::disk($disk)->exists($path)) {
+                return Storage::disk($disk)->url($path);
+            }
+            return asset($default);
+        }
+    }
+
 }
