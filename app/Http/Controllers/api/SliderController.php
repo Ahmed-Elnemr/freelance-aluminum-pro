@@ -14,9 +14,9 @@ class SliderController extends Controller
     public function listIntro()
     {
       $slider=  Slider::active()->whereType(SliderTypeEnum::INTRODUCTION)->get();
-      return ApiResponder::loaded([
+      return ApiResponder::loaded(
           SliderResource::collection($slider)
-      ]);
+      );
 
     }
 }
