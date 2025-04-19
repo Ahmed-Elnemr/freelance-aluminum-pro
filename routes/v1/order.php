@@ -9,5 +9,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('orders/current', [OrderController::class, 'currentOrders']);
     Route::get('orders/expired', [OrderController::class, 'expiredOrders']);
     Route::get('orders/{order}', [OrderController::class, 'show']);
-
 });

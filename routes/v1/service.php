@@ -10,10 +10,13 @@ Route::prefix('services')->group(function () {
         Route::get('products', 'products');
         Route::get('maintenance', 'maintenance');
         Route::get('{service}', 'show');
+
     });
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('favourite', [FavoriteController::class, 'toggle']);
         Route::post('rate/{service}', [RateController::class, 'storeRate']);
+        Route::get('my-favorites/get', [FavoriteController::class, 'myFavoriteServices']);
+
     });
 });
 

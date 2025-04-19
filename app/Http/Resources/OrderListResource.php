@@ -19,13 +19,13 @@ class OrderListResource extends JsonResource
         $locationName = $locationData['location_name'] ?? '';
         return [
             'id' => $this->id,
-            'user_name' => $this->user?->name,
-            'maintenance_type' => $this->maintenanceType?->name,
-            'location' => $locationName,
-            'description' => $this->description,
-            'status' => $this->status->value,
-            'status_label' => $this->status->label(),
-            'created' => $this->created_at?->format('d-m-Y'),
+            'user_name' =>(string) $this->user?->name,
+            'maintenance_type' =>(string) $this->maintenanceType?->name,
+            'location' =>(string) $locationName,
+            'description' =>(string) $this->description,
+            'status' =>(string) $this->status->value,
+            'status_label' =>(string) $this->status->label(),
+            'created' => (string) $this->created_at?->format('d-m-Y'),
         ];
     }
 }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\api;
 
 use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ServiceResource;
+use App\Models\Favorite;
 use App\Models\Service;
 use Illuminate\Http\Request;
 
@@ -32,5 +34,22 @@ class FavoriteController extends Controller
         ]);
 
         return ApiResponder::success(__('Added to favorites successfully'));
+    }
+
+    //todo::getFavorites
+
+    public function myFavoriteServices()
+    {
+        $user = auth('sanctum')->user();
+
+        $favorites = Favorite::with('favouritable')
+            ->where('user_id', $user->id)
+            ->where('favouritable_type', Service::class)
+            ->latest()
+            ->get()
+            ->filter(fn($fav) => $fav->favouritable)
+            ->map(fn($fav) => $fav->favouritable)
+       ;
+        return ApiResponder::loaded(ServiceResource::collection($favorites));
     }
 }
