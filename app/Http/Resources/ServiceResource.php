@@ -20,8 +20,10 @@ class ServiceResource extends JsonResource
             'content' => (string)$this->content,
             'price' => (double)$this->price,
             'final_price' => (double)$this->final_price,
-            'rate'=>(float)3,
-            'is_favourite'=>(bool)true,
+            'rate' => round($this->ratings_avg_rating ?? 0, 1),
+            'ratings_count' => $this->ratings_count ?? 0,
+            'my_rating'=>(double) $this->my_rating,
+            'is_favourite' => $this->isFavorited(),
             'images' => [
                 getDefaultImageUrl($this->image),
                 getDefaultImageUrl($this->image),

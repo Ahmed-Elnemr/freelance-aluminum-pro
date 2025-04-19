@@ -35,6 +35,9 @@ class ServiceController extends Controller
         if (!$service->isInactive()) {
             return ApiResponder::notFound();
         }
+
+        $service->loadCount('ratings')
+            ->loadAvg('ratings', 'rating');
         return ApiResponder::get(
             '',
             [

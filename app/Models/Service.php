@@ -31,11 +31,40 @@ class Service extends Model implements HasMedia
         'category' => CategoryEnum::class,
     ];
 
-
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('services');
     }
+//todo:accessors
+//    public function getAverageRatingAttribute()
+//    {
+//        return round($this->ratings()->avg('rating'), 1);
+//    }
+//
+//    public function getRatingsCountAttribute()
+//    {
+//        return $this->ratings()->count();
+//    }
+//
+    public function getMyRatingAttribute()
+    {
+        $user = auth('sanctum')->user();
+        if (!$user) return null;
+
+        return $this->ratings()->where('user_id', $user->id)->value('rating');
+    }
+
+    public function isFavorited(): bool
+    {
+        $user = auth('sanctum')->user();
+        if (!$user) return false;
+
+        return $this->favoritedByUsers()
+            ->where('user_id', $user->id)
+            ->exists();
+    }
+
+
     //todo:scope
     public function similar()
     {
@@ -69,6 +98,12 @@ class Service extends Model implements HasMedia
     {
         return $this->morphMany(Rating::class, 'rateable');
     }
+
+    public function favoritedByUsers(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(Favorite::class, 'favouritable');
+    }
+
 
 
     //todo: # end relation  #

@@ -92,6 +92,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Rating::class);
     }
+
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
     //todo: # end relation  #
 
 }
