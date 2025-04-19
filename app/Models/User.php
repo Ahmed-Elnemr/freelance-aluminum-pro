@@ -85,6 +85,12 @@ class User extends Authenticatable
     public function orders(): HasMany
     {
         return $this->hasMany( Order::class);
+
+    }
+
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(Rating::class);
     }
     //todo: # end relation  #
 

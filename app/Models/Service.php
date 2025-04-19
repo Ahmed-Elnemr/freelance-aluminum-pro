@@ -47,6 +47,11 @@ class Service extends Model implements HasMedia
             ->get();
     }
 
+    public function averageRating(): float
+    {
+        return round($this->ratings()->avg('rating'), 1);
+    }
+
     //todo:relation
     public function categoryService(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -56,6 +61,15 @@ class Service extends Model implements HasMedia
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
+
+
     }
+
+    public function ratings(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(Rating::class, 'rateable');
+    }
+
+
     //todo: # end relation  #
 }
