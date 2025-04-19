@@ -14,7 +14,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasActiveScope,SoftDeletes,HasApiTokens;
+    use HasFactory, Notifiable, HasActiveScope, SoftDeletes, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -54,6 +54,7 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
     //todo:scope
     public function isClient(): bool
     {
@@ -73,6 +74,7 @@ class User extends Authenticatable
     {
         return $this->morphMany(UserDevice::class, 'user', 'user_type', 'user_id')->latest();
     }
+
     public function otps(): HasMany
     {
         return $this->hasMany(Otp::class);
@@ -82,10 +84,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(LoginActivity::class);
     }
+
     public function orders(): HasMany
     {
-        return $this->hasMany( Order::class);
-
+        return $this->hasMany(Order::class)->where('is_active', 1)
+            ->with(['user', 'service', 'maintenanceType']);
     }
 
     public function ratings(): HasMany

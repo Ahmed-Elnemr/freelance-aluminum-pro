@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class StoreOrderRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'service_id' => 'required|exists:services,id,deleted_at,NULL,is_active,1',
+            'maintenance_type_id' => 'required|exists:maintenance_types,id,deleted_at,NULL,is_active,1',
+            'location_data' => 'required|json',
+            'description' => 'nullable|string|max:1000',
+        ];
+    }
+}

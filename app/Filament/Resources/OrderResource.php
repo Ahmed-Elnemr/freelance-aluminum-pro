@@ -30,8 +30,6 @@ class OrderResource extends Resource
         return __('dashboard.orders');
     }
 
-
-
     public static function getModelLabel(): string
     {
         return __('dashboard.order');
@@ -46,32 +44,34 @@ class OrderResource extends Resource
 
     public static function form(Form $form): Form
     {
-
-
         return $form
             ->schema([
                 Section::make(__('dashboard.order_information'))
                     ->schema([
                         Forms\Components\Select::make('user_id')
                             ->label(__('dashboard.user'))
-                            ->options(User::where('type', UserTypeEnum::CLIENT->value)->active()->get()
-                                ->pluck('name', 'id'))
+                            ->options(User::where('type', UserTypeEnum::CLIENT->value)
+                                ->active()
+                                ->get()
+                                ->pluck('name', 'id')
+                                ->filter(fn($label) => !is_null($label))) // التأكد من أن ال label ليس null
                             ->searchable()
                             ->required(),
 
                         Forms\Components\Select::make('service_id')
                             ->label(__('dashboard.service'))
-                            ->options(Service::active()->get()->pluck('name', 'id'))
+                            ->options(Service::active()->get()->pluck('name', 'id')
+                                ->filter(fn($label) => !is_null($label))) // التأكد من أن ال label ليس null
                             ->searchable()
                             ->required(),
 
                         Forms\Components\Select::make('maintenance_type_id')
                             ->label(__('dashboard.maintenance_type'))
-                            ->options(MaintenanceType::active()->get()->pluck('name', 'id'))
+                            ->options(MaintenanceType::active()->get()->pluck('name', 'id')
+                                ->filter(fn($label) => !is_null($label))) // التأكد من أن ال label ليس null
                             ->searchable()
                             ->required(),
                     ])->columns(3),
-
 
                 Section::make(__('dashboard.location_url'))
                     ->schema([
@@ -85,6 +85,7 @@ class OrderResource extends Resource
                             ->default([])
                             ->dehydrateStateUsing(fn ($state) => $state ?? [])
                     ]),
+
                 Section::make(__('dashboard.additional_info'))
                     ->schema([
                         Forms\Components\Textarea::make('description.ar')
@@ -152,23 +153,27 @@ class OrderResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('user_id')
                     ->label(__('dashboard.user'))
-                    ->options(User::all()->pluck('name', 'id'))
+                    ->options(User::all()->pluck('name', 'id')
+                        ->filter(fn($label) => !is_null($label))) // التأكد من أن ال label ليس null
                     ->searchable(),
 
                 Tables\Filters\SelectFilter::make('service_id')
                     ->label(__('dashboard.service'))
-                    ->options(Service::all()->pluck('name', 'id'))
+                    ->options(Service::all()->pluck('name', 'id')
+                        ->filter(fn($label) => !is_null($label))) // التأكد من أن ال label ليس null
                     ->searchable(),
 
                 Tables\Filters\SelectFilter::make('maintenance_type_id')
                     ->label(__('dashboard.maintenance_type'))
-                    ->options(MaintenanceType::all()->pluck('name', 'id'))
+                    ->options(MaintenanceType::all()->pluck('name', 'id')
+                        ->filter(fn($label) => !is_null($label))) // التأكد من أن ال label ليس null
                     ->searchable(),
 
                 Tables\Filters\SelectFilter::make('status')
                     ->label(__('dashboard.status'))
                     ->options(OrderStatusEnum::options())
                     ->native(false),
+
                 Tables\Filters\SelectFilter::make('is_active')
                     ->label(__('dashboard.activation'))
                     ->options([
@@ -193,8 +198,7 @@ class OrderResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-        ];
+        return [];
     }
 
     public static function getPages(): array

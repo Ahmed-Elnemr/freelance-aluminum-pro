@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources;
 
+use App\Filament\Resources\MaintenanceTypeResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class OrderResource extends JsonResource
+class OrderListResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,11 +19,9 @@ class OrderResource extends JsonResource
         $locationName = $locationData['location_name'] ?? '';
         return [
             'id' => $this->id,
-            'user_name'=> $this->user?->name,
+            'user_name' => $this->user?->name,
             'maintenance_type' => $this->maintenanceType?->name,
             'location' => $locationName,
-            'price' =>(double) $this->service->price,
-            'final_price' =>(double) $this->service->final_price,
             'description' => $this->description,
             'status' => $this->status->value,
             'status_label' => $this->status->label(),
