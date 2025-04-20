@@ -26,7 +26,6 @@ class CategoryServiceOverview extends BaseWidget
 
             $this->getProductServicesStats(),
 
-            $this->getMaintenanceTypesStats(),
 
             $this->getCurrentOrdersStats(),
 
@@ -80,20 +79,6 @@ class CategoryServiceOverview extends BaseWidget
             ->description($this->getTrendDescription($increase))
             ->descriptionIcon($this->getTrendIcon($increase))
             ->chart($this->getWeeklyData(Service::class, ['category' => CategoryEnum::PRODUCTS->value]))
-            ->color($this->getTrendColor($increase));
-    }
-
-    protected function getMaintenanceTypesStats(): Stat
-    {
-        $currentCount = MaintenanceType::count();
-        $lastMonthCount = MaintenanceType::where('created_at', '<', Carbon::now()->subMonth())->count();
-
-        $increase = $currentCount - $lastMonthCount;
-
-        return Stat::make(__('dashboard.maintenance_types'), $currentCount)
-            ->description($this->getTrendDescription($increase))
-            ->descriptionIcon($this->getTrendIcon($increase))
-            ->chart($this->getWeeklyData(MaintenanceType::class))
             ->color($this->getTrendColor($increase));
     }
 

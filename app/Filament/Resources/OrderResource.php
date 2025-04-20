@@ -5,14 +5,12 @@ namespace App\Filament\Resources;
 use App\Enum\OrderStatusEnum;
 use App\Enum\UserTypeEnum;
 use App\Filament\Resources\OrderResource\Pages;
-use App\Models\MaintenanceType;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\User;
 use App\Service\GoogleMapsUrlInput;
 use Filament\Forms;
 use Filament\Forms\Components\Hidden;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -65,12 +63,6 @@ class OrderResource extends Resource
                             ->searchable()
                             ->required(),
 
-                        Forms\Components\Select::make('maintenance_type_id')
-                            ->label(__('dashboard.maintenance_type'))
-                            ->options(MaintenanceType::active()->get()->pluck('name', 'id')
-                                ->filter(fn($label) => !is_null($label))) // التأكد من أن ال label ليس null
-                            ->searchable()
-                            ->required(),
                     ])->columns(3),
 
                 Section::make(__('dashboard.location_url'))
@@ -125,10 +117,6 @@ class OrderResource extends Resource
                     ->sortable()
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('maintenanceType.name')
-                    ->label(__('dashboard.maintenance_type'))
-                    ->sortable()
-                    ->searchable(),
 
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('dashboard.status'))
@@ -160,12 +148,6 @@ class OrderResource extends Resource
                 Tables\Filters\SelectFilter::make('service_id')
                     ->label(__('dashboard.service'))
                     ->options(Service::all()->pluck('name', 'id')
-                        ->filter(fn($label) => !is_null($label))) // التأكد من أن ال label ليس null
-                    ->searchable(),
-
-                Tables\Filters\SelectFilter::make('maintenance_type_id')
-                    ->label(__('dashboard.maintenance_type'))
-                    ->options(MaintenanceType::all()->pluck('name', 'id')
                         ->filter(fn($label) => !is_null($label))) // التأكد من أن ال label ليس null
                     ->searchable(),
 

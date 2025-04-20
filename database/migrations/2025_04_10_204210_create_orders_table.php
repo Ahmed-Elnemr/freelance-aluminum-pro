@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(App\Models\User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(App\Models\Service::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(App\Models\MaintenanceType::class)->constrained()->cascadeOnDelete();
             $table->json('location_data');
             $table->json('description')->nullable();
             $table->string('status');

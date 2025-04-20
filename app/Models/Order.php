@@ -21,7 +21,6 @@ class Order extends Model implements HasMedia
     protected $fillable = [
         'service_id',
         'user_id',
-        'maintenance_type_id',
         'location_data',
         'description',
         'status',
@@ -65,10 +64,6 @@ class Order extends Model implements HasMedia
         return $this->belongsTo(Service::class);
     }
 
-    public function maintenanceType(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(MaintenanceType::class);
-    }
 
     //todo: # end relation  #
 }

@@ -20,7 +20,6 @@ class OrderListResource extends JsonResource
         return [
             'id' => $this->id,
             'user_name' =>(string) $this->user?->name,
-            'maintenance_type' =>(string) $this->maintenanceType?->name,
             'location' =>(string) $locationName,
             'description' =>(string) $this->description,
             'status' =>(string) $this->status->value,
