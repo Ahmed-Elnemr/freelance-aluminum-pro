@@ -23,7 +23,7 @@ class StoreOrderRequest extends FormRequest
     {
         return [
             'service_id' => 'required|exists:services,id,deleted_at,NULL,is_active,1',
-            'maintenance_type_id' => 'required|exists:maintenance_types,id,deleted_at,NULL,is_active,1',
+            'service_type_id' => 'required|exists:maintenance_types,id,deleted_at,NULL,is_active,1',
             'location_data' => 'required|json',
             'description' => 'nullable|string|max:1000',
         ];

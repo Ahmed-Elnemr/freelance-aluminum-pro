@@ -6,7 +6,6 @@ use App\Enum\CategoryEnum;
 use App\Enum\OrderStatusEnum;
 use App\Enum\UserTypeEnum;
 use App\Models\CategoryService;
-use App\Models\MaintenanceType;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\User;

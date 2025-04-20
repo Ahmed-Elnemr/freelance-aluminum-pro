@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use App\Filament\Resources\MaintenanceTypeResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,7 +14,9 @@ class OrderListResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $locationData = json_decode($this->location_data, true);
+        $locationData = is_string($this->location_data)
+            ? json_decode($this->location_data, true)
+            : $this->location_data;
         $locationName = $locationData['location_name'] ?? '';
         return [
             'id' => $this->id,

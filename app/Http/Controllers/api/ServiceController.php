@@ -46,4 +46,33 @@ class ServiceController extends Controller
             ]
         );
     }
+
+    //todo:list two categories for services
+    public function listProducts()
+    {
+        $services = Service::active()
+            ->whereCategory(CategoryEnum::PRODUCTS)
+            ->get(['id', 'name'])
+            ->map(fn($service) => [
+                'id' => $service->id,
+                'name' => $service->getTranslation('name', app()->getLocale()),
+            ]);
+
+        return ApiResponder::loaded($services);
+    }
+
+    public function listMaintenance()
+    {
+        $services = Service::active()
+            ->whereCategory(CategoryEnum::MAINTENANCE)
+            ->get(['id', 'name'])
+            ->map(fn($service) => [
+                'id' => $service->id,
+                'name' => $service->getTranslation('name', app()->getLocale()),
+            ])
+            ->toArray();
+
+        return ApiResponder::loaded($services);
+    }
+
 }
