@@ -19,7 +19,7 @@ class ServiceListResource extends JsonResource
             'name' => (string)$this->name,
             'content' => (string)$this->content,
             'final_price' =>(double) $this->final_price,
-            'is_favourite'=>(bool)true,
+            'is_favourite' => $this->isFavorited(),
             'base_image' => getDefaultImageUrl($this->base_image)
         ];
     }

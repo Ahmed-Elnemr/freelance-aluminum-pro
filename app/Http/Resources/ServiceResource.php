@@ -24,6 +24,7 @@ class ServiceResource extends JsonResource
             'ratings_count' => $this->ratings_count ?? 0,
             'my_rating'=>(double) $this->my_rating,
             'is_favourite' => $this->isFavorited(),
+            'base_image' => getDefaultImageUrl($this->base_image),
             'images' => [
                 getDefaultImageUrl($this->image),
                 getDefaultImageUrl($this->image),

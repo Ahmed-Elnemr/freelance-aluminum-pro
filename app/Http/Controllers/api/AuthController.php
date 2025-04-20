@@ -30,7 +30,7 @@ class AuthController extends Controller
     public function login(UserLoginRequest $request)
     {
         $validatedData = $request->validated();
-        $user = User::whereMobile($request->mobile)->whereStatus(1)->first();
+        $user = User::whereMobile($request->mobile)->whereIsActive(1)->first();
         if (!$user) {
             $user = User::create([
                 'mobile' => $validatedData['mobile'],
