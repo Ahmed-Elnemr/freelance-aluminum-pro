@@ -20,6 +20,8 @@ class OrderResource extends JsonResource
             'id' => $this->id,
             'user_name'=>(string) $this->user?->name,
             'location' =>(string) $locationName,
+            'service_name' =>(string) $this->service?->name,
+            'service_id' =>(int) $this->service?->id,
             'service_type_id' =>(int) $this->service_type_id,
             'service_type_name' =>(string) $this->service_type_name,
             'price' =>(double) $this->service->price,
