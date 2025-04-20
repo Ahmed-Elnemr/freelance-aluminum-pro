@@ -71,7 +71,10 @@ class OrderResource extends Resource
                             ->label(__('dashboard.location_url'))
                             ->placeholder('https://maps.app.goo.gl/...')
                             ->locationDataField('location_data')
-                            ->required(),
+                            ->rules([
+                                'regex:/^https:\/\/maps\.app\.goo\.gl\/[A-Za-z0-9\-_]+$/',
+                            ]),
+
 
                         Hidden::make('location_data')
                             ->default([])
