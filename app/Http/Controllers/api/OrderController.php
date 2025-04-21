@@ -50,7 +50,13 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        return ApiResponder::loaded( OrderResource::make($order));
+        $authUser = auth('sanctum')->user();
+
+        if ($order->user_id !== $authUser->id) {
+            return ApiResponder::failed('Unauthorized', 403);
+        }
+        return ApiResponder::loaded(OrderResource::make($order));
+
     }
 
 
