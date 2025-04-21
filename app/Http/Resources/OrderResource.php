@@ -22,8 +22,6 @@ class OrderResource extends JsonResource
             'location' =>(string) $locationName,
             'category_type' =>(string) $this->service?->category?->value,
             'category_label' =>(string) $this->service?->category?->label(),
-            'service_type_id' =>(int) $this->service_type_id,
-            'service_type_name' =>(string) $this->service_type_name,
             'price' =>(double) $this->service->price,
             'final_price' =>(double) $this->service->final_price,
             'description' =>(string) $this->description,
