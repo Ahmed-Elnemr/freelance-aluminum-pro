@@ -12,7 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class MessageSent implements ShouldBroadcastNow
+class MessageSentEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -20,26 +20,31 @@ class MessageSent implements ShouldBroadcastNow
 
     public function __construct(Message $message)
     {
-        $this->message = $message;
-
-
+        $this->message = $message->load('sender');
     }
 
     public function broadcastOn()
     {
-        return new PrivateChannel('chat' . $this->message->receiver_id);
+        return new PrivateChannel('chat.'.$this->message->receiver_id);
     }
-    public function broadcastAs(){
+
+
+    public function broadcastAs()
+    {
         return 'chat_message';
     }
+
     public function broadcastWith()
     {
         return [
             'id' => $this->message->id,
             'message' => $this->message->message,
             'sender_id' => $this->message->sender_id,
+            'sender_name' => $this->message->sender->name,
+            'sender_avatar' => $this->message->sender->avatar_url,
             'receiver_id' => $this->message->receiver_id,
             'created_at' => $this->message->created_at->toDateTimeString(),
+            'conversation_id' => $this->message->conversation_id,
         ];
     }
 }
