@@ -21,7 +21,6 @@ class OrderController extends Controller
         $order = Order::create([
             'user_id' => $user->id,
             'service_id' => $request->service_id,
-            'service_type_id' => $request->service_type_id,
             'location_data' => $request->location_data,
             'description' => $request->description,
             'status' => OrderStatusEnum::CURRENT,

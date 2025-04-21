@@ -21,7 +21,6 @@ class Order extends Model implements HasMedia
     public array $translatable = ['description'];
     protected $fillable = [
         'service_id',
-        'service_type_id',
         'user_id',
         'location_data',
         'description',
@@ -75,10 +74,6 @@ class Order extends Model implements HasMedia
     public function service(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Service::class);
-    }
-    public function serviceType(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Service::class, 'service_type_id');
     }
 
     //todo: # end relation  #
