@@ -88,7 +88,7 @@ class User extends Authenticatable
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class)->where('is_active', 1)
-            ->with(['user', 'service', 'serviceType']);
+            ->with(['user', 'service']);
     }
 
     public function ratings(): HasMany
