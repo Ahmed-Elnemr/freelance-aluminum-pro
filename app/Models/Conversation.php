@@ -57,7 +57,16 @@ class Conversation extends Model
                 ->where('admin_id', $user1);
         });
     }
-
+    public static function firstBetween($userId1, $userId2)
+    {
+        return self::where(function ($query) use ($userId1, $userId2) {
+            $query->where('client_id', $userId1)
+                ->where('admin_id', $userId2);
+        })->orWhere(function ($query) use ($userId1, $userId2) {
+            $query->where('client_id', $userId2)
+                ->where('admin_id', $userId1);
+        })->first();
+    }
 
     public static function firstOrCreateBetween($user1, $user2)
     {

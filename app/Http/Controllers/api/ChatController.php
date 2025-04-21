@@ -16,12 +16,11 @@ class ChatController extends Controller
     public function sendMessage(Request $request)
     {
         $request->validate([
-            'receiver_id' => 'required|exists:users,id',
             'message' => 'required|string',
         ]);
 
         $sender = auth()->user();
-        $receiver = User::findOrFail($request->receiver_id);
+        $receiver = User::where('type', 'admin')->first();
 
         $conversation = Conversation::firstOrCreateBetween($sender->id, $receiver->id);
 
@@ -76,22 +75,55 @@ class ChatController extends Controller
     }
 
     // todo: getMessages
-    public function getMessages(Request $request, $conversationId)
+//    public function getMessages(Request $request, $conversationId)
+//    {
+//        $conversation = Conversation::findOrFail($conversationId);
+//        $user = auth()->user();
+//
+//        if (!in_array($user->id, [$conversation->client_id, $conversation->admin_id])) {
+//            return ApiResponder::failed('Unauthorized', 403);
+//        }
+//
+//        Message::where('conversation_id', $conversationId)
+//            ->where('receiver_id', $user->id)
+//            ->whereNull('seen_at')
+//            ->update(['seen_at' => now()]);
+//
+//        $messages = Message::with('sender')
+//            ->where('conversation_id', $conversationId)
+//            ->latest()
+//            ->paginate(40);
+//
+//        return ApiResponder::loaded([
+//            'conversation' => $conversation,
+//            'messages' => $messages,
+//        ]);
+//    }
+
+
+    public function getMessages(Request $request)
     {
-        $conversation = Conversation::findOrFail($conversationId);
         $user = auth()->user();
 
-        if (!in_array($user->id, [$conversation->client_id, $conversation->admin_id])) {
-            return ApiResponder::failed('Unauthorized', 403);
+        $admin = User::where('type', 'admin')->first();
+
+        if (!$admin) {
+            return ApiResponder::failed('No admin found', 404);
         }
 
-        Message::where('conversation_id', $conversationId)
+        $conversation = Conversation::firstBetween($user->id, $admin->id);
+
+        if (!$conversation) {
+            return ApiResponder::failed('Conversation not found', 404);
+        }
+
+        Message::where('conversation_id', $conversation->id)
             ->where('receiver_id', $user->id)
             ->whereNull('seen_at')
             ->update(['seen_at' => now()]);
 
         $messages = Message::with('sender')
-            ->where('conversation_id', $conversationId)
+            ->where('conversation_id', $conversation->id)
             ->latest()
             ->paginate(40);
 
