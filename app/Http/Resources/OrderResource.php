@@ -14,7 +14,16 @@ class OrderResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $locationData = json_decode($this->location_data, true);
+        $locationDataRaw = $this->location_data;
+
+        if (is_array($locationDataRaw)) {
+            $locationData = $locationDataRaw;
+        } elseif (is_string($locationDataRaw)) {
+            $locationData = json_decode($locationDataRaw, true);
+        } else {
+            $locationData = [];
+        }
+
         $locationName = $locationData['location_name'] ?? '';
         return [
             'id' => $this->id,
