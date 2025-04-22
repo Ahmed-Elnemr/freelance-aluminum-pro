@@ -23,8 +23,10 @@ class StoreOrderRequest extends FormRequest
     {
         return [
             'service_id' => 'required|exists:services,id,deleted_at,NULL,is_active,1',
-            'location_data' => 'required|json',
-            'description' => 'nullable|string|max:1000',
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'location_name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000'
         ];
     }
 }

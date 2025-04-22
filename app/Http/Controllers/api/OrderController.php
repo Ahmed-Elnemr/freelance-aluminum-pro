@@ -21,7 +21,9 @@ class OrderController extends Controller
         $order = Order::create([
             'user_id' => $user->id,
             'service_id' => $request->service_id,
-            'location_data' => $request->location_data,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'location_name' => $request->location_name,
             'description' => $request->description,
             'status' => OrderStatusEnum::CURRENT,
             'is_active' => true,
