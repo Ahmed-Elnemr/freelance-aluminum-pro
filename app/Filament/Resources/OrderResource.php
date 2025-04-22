@@ -8,9 +8,7 @@ use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\User;
-use App\Service\GoogleMapsUrlInput;
 use Filament\Forms;
-use Filament\Forms\Components\Hidden;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -52,34 +50,39 @@ class OrderResource extends Resource
                                 ->active()
                                 ->get()
                                 ->pluck('name', 'id')
-                                ->filter(fn($label) => !is_null($label))) // التأكد من أن ال label ليس null
+                                ->filter(fn($label) => !is_null($label)))
                             ->searchable()
                             ->required(),
 
                         Forms\Components\Select::make('service_id')
                             ->label(__('dashboard.service'))
                             ->options(Service::active()->get()->pluck('name', 'id')
-                                ->filter(fn($label) => !is_null($label))) // التأكد من أن ال label ليس null
+                                ->filter(fn($label) => !is_null($label)))
                             ->searchable()
                             ->required(),
-
                     ])->columns(3),
 
-                Section::make(__('dashboard.location_url'))
+                Section::make(__('dashboard.location'))
                     ->schema([
-                        GoogleMapsUrlInput::make('google_maps_url')
+                        Forms\Components\TextInput::make('google_maps_url')
                             ->label(__('dashboard.location_url'))
                             ->placeholder('https://maps.app.goo.gl/...')
-                            ->locationDataField('location_data')
-                            ->rules([
-                                'regex:/^https:\/\/maps\.app\.goo\.gl\/[A-Za-z0-9\-_]+$/',
-                            ]),
+                            ->columnSpanFull(),
 
+                        Forms\Components\TextInput::make('location_name')
+                            ->label(__('dashboard.location_name'))
+                            ->required(),
 
-                        Hidden::make('location_data')
-                            ->default([])
-                            ->dehydrateStateUsing(fn ($state) => $state ?? [])
-                    ]),
+                        Forms\Components\TextInput::make('latitude')
+                            ->label(__('dashboard.latitude'))
+                            ->numeric()
+                            ->required(),
+
+                        Forms\Components\TextInput::make('longitude')
+                            ->label(__('dashboard.longitude'))
+                            ->numeric()
+                            ->required(),
+                    ])->columns(2),
 
                 Section::make(__('dashboard.additional_info'))
                     ->schema([
@@ -120,22 +123,16 @@ class OrderResource extends Resource
                     ->sortable()
                     ->searchable(),
 
-
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('dashboard.status'))
                     ->formatStateUsing(fn (OrderStatusEnum $state) => $state->label())
                     ->sortable()
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('location_data.location_name')
+                Tables\Columns\TextColumn::make('location_name')
                     ->label(__('dashboard.location_name'))
-                    ->formatStateUsing(function ($state, $record) {
-                        return rtrim($state, '،');
-                    })
                     ->limit(30)
-                    ->tooltip(function ($record) {
-                        return $record->location_data['location_name'] ?? '';
-                    }),
+                    ->tooltip(fn ($record) => $record->location_name),
 
                 Tables\Columns\BooleanColumn::make('is_active')
                     ->label(__('dashboard.active'))
@@ -145,13 +142,13 @@ class OrderResource extends Resource
                 Tables\Filters\SelectFilter::make('user_id')
                     ->label(__('dashboard.user'))
                     ->options(User::all()->pluck('name', 'id')
-                        ->filter(fn($label) => !is_null($label))) // التأكد من أن ال label ليس null
+                        ->filter(fn($label) => !is_null($label)))
                     ->searchable(),
 
                 Tables\Filters\SelectFilter::make('service_id')
                     ->label(__('dashboard.service'))
                     ->options(Service::all()->pluck('name', 'id')
-                        ->filter(fn($label) => !is_null($label))) // التأكد من أن ال label ليس null
+                        ->filter(fn($label) => !is_null($label)))
                     ->searchable(),
 
                 Tables\Filters\SelectFilter::make('status')

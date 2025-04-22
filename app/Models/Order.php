@@ -22,7 +22,9 @@ class Order extends Model implements HasMedia
     protected $fillable = [
         'service_id',
         'user_id',
-        'location_data',
+        'latitude',
+        'longitude',
+        'location_name',
         'description',
         'status',
         'is_active',
@@ -30,7 +32,6 @@ class Order extends Model implements HasMedia
 
     protected $casts = [
         'status' => OrderStatusEnum::class,
-        'location_data' => 'array',
     ];
 
     //todo: accessor
@@ -42,26 +43,51 @@ class Order extends Model implements HasMedia
     }
 
 //todo:api method
+    //todo:api method
+//    protected function getAddressName(float $latitude, float $longitude): string
+//    {
+//        $apiKey = config('services.google_maps.api_key');
+//
+//        if (!$apiKey) {
+//            return "Location: {$latitude}, {$longitude}";
+//        }
+//
+//        try {
+//            $client = new \GuzzleHttp\Client();
+//            $response = $client->get(
+//                "https://maps.googleapis.com/maps/api/geocode/json?latlng={$latitude},{$longitude}&key={$apiKey}"
+//            );
+//            $data = json_decode($response->getBody(), true);
+//
+//            return $data['results'][0]['formatted_address'] ?? "Location: {$latitude}, {$longitude}";
+//        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+//            return "Location: {$latitude}, {$longitude}";
+//        }
+//    }
     protected function getAddressName(float $latitude, float $longitude): string
     {
         $apiKey = config('services.google_maps.api_key');
 
+        // لو المفتاح مش موجود نرجع وصف تقريبي
         if (!$apiKey) {
-            return "Location: {$latitude}, {$longitude}";
+            return "موقع تقريبي: خط العرض {$latitude}، خط الطول {$longitude}";
         }
 
         try {
-            $client = new Client();
+            $client = new \GuzzleHttp\Client();
             $response = $client->get(
                 "https://maps.googleapis.com/maps/api/geocode/json?latlng={$latitude},{$longitude}&key={$apiKey}"
             );
             $data = json_decode($response->getBody(), true);
 
-            return $data['results'][0]['formatted_address'] ?? "Location: {$latitude}, {$longitude}";
-        } catch (GuzzleException $e) {
-            return "Location: {$latitude}, {$longitude}";
+            return $data['results'][0]['formatted_address'] ?? "موقع تقريبي: خط العرض {$latitude}، خط الطول {$longitude}";
+        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+            return "موقع تقريبي: خط العرض {$latitude}، خط الطول {$longitude}";
         }
     }
+
+//todo:api method end #
+
     //todo:api method end #
 
 
