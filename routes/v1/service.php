@@ -12,6 +12,7 @@ Route::prefix('services')->group(function () {
         Route::get('{service}', 'show');
         Route::get('products/list', 'listProducts');
         Route::get('maintenance/list', 'listMaintenance');
+        Route::post('search', 'search');
 
     });
     Route::middleware('auth:sanctum')->group(function () {
