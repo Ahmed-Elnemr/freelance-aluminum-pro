@@ -112,7 +112,12 @@ class ChatController extends Controller
         }
 
         $conversation = Conversation::firstBetween($user->id, $admin->id);
-
+        if (!$conversation) {
+            return ApiResponder::loaded([
+                'conversation' => '',
+                'messages' => [],
+            ]);
+        }
         if (!$conversation) {
             return ApiResponder::failed('Conversation not found', 404);
         }
