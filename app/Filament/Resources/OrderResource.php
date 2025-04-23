@@ -67,22 +67,9 @@ class OrderResource extends Resource
                         Forms\Components\TextInput::make('google_maps_url')
                             ->label(__('dashboard.location_url'))
                             ->placeholder('https://maps.app.goo.gl/...')
-                            ->columnSpanFull(),
-
-                        Forms\Components\TextInput::make('location_name')
-                            ->label(__('dashboard.location_name'))
+                            ->columnSpanFull()
                             ->required(),
-
-                        Forms\Components\TextInput::make('latitude')
-                            ->label(__('dashboard.latitude'))
-                            ->numeric()
-                            ->required(),
-
-                        Forms\Components\TextInput::make('longitude')
-                            ->label(__('dashboard.longitude'))
-                            ->numeric()
-                            ->required(),
-                    ])->columns(2),
+                    ]),
 
                 Section::make(__('dashboard.additional_info'))
                     ->schema([
