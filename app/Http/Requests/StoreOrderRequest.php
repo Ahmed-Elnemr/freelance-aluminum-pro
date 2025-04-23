@@ -26,7 +26,9 @@ class StoreOrderRequest extends FormRequest
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'location_name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000'
+            'description' => 'nullable|string|max:1000',
+            'images' => 'nullable|array',
+            'images.*' => 'nullable|mimes:jpg,jpeg,png,gif,webp,mp4,avi,mkv|max:10240',
         ];
     }
 }

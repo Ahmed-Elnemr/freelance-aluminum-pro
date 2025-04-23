@@ -68,7 +68,6 @@ class Order extends Model implements HasMedia
     {
         $apiKey = config('services.google_maps.api_key');
 
-        // لو المفتاح مش موجود نرجع وصف تقريبي
         if (!$apiKey) {
             return "موقع تقريبي: خط العرض {$latitude}، خط الطول {$longitude}";
         }
@@ -85,7 +84,10 @@ class Order extends Model implements HasMedia
             return "موقع تقريبي: خط العرض {$latitude}، خط الطول {$longitude}";
         }
     }
-
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('media')->useDisk('public');
+    }
 //todo:api method end #
 
     //todo:api method end #

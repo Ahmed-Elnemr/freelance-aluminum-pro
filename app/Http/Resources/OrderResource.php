@@ -28,6 +28,12 @@ class OrderResource extends JsonResource
             'status' => (string) $this->status->value,
             'status_label' => (string) $this->status->label(),
             'created' => (string) $this->created_at?->format('d-m-Y'),
+            'media' => $this->getMedia('media')->map(function ($media) {
+                return [
+                    'url' => $media->getUrl(),
+                    'type' => $media->mime_type,
+                ];
+            }),
         ];
     }
 }

@@ -28,6 +28,12 @@ class OrderController extends Controller
             'status' => OrderStatusEnum::CURRENT,
             'is_active' => true,
         ]);
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $media) {
+                $order->addMedia($media)->toMediaCollection('media');
+            }
+        }
+
 
         return ApiResponder::created($order, __('Order created successfully'));
     }
