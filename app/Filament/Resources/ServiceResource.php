@@ -192,8 +192,8 @@ class ServiceResource extends Resource
     public static function getRelations(): array
     {
         return [
-            // يمكنك إضافة RelationManagers هنا إذا لزم الأمر
-        ];
+
+            RelationManagers\OrdersRelationManager::class,];
     }
 
     public static function getPages(): array
