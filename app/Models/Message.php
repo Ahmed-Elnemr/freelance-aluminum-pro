@@ -4,15 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Message extends Model
+class Message extends Model implements HasMedia
 {
+    use InteractsWithMedia;
     protected $fillable = [
         'conversation_id',
         'sender_id',
         'receiver_id',
         'message',
         'seen_at',
+        'type',
     ];
 
     protected $casts = [
@@ -32,6 +36,13 @@ class Message extends Model
             }
         });
     }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('attachments')
+            ->useDisk('public');
+    }
+    //todo: relation
     public function conversation(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Conversation::class);
@@ -50,5 +61,10 @@ class Message extends Model
     public function scopeLatestFirst($query)
     {
         return $query->orderBy('created_at', 'desc');
+    }
+
+    public function attachments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ChatAttachment::class);
     }
 }

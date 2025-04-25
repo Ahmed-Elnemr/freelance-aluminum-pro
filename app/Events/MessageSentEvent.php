@@ -45,6 +45,8 @@ class MessageSentEvent implements ShouldBroadcastNow
             'receiver_id' => $this->message->receiver_id,
             'created_at' => $this->message->created_at->toDateTimeString(),
             'conversation_id' => $this->message->conversation_id,
+            'media' => $this->message->attachments()->get(),
+            'type' => $this->message->type
         ];
     }
 }

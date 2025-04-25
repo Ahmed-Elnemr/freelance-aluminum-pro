@@ -40,6 +40,22 @@
                                     <div class="text-xs text-gray-500 dark:text-gray-400">
                                         {{ $message->created_at->diffForHumans() }}
                                     </div>
+
+                                    {{-- عرض المرفقات (الصور والفيديوهات) --}}
+                                    @foreach($message->attachments as $attachment)
+                                        @if(str_starts_with($attachment->mime_type, 'image/'))
+                                            <div class="mt-2">
+                                                <img src="{{$attachment->file_path}}" alt="Attachment" class="w-32 h-32 object-cover rounded-md" />
+                                            </div>
+                                        @elseif(str_starts_with($attachment->mime_type, 'video/'))
+                                            <div class="mt-2">
+                                                <video controls class="w-full rounded-md">
+                                                    <source src="{{$attachment->file_path }}" type="{{ $attachment->mime_type }}">
+                                                    Your browser does not support the video tag.
+                                                </video>
+                                            </div>
+                                        @endif
+                                    @endforeach
                                 </div>
                             </div>
                         @endforeach
@@ -52,6 +68,14 @@
                             placeholder="اكتب رسالتك..."
                             class="flex-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-blue-200 focus:outline-none py-2 px-4"
                         />
+
+                        <input
+                            type="file"
+                            wire:model="attachments"
+                            multiple
+                            class="py-2 px-4 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-blue-200 focus:outline-none"
+                        />
+
                         <button
                             type="submit"
                             class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md dark:shadow-none hover:bg-blue-700 focus:ring-2 focus:ring-blue-400"

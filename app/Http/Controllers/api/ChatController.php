@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Enum\MessageTypeEnum;
 use App\Events\MessageSentEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
@@ -9,6 +10,8 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Helpers\Response\ApiResponder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ChatController extends Controller
 {
@@ -16,7 +19,8 @@ class ChatController extends Controller
     public function sendMessage(Request $request)
     {
         $request->validate([
-            'message' => 'required|string',
+            'message' => 'nullable|string',
+            'file.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,pdf,doc,docx|max:10240',
         ]);
 
         $sender = auth()->user();
@@ -24,18 +28,46 @@ class ChatController extends Controller
 
         $conversation = Conversation::firstOrCreateBetween($sender->id, $receiver->id);
 
-        $message = Message::create([
-            'conversation_id' => $conversation->id,
-            'sender_id' => $sender->id,
-            'receiver_id' => $receiver->id,
-            'message' => $request->message,
-        ]);
+        try {
+            $type = match (true) {
+                $request->hasFile('file') && $request->filled('message') => MessageTypeEnum::MULTIPLE,
+                $request->hasFile('file') => MessageTypeEnum::FILE,
+                $request->filled('message') => MessageTypeEnum::TEXT,
+                default => throw new \Exception('Either message or file is required.')
+            };
 
-        $conversation->update(['last_message_at' => now()]);
+            DB::beginTransaction();
 
-        event(new MessageSentEvent($message));
+            $message = Message::create([
+                'conversation_id' => $conversation->id,
+                'sender_id' => $sender->id,
+                'receiver_id' => $receiver->id,
+                'message' => $request->message,
+                'type' => $type->value,
+            ]);
 
-        return ApiResponder::success('Message sent successfully', $message->load('sender'));
+            if ($request->hasFile('file')) {
+                foreach ($request->file('file') as $file) {
+                    $path = $file->store('chat_attachments', 'public');
+                    $filePath = Storage::url($path);
+
+                    $message->attachments()->create([
+                        'file_path' => $filePath,
+                        'mime_type' => $file->getMimeType(),
+                    ]);
+                }
+            }
+
+            $conversation->update(['last_message_at' => now()]);
+            event(new MessageSentEvent($message));
+
+            DB::commit();
+
+            return ApiResponder::success('Message sent successfully', $message->load('sender', 'attachments'));
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ApiResponder::failed($e->getMessage(), 422);
+        }
     }
 
     // todo: getConversations
@@ -75,30 +107,7 @@ class ChatController extends Controller
     }
 
     // todo: getMessages
-//    public function getMessages(Request $request, $conversationId)
-//    {
-//        $conversation = Conversation::findOrFail($conversationId);
-//        $user = auth()->user();
-//
-//        if (!in_array($user->id, [$conversation->client_id, $conversation->admin_id])) {
-//            return ApiResponder::failed('Unauthorized', 403);
-//        }
-//
-//        Message::where('conversation_id', $conversationId)
-//            ->where('receiver_id', $user->id)
-//            ->whereNull('seen_at')
-//            ->update(['seen_at' => now()]);
-//
-//        $messages = Message::with('sender')
-//            ->where('conversation_id', $conversationId)
-//            ->latest()
-//            ->paginate(40);
-//
-//        return ApiResponder::loaded([
-//            'conversation' => $conversation,
-//            'messages' => $messages,
-//        ]);
-//    }
+
 
 
     public function getMessages(Request $request)
@@ -127,7 +136,7 @@ class ChatController extends Controller
             ->whereNull('seen_at')
             ->update(['seen_at' => now()]);
 
-        $messages = Message::with('sender')
+        $messages = Message::with(['sender', 'attachments'])
             ->where('conversation_id', $conversation->id)
             ->latest()
             ->paginate(40);
