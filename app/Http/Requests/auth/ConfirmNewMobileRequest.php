@@ -3,6 +3,7 @@
 namespace App\Http\Requests\auth;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ConfirmNewMobileRequest extends FormRequest
 {
@@ -23,8 +24,11 @@ class ConfirmNewMobileRequest extends FormRequest
     {
         return [
             'code' => 'required|string',
-            'mobile' => 'required|string|unique:users,mobile',
-        ];
+            'mobile' => [
+                'required',
+                'string',
+                Rule::unique('users', 'mobile')->whereNull('deleted_at'),
+            ],        ];
     }
 
     public function attributes()

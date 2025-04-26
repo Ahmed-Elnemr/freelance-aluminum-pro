@@ -25,7 +25,7 @@ class UserEditeProfile extends FormRequest
         return [
             'mobile' => [
                 'required', 'string', 'regex:/^05\d{8}$/', 'max:15',
-                Rule::unique('users', 'mobile')->ignore(auth()->id()),
+                Rule::unique('users', 'mobile')->ignore(auth()->id())->whereNull('deleted_at'),
             ],
             'name' => ['required', 'string', 'max:25', 'min:2', ],
         ];
