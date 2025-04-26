@@ -15,7 +15,20 @@ class ChatPage extends Page
 {
     use WithFileUploads;
 
-    protected static ?string $title = 'Chat Page';
+//    protected static ?string $title = 'Chat Page';
+    public static function getNavigationLabel(): string
+    {
+        return __('conversations');
+    }
+    public static function getModelLabel(): string
+    {
+        return __('conversations');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('conversations');
+    }
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
     protected static string $view = 'filament.pages.chat-page';
 
@@ -34,6 +47,12 @@ class ChatPage extends Page
     {
         $this->selectedConversationId = $id;
         $this->selectedConversation = Conversation::with('messages.sender', 'client', 'admin')->findOrFail($id);
+        $authId = auth()->id();
+
+        Message::where('conversation_id', $id)
+            ->where('receiver_id', $authId)
+            ->whereNull('seen_at')
+            ->update(['seen_at' => now()]);
     }
 
     public function getMessagesProperty()
