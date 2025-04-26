@@ -50,19 +50,21 @@ class SettingResource extends Resource
                 ->maxLength(255),
 
             Forms\Components\TextInput::make('name.ar')
-                ->label('Name (Arabic)')
+                ->label(__('dashboard.english_name'))
                 ->required()
                 ->maxLength(255),
             Forms\Components\TextInput::make('key')
+                ->label(__('key'))
                 ->required()
                 ->disabled(fn($record) => $record !== null),
 
             Forms\Components\Select::make('type')
+                ->label(__('type'))
                 ->options([
-                    'text' => 'Text',
-                    'textarea' => 'Textarea',
-                    'image' => 'Image',
-                    'number' => 'Number',
+                    'text' => __('text'),
+                    'textarea' => __('textarea'),
+                    'image' => __('image'),
+                    'number' => __('number'),
                 ])
                 ->required()
                 ->reactive()
@@ -75,7 +77,7 @@ class SettingResource extends Resource
             Forms\Components\Group::make([
                 // Text Field
                 Forms\Components\TextInput::make('value')
-                    ->label('Value (Text)')
+                    ->label(__('value'))
                     ->visible(fn($get) => $get('type') === 'text')
                     ->required(fn($get) => $get('type') === 'text'),
 
@@ -124,10 +126,11 @@ class SettingResource extends Resource
             ->columns([
 
                 Tables\Columns\TextColumn::make('name')
+                    ->label(__('name'))
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('value')
-                    ->label('Value')
+                    ->label(__('value'))
                     ->getStateUsing(function (Setting $record) {
                         if ($record->type === 'image') {
                             return $record->getFirstMediaUrl('settings');
