@@ -45,7 +45,6 @@ class ServiceResource extends Resource
     {
         return ['ar', 'en'];
     }
-
     public static function form(Form $form): Form
     {
         return $form

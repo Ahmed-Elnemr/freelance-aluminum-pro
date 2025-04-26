@@ -58,5 +58,7 @@
     "value": "القيمة",
     "text": "نص",
     "textarea": "محتوى",
-    "number": "رقم"
+    "number": "رقم",
+    "services connected": "الخدمات المتصلة",
+    "orders connected": "الطلبات المتصلة"
 }
