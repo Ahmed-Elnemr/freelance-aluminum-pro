@@ -158,6 +158,6 @@ class SliderResource extends Resource
     {
         return parent::getEloquentQuery()->withoutGlobalScopes([
             SoftDeletingScope::class,
-        ]);
+        ])->latest();
     }
 }

@@ -102,8 +102,7 @@ class SettingResource extends Resource
 
                 // Image Field
                 Forms\Components\FileUpload::make('image')
-//                    ->label('File Upload')nmr
-                    ->label(trans('nmr'))
+                    ->label(trans('image'))
                     ->visible(fn($get) => $get('type') === 'image')
                     ->required(fn($get) => $get('type') === 'image')
                     ->acceptedFileTypes(['image/*'])
