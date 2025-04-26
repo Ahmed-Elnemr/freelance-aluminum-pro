@@ -63,9 +63,9 @@ class AuthController extends Controller
         $user->update([
             'name' => $request->name
         ]);
-        return ApiResponder::success([
+        return ApiResponder::success( __('auth.Name created successfully'),[
             'user' => UserResource::make($user),
-        ], __('auth.Name created successfully'));
+        ]);
     }
 
     public function logout(Request $request)
