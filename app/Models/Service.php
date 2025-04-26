@@ -36,6 +36,7 @@ class Service extends Model implements HasMedia
         $this->addMediaCollection('services');
     }
 //todo:accessors
+
 //    public function getAverageRatingAttribute()
 //    {
 //        return round($this->ratings()->avg('rating'), 1);

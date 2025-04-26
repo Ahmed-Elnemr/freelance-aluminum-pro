@@ -27,12 +27,9 @@ class ServiceResource extends JsonResource
             'my_rating'=>(double) $this->my_rating,
             'is_favourite' => $this->isFavorited(),
             'base_image' => getDefaultImageUrl($this->base_image),
-            'images' => [
-                getDefaultImageUrl($this->image),
-                getDefaultImageUrl($this->image),
-                getDefaultImageUrl($this->image),
-                getDefaultImageUrl($this->image),
-            ]
+            'images' => $this->getMedia('services')->map(function ($media) {
+                return $media->getUrl();
+            }),
         ];
     }
 }

@@ -75,8 +75,8 @@ class SliderResource extends Resource
 
                 SpatieMediaLibraryFileUpload::make('sliders')
                     ->collection('sliders')
-                ->required()
-                ->label(__('image')),
+                    ->required()
+                    ->label(__('image')),
 
                 Forms\Components\Toggle::make('is_active')
                     ->label(__('active'))
@@ -98,7 +98,7 @@ class SliderResource extends Resource
 
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('type'))
-                    ->formatStateUsing(fn (SliderTypeEnum $state) => $state->label())
+                    ->formatStateUsing(fn(SliderTypeEnum $state) => $state->label())
                     ->sortable()
                     ->searchable(),
 
@@ -106,14 +106,10 @@ class SliderResource extends Resource
                     ->label(__('active'))
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('created_at'))
-                    ->dateTime()
-                    ->sortable(),
                 Tables\Columns\ImageColumn::make('sliders')
                     ->label(__('الصورة'))
-                    ->getStateUsing(fn (Slider $record) => $record->getFirstMediaUrl('sliders'))
-                    ->size(60),
+                    ->getStateUsing(fn(Slider $record) => $record->getFirstMediaUrl('sliders'))
+                    ->size(100),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')

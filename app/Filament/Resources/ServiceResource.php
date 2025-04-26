@@ -8,6 +8,7 @@ use App\Filament\Resources\ServiceResource\RelationManagers;
 use App\Models\Service;
 use App\Models\CategoryService;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
@@ -50,17 +51,17 @@ class ServiceResource extends Resource
         return $form
             ->schema([
 
-                Forms\Components\FileUpload::make('images')
-                    ->label(__('dashboard.images'))
+                SpatieMediaLibraryFileUpload::make('services')
+                    ->label(__('images'))
+                    ->collection('services')
                     ->multiple()
-                    ->image()
-                    ->imageEditor()
-                    ->directory('services')
                     ->reorderable()
                     ->appendFiles()
                     ->downloadable()
                     ->openable()
                     ->preserveFilenames()
+                    ->image()
+                    ->imageEditor()
                     ->columnSpanFull(),
 
 
@@ -103,13 +104,13 @@ class ServiceResource extends Resource
                     ->label(__('dashboard.price'))
                     ->numeric()
                     ->required()
-                    ->prefix('$'),
+                    ->prefix('SAR'),
 
                 Forms\Components\TextInput::make('final_price')
                     ->label(__('final price'))
                     ->numeric()
                     ->required()
-                    ->prefix('$'),
+                    ->prefix('SAR'),
 
 
                 Forms\Components\Toggle::make('is_active')
@@ -144,12 +145,12 @@ class ServiceResource extends Resource
 
                 Tables\Columns\TextColumn::make('price')
                     ->label(__('dashboard.price'))
-                    ->money('USD')
+                    ->money('SAR')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('final_price')
                     ->label(__('final price'))
-                    ->money('USD')
+                    ->money('SAR')
                     ->sortable(),
 
                 Tables\Columns\BooleanColumn::make('is_active')
@@ -210,6 +211,6 @@ class ServiceResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ]);
+            ])->latest();
     }
 }
