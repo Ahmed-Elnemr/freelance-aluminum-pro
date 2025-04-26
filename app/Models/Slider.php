@@ -25,5 +25,9 @@ class Slider extends Model implements HasMedia
     protected $casts = [
         'type' =>SliderTypeEnum::class,
     ];
-
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('sliders')
+            ->singleFile();
+    }
 }

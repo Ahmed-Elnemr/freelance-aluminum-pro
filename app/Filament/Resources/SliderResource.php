@@ -6,10 +6,12 @@ use App\Enum\SliderTypeEnum;
 use App\Filament\Resources\SliderResource\Pages;
 use App\Models\Slider;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Concerns\Translatable;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -71,16 +73,10 @@ class SliderResource extends Resource
                     ->native(false)
                     ->searchable(),
 
-                Forms\Components\FileUpload::make('slider_image')
-                    ->label(__('image'))
-                    ->image()
-//                    ->required()
-                    ->imageEditor()
-                    ->directory('sliders')
-                    ->preserveFilenames()
-                    ->downloadable()
-                    ->openable()
-                    ->columnSpanFull(),
+                SpatieMediaLibraryFileUpload::make('sliders')
+                    ->collection('sliders')
+                ->required()
+                ->label(__('image')),
 
                 Forms\Components\Toggle::make('is_active')
                     ->label(__('active'))
@@ -114,6 +110,10 @@ class SliderResource extends Resource
                     ->label(__('created_at'))
                     ->dateTime()
                     ->sortable(),
+                Tables\Columns\ImageColumn::make('sliders')
+                    ->label(__('الصورة'))
+                    ->getStateUsing(fn (Slider $record) => $record->getFirstMediaUrl('sliders'))
+                    ->size(60),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
