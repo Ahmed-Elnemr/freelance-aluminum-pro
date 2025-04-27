@@ -20,7 +20,7 @@ class SliderResource extends JsonResource
             'name' => (string)$this->name,
             'content' => (string) $this->content,
             'type' => $this->type,
-            'image' => getDefaultImageUrl($this->getFirstMediaUrl('sliders')),
+            'image' =>$this->getFirstMediaUrl('sliders'),
         ];
     }
 }
