@@ -57,7 +57,7 @@ class CustomNotification extends Notification
         return [
             'title' => $this->title,
             'body' => $this->body,
-            'type' => 'custom_notification',
+            'type' => 'admin',
         ];
     }
 }
