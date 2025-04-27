@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Resources\NotificationResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -30,7 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('ALUMINUM PRO')
-            ->favicon(getSettingMediaUrl('logo','settings',))
+            ->favicon(getSettingMediaUrl('logo', 'settings'))
 //            ->brandLogo(getSettingMediaUrl('logo','settings',))
             ->brandLogoHeight('3rem')
             ->colors([
@@ -61,10 +62,14 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->plugins([
-        TranslationManagerPlugin::make(),
+                TranslationManagerPlugin::make(),
                 SpatieLaravelTranslatablePlugin::make()
-                ->defaultLocales(['ar', 'en'])
+                    ->defaultLocales(['ar', 'en'])
 
-    ]);
+            ])
+            ->resources([
+                // ...
+                NotificationResource::class,
+            ]);
     }
 }
