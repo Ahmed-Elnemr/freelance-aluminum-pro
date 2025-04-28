@@ -67,6 +67,8 @@ class AdminPanelProvider extends PanelProvider
                     ->defaultLocales(['ar', 'en'])
 
             ])
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('10s')
             ->resources([
                 // ...
                 NotificationResource::class,
