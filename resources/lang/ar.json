@@ -60,5 +60,7 @@
     "textarea": "محتوى",
     "number": "رقم",
     "services connected": "الخدمات المتصلة",
-    "orders connected": "الطلبات المتصلة"
+    "orders connected": "الطلبات المتصلة",
+    "Notification deleted successfully.": "تم حذف الاشعار بنجاح.",
+    "All notifications deleted successfully.": "تم حذف جميع الاشعارات بنجاح."
 }
