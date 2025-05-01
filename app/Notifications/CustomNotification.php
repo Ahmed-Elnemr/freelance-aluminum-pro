@@ -8,10 +8,13 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Foundation\Bus\Dispatchable;
 
 class CustomNotification extends Notification
 {
-    use Queueable;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected array $data;
 
@@ -26,7 +29,7 @@ class CustomNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database', FcmChannel::class];
+        return ['database',FcmChannel::class];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -44,9 +47,10 @@ class CustomNotification extends Notification
 
     public function toFcm($notifiable)
     {
-        if (!$notifiable->fcm_token) {
-            return;
-        }
+//        dd($notifiable->fcm_token);
+//        if (!$notifiable->fcm_token) {
+//            return;
+//        }
 
         FCMAction::new($notifiable)
             ->withData($this->data)

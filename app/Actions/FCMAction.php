@@ -3,7 +3,6 @@
 namespace App\Actions;
 
 use Illuminate\Database\Eloquent\Model;
-
 use Kreait\Firebase\Contract\Messaging;
 use Kreait\Firebase\Messaging\AndroidConfig;
 use Kreait\Firebase\Messaging\ApnsConfig;
@@ -115,7 +114,6 @@ class FCMAction
             ])
         );
         if ($type === 'tokens') {
-
             if (! empty($this->firebaseToken)) {
                 $this->messaging->sendMulticast($message, $this->firebaseToken);
 
