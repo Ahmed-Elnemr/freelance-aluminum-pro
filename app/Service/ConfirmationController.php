@@ -10,6 +10,7 @@ use App\Http\Requests\auth\SendMobileOtpRequest;
 use App\Http\Resources\user\UserResource;
 use App\Models\Otp;
 use App\Models\User;
+use App\Notifications\WelcomeNotification;
 use Carbon\Carbon;
 //use Modules\User\Models\Otp;
 //use Modules\User\Models\User;
@@ -77,6 +78,7 @@ class ConfirmationController extends Controller
         ]);
         $token->update(['status' => true]);
         $user->update(['status' => true,'online' => true]);
+        $user->notify(new WelcomeNotification());
         $access_token = $user->createToken('authToken')->plainTextToken;
         return ApiResponder::loaded([
             'user' => UserResource::make($user),

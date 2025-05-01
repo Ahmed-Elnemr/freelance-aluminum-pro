@@ -9,6 +9,7 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\OrderListResource;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Notifications\OrderCreatedNotification;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -28,6 +29,7 @@ class OrderController extends Controller
             'status' => OrderStatusEnum::CURRENT,
             'is_active' => true,
         ]);
+        $user->notify(new OrderCreatedNotification($order));
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $media) {
                 $order->addMedia($media)->toMediaCollection('media');

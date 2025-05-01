@@ -32,8 +32,12 @@ class AuthController extends Controller
         $validatedData = $request->validated();
         $user = User::whereMobile($request->mobile)->whereIsActive(1)->first();
         if (!$user) {
+            do {
+                $generatedName = 'aluminum_' . rand(1000, 9999);
+            } while (User::where('name', $generatedName)->exists());
             $user = User::create([
                 'mobile' => $validatedData['mobile'],
+                'name' => $generatedName,
                 'status' => 0,
             ]);
             $code = ConfirmationController::sendCode($user);

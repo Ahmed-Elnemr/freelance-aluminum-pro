@@ -5,6 +5,7 @@ use App\Events\MessageSentEvent;
 use App\Models\ChatAttachment;
 use App\Models\Conversation;
 use App\Models\Message;
+use App\Notifications\NewMessageFromAdminNotification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -105,6 +106,8 @@ class ChatPage extends Page
 
         // Dispatch event to broadcast the new message
         broadcast(new MessageSentEvent($message));
+        $receiver = $this->selectedConversation->client;
+        $receiver?->notify(new NewMessageFromAdminNotification());
 
         $this->newMessage = '';
         $this->attachments = []; // Clear attachments after sending message

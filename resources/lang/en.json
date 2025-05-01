@@ -1,0 +1,13 @@
+{
+    "notification_welcome_title": "Welcome",
+    "notification_welcome_body": "Thanks for joining us. We hope you enjoy the experience",
+    "notification_new_order_title": "New Order Created",
+    "notification_new_order_body": "A new order has been created for the service: :service_name",
+    "notification_order_completed_title": "Order Completed",
+    "notification_order_completed_body": "The order for the service: :service_name has been completed",
+    "notification_new_admin_message_title": "New Message",
+    "notification_new_admin_message_body": "You have a new message from the admin"
+}
+
+
+

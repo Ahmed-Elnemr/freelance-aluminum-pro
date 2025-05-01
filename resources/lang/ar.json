@@ -62,5 +62,13 @@
     "services connected": "الخدمات المتصلة",
     "orders connected": "الطلبات المتصلة",
     "Notification deleted successfully.": "تم حذف الاشعار بنجاح.",
-    "All notifications deleted successfully.": "تم حذف جميع الاشعارات بنجاح."
+    "All notifications deleted successfully.": "تم حذف جميع الاشعارات بنجاح.",
+    "notification_welcome_title": "مرحبًا بك",
+    "notification_welcome_body": "شكرًا لانضمامك إلينا. نتمنى لك تجربة رائعة",
+    "notification_new_order_title": "تم إنشاء طلب جديد",
+    "notification_new_order_body": ":service_name تم إنشاء طلب جديد على الخدمة",
+    "notification_order_completed_title": "تم إنهاء الطلب",
+    "notification_order_completed_body": ":service_name تم إنهاء الطلب على الخدمة",
+    "notification_new_admin_message_title": "رسالة جديدة",
+    "notification_new_admin_message_body": "لديك رسالة جديدة من المسؤول"
 }

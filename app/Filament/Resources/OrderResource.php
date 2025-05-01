@@ -8,6 +8,7 @@ use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Order;
 use App\Models\Service;
 use App\Models\User;
+use App\Notifications\OrderCompletedNotification;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -85,7 +86,12 @@ class OrderResource extends Resource
                             ->label(__('dashboard.status'))
                             ->options(OrderStatusEnum::options())
                             ->required()
-                            ->native(false),
+                            ->native(false)
+                            ->afterStateUpdated(function ($state, $set, $get, ?Order $record) {
+                                if ($record && $state === 'expired') {
+                                    $record->user->notify(new OrderCompletedNotification($record));
+                                }
+                            }),
 
                         Forms\Components\Toggle::make('is_active')
                             ->label(__('dashboard.active'))
