@@ -2,62 +2,56 @@
 
 namespace App\Notifications;
 
+use App\Actions\FCMAction;
+use App\Notifications\Channels\FcmChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class CustomNotification extends Notification
 {
     use Queueable;
 
-    /**
-     * Create a new notification instance.
-     */
-    public $title;
-    public $body;
+    protected array $data;
 
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct($title, $body)
+    public function __construct(array $title, array $body)
     {
-        $this->title = $title;
-        $this->body = $body;
+        $this->data = [
+            'title' => $title,
+            'body' => $body,
+            'type' => 'custom_notification',
+        ];
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', FcmChannel::class];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->line('Notification preview')
+            ->action('View', url('/'))
+            ->line('Thank you for using our application!');
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
     public function toArray(object $notifiable): array
     {
-        return [
-            'title' => $this->title,
-            'body' => $this->body,
-            'type' => 'admin',
-        ];
+        return $this->data;
+    }
+
+    public function toFcm($notifiable)
+    {
+        if (!$notifiable->fcm_token) {
+            return;
+        }
+
+        FCMAction::new($notifiable)
+            ->withData($this->data)
+            ->withTitle($this->data['title'][app()->getLocale()] ?? '')
+            ->withBody($this->data['body'][app()->getLocale()] ?? '')
+            ->sendMessage('tokens');
     }
 }
