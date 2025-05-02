@@ -41,18 +41,25 @@
                                         {{ $message->created_at->diffForHumans() }}
                                     </div>
 
-                                    {{-- عرض المرفقات (الصور والفيديوهات) --}}
+                                    {{-- عرض المرفقات (الصور، الفيديوهات، التسجيلات الصوتية) --}}
                                     @foreach($message->attachments as $attachment)
                                         @if(str_starts_with($attachment->mime_type, 'image/'))
                                             <div class="mt-2">
-                                                <img src="{{$attachment->file_path}}" alt="Attachment" class="w-32 h-32 object-cover rounded-md" />
+                                                <img src="{{ $attachment->file_path }}" alt="Attachment" class="w-32 h-32 object-cover rounded-md" />
                                             </div>
                                         @elseif(str_starts_with($attachment->mime_type, 'video/'))
                                             <div class="mt-2">
                                                 <video controls class="w-full rounded-md">
-                                                    <source src="{{$attachment->file_path }}" type="{{ $attachment->mime_type }}">
-                                                    Your browser does not support the video tag.
+                                                    <source src="{{ $attachment->file_path }}" type="{{ $attachment->mime_type }}">
+                                                    متصفحك لا يدعم تشغيل الفيديو.
                                                 </video>
+                                            </div>
+                                        @elseif(str_starts_with($attachment->mime_type, 'audio/'))
+                                            <div class="mt-2">
+                                                <audio controls class="w-full rounded-md">
+                                                    <source src="{{ $attachment->file_path }}" type="{{ $attachment->mime_type }}">
+                                                    متصفحك لا يدعم تشغيل الصوت.
+                                                </audio>
                                             </div>
                                         @endif
                                     @endforeach
@@ -60,6 +67,7 @@
                             </div>
                         @endforeach
                     </div>
+
 
                     <form wire:submit.prevent="sendMessage" class="mt-4 flex items-center gap-2 w-full">
                         <input
