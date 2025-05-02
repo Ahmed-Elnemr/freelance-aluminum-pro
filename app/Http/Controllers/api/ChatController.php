@@ -8,10 +8,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
+use Filament\Notifications\Notification;
 use Illuminate\Http\Request;
 use App\Helpers\Response\ApiResponder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ChatController extends Controller
 {
@@ -65,7 +67,23 @@ class ChatController extends Controller
 
             $conversation->update(['last_message_at' => now()]);
             event(new MessageSentEvent($message));
+            //todo: send notification
+            $senderName = $sender->name;
+            $previewText = '';
 
+            if ($request->filled('message')) {
+                $previewText = Str::limit(strip_tags($request->message), 100);
+            }
+
+            $notificationBody = "لديك رسالة جديدة من المستخدم: <strong>{$senderName}</strong>";
+            if ($previewText) {
+                $notificationBody .= "<br>{$previewText}";
+            }
+
+            Notification::make()
+                ->title('رسالة جديدة')
+                ->body($notificationBody)
+                ->sendToDatabase($receiver);
             DB::commit();
 
             return ApiResponder::success('Message sent successfully', $message->load('sender', 'attachments'));
