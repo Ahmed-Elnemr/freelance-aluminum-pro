@@ -20,7 +20,8 @@ class ChatController extends Controller
     {
         $request->validate([
             'message' => 'nullable|string',
-            'file.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi,pdf,doc,docx|max:10240',
+            'file.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mp3,mov,avi,pdf,doc,docx|max:10240',
+            'is_record' => 'nullable|boolean',
         ]);
 
         $sender = auth()->user();
@@ -51,9 +52,13 @@ class ChatController extends Controller
                     $path = $file->store('chat_attachments', 'public');
                     $filePath = Storage::url($path);
 
+                    $mimeType = $request->boolean('is_record')
+                        ? 'audio/mp3'
+                        : $file->getMimeType();
+
                     $message->attachments()->create([
                         'file_path' => $filePath,
-                        'mime_type' => $file->getMimeType(),
+                        'mime_type' => $mimeType,
                     ]);
                 }
             }

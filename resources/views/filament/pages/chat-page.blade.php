@@ -2,7 +2,8 @@
     <div>
         <div class="flex flex-col md:flex-row gap-4">
             {{-- قائمة المحادثات --}}
-            <div class="w-full md:w-1/4 space-y-2 border p-4 rounded-md flex-shrink-0 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 max-h-screen overflow-y-auto">
+            <div
+                class="w-full md:w-1/4 space-y-2 border p-4 rounded-md flex-shrink-0 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 max-h-screen overflow-y-auto">
                 <h3 class="text-lg font-bold mb-2">المحادثات</h3>
                 @foreach($conversations as $conversation)
                     <div
@@ -32,10 +33,12 @@
                         المحادثة مع {{ $selectedConversation->client->name }}
                     </h2>
 
-                    <div class="border p-4 rounded-md flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col-reverse space-y-2 space-y-reverse message-container border-gray-300 dark:border-gray-700 max-h-[500px]">
+                    <div
+                        class="border p-4 rounded-md flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col-reverse space-y-2 space-y-reverse message-container border-gray-300 dark:border-gray-700 max-h-[500px]">
                         @foreach($this->messages as $message)
                             <div class="{{ $message->sender_id === auth()->id() ? 'text-right' : 'text-left' }}">
-                                <div class="inline-block bg-white dark:bg-gray-700 text-black dark:text-white px-4 py-2 rounded shadow">
+                                <div
+                                    class="inline-block bg-white dark:bg-gray-700 text-black dark:text-white px-4 py-2 rounded shadow">
                                     <strong>{{ $message->sender->name }}</strong>: {{ $message->message }}
                                     <div class="text-xs text-gray-500 dark:text-gray-400">
                                         {{ $message->created_at->diffForHumans() }}
@@ -45,19 +48,22 @@
                                     @foreach($message->attachments as $attachment)
                                         @if(str_starts_with($attachment->mime_type, 'image/'))
                                             <div class="mt-2">
-                                                <img src="{{ $attachment->file_path }}" alt="Attachment" class="w-32 h-32 object-cover rounded-md" />
+                                                <img src="{{ $attachment->file_path }}" alt="Attachment"
+                                                     class="w-32 h-32 object-cover rounded-md"/>
                                             </div>
                                         @elseif(str_starts_with($attachment->mime_type, 'video/'))
                                             <div class="mt-2">
                                                 <video controls class="w-full rounded-md">
-                                                    <source src="{{ $attachment->file_path }}" type="{{ $attachment->mime_type }}">
+                                                    <source src="{{ $attachment->file_path }}"
+                                                            type="{{ $attachment->mime_type }}">
                                                     متصفحك لا يدعم تشغيل الفيديو.
                                                 </video>
                                             </div>
                                         @elseif(str_starts_with($attachment->mime_type, 'audio/'))
                                             <div class="mt-2">
                                                 <audio controls class="w-full rounded-md">
-                                                    <source src="{{ $attachment->file_path }}" type="{{ $attachment->mime_type }}">
+                                                    <source src="{{ $attachment->file_path }}"
+                                                            type="{{ $attachment->mime_type }}">
                                                     متصفحك لا يدعم تشغيل الصوت.
                                                 </audio>
                                             </div>
