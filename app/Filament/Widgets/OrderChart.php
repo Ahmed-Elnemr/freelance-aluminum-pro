@@ -2,8 +2,6 @@
 
 namespace App\Filament\Widgets;
 
-use App\Enum\OrderStatusEnum;
-use App\Enum\OrderTypeEnum;
 use App\Models\Order;
 use Filament\Widgets\ChartWidget;
 use Flowframe\Trend\Trend;
@@ -11,24 +9,26 @@ use Flowframe\Trend\TrendValue;
 
 class OrderChart extends ChartWidget
 {
-    protected static ?string $heading = null;
+    protected static ?string $heading = 'Orders';
+    protected static string $color = 'success';
+    protected static ?string $maxHeight = '10000px';
 
     public function getHeading(): string
     {
-        return __('dashboard.orders_by_type');
+        return __('orders');
     }
 
     public function getDescription(): ?string
     {
-        return __('dashboard.Timeline of request types');
+        return __('orders chart');
     }
 
     protected function getData(): array
     {
-        $monthlyData = Trend::model(Order::class)
+        $data = Trend::model(Order::class)
             ->between(
                 start: now()->startOfYear(),
-                end: now()->endOfYear()
+                end: now()->endOfYear(),
             )
             ->perMonth()
             ->count();
@@ -36,19 +36,16 @@ class OrderChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('dashboard.orders_count'),
-                    'data' => $monthlyData->map(fn (TrendValue $value) => $value->aggregate),
+                    'label' => __('orders'),
+                    'data' => $data->map(fn (TrendValue $value) => $value->aggregate),
                 ],
             ],
-            'labels' => $monthlyData->map(function (TrendValue $value) {
-                // تحويل التاريخ من نص إلى كائن Carbon أولاً
-                return now()->parse($value->date)->translatedFormat('M'); // إرجاع اسم الشهر المختصر
-            }),
+            'labels' => $data->map(fn (TrendValue $value) => $value->date),
         ];
     }
 
     protected function getType(): string
     {
-        return 'polarArea'; // أو 'line' إذا أردت رسم بياني خطي
+        return 'line'; // نفس النوع زي ClientChart
     }
 }

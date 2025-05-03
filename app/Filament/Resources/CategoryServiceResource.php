@@ -17,7 +17,15 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class CategoryServiceResource extends Resource
 {
     use Translatable;
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
+    public static function getNavigationGroup( ): ?string
+    {
+        return __('Services Management' );
 
+    }
     protected static ?string $model = CategoryService::class;
     public static function getNavigationLabel(): string
     {

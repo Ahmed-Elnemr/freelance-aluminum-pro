@@ -22,6 +22,15 @@ class SettingResource extends Resource
 {
     use Translatable;
     protected static ?string $model = Setting::class;
+    public static function getNavigationSort(): ?int
+    {
+        return 9;
+    }
+    public static function getNavigationGroup( ): ?string
+    {
+        return __('Management' );
+
+    }
     public static function getNavigationLabel(): string
     {
         return __('dashboard.settings');

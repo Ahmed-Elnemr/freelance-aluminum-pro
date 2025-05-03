@@ -12,6 +12,10 @@ class ClientChart extends ChartWidget
     protected static ?string $heading = 'Clients';
     protected static string $color = 'info';
     protected static ?string $maxHeight = '10000px';
+    public function getHeading(): string
+    {
+        return __('clients');
+    }
     public function getDescription(): ?string
     {
         return __('dashboard.Timeline of in-app customer growth rate');

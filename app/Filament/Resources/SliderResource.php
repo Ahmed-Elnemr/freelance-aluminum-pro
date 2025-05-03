@@ -19,7 +19,15 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class SliderResource extends Resource
 {
     use Translatable;
+    public static function getNavigationSort(): ?int
+    {
+        return 5;
+    }
+    public static function getNavigationGroup( ): ?string
+    {
+        return __('Management' );
 
+    }
     protected static ?string $model = Slider::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-photo';

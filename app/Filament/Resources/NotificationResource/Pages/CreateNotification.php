@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\NotificationResource\Pages;
 
+use App\Enum\UserTypeEnum;
 use App\Filament\Resources\NotificationResource;
 use App\Models\User;
 use App\Notifications\CustomNotification;
@@ -30,6 +31,7 @@ class CreateNotification extends CreateRecord
                 ->where('is_active', 1)
                 ->where('status', 1)
                 ->where('type', 'client')
+                ->where('type', '!=', UserTypeEnum::ADMIN)
                 ->whereNull('deleted_at')
                 ->cursor();
         } else {

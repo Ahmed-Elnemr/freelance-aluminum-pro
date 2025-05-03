@@ -23,7 +23,14 @@ class ServiceResource extends Resource
 
     protected static ?string $model = Service::class;
 
-
+    public static function getNavigationSort(): ?int
+    {
+        return 2;
+    }
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Services Management' );
+    }
     public static function getNavigationLabel(): string
     {
         return __('dashboard.services');

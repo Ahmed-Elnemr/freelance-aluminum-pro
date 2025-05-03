@@ -17,7 +17,15 @@ class RatingResource extends Resource
 {
     protected static ?string $model = Rating::class;
     protected static ?string $navigationIcon = 'heroicon-o-star';
+    public static function getNavigationSort(): ?int
+    {
+        return 6;
+    }
+    public static function getNavigationGroup( ): ?string
+    {
+        return __('Management' );
 
+    }
     public static function getNavigationLabel(): string
     {
         return __('Ratings');

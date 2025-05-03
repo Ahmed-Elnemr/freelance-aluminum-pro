@@ -15,15 +15,38 @@ class NotificationResource extends Resource
 {
     protected static ?string $model = \Illuminate\Notifications\DatabaseNotification::class;
 //    protected static ?string $model = null;
+    public static function getNavigationSort(): ?int
+    {
+        return 8;
+    }
+    public static function getNavigationGroup( ): ?string
+    {
+        return __('Management' );
+
+    }
+
 
     protected static ?string $navigationIcon = 'heroicon-o-bell';
+    public static function getNavigationLabel(): string
+    {
+        return __('Notifications');
+    }
 
+    public static function getModelLabel(): string
+    {
+        return __('Notification');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Notifications');
+    }
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Checkbox::make('send_to_all')
-                    ->label('إرسال إلى جميع المستخدمين')
+                    ->label(__('Send to all users'))
                     ->default(false)
                     ->reactive()
                     ->afterStateUpdated(function (callable $set, $state) {
@@ -33,7 +56,7 @@ class NotificationResource extends Resource
                     }),
 
                 Forms\Components\Select::make('users')
-                    ->label('المستلمون')
+                    ->label(__('Recipients'))
                     ->options(User::all()->pluck('name', 'id'))
                     ->multiple()
                     ->searchable()
@@ -76,14 +99,14 @@ class NotificationResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('notifiable.name')
-                    ->label('المستخدم'),
+                    ->label(__('User')),
                 Tables\Columns\TextColumn::make('data.title')
-                    ->label('العنوان'),
+                    ->label(__('Title')),
 
                 Tables\Columns\TextColumn::make('data.body')
-                    ->label('المحتوي'),
+                    ->label(__('Body')),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('تاريخ الإرسال')
+                    ->label(__('Created at'))
                     ->dateTime(),
             ])
             ->filters([

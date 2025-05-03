@@ -21,6 +21,29 @@ use Filament\Forms\Components\Section;
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
+    public static function getNavigationSort(): ?int
+    {
+        return 3;
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::active()->where('status', OrderStatusEnum::CURRENT->value)->count() ?? 0;
+    }
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return static::getModel()::active()->where('status', OrderStatusEnum::CURRENT->value)->count()
+        > 10 ? 'warning' : 'primary';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return __('Current Orders');
+    }
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Services Management' );
+    }
 
     public static function getNavigationLabel(): string
     {

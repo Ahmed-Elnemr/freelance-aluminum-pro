@@ -20,12 +20,10 @@ class CategoryServiceOverview extends BaseWidget
     {
         return [
             $this->getUserStats(),
-
+            $this->getCategoryServicesStats(),
             $this->getMaintenanceServicesStats(),
 
             $this->getProductServicesStats(),
-
-
             $this->getCurrentOrdersStats(),
 
             $this->getExpiredOrdersStats(),
@@ -154,5 +152,19 @@ class CategoryServiceOverview extends BaseWidget
             })
                 ->toArray();
         });
+    }
+
+    protected function getCategoryServicesStats(): Stat
+    {
+        $currentCount = \App\Models\CategoryService::count();
+        $lastMonthCount = \App\Models\CategoryService::where('created_at', '<', Carbon::now()->subMonth())->count();
+
+        $increase = $currentCount - $lastMonthCount;
+
+        return Stat::make(__('dashboard.category_services'), $currentCount)
+            ->description($this->getTrendDescription($increase))
+            ->descriptionIcon($this->getTrendIcon($increase))
+            ->chart($this->getWeeklyData(\App\Models\CategoryService::class))
+            ->color($this->getTrendColor($increase));
     }
 }

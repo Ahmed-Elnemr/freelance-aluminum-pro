@@ -84,5 +84,19 @@
     "Rating": "التقييم",
     "Rateable Name":"اسم الخدمة",
     "Ratings":"التقييمات",
-    "Rating": "التقييم"
+    "Rating": "التقييم",
+    "Send to all users": "إرسال إلى جميع المستخدمين",
+    "Recipients": "المستلمون",
+    "Title": "العنوان",
+    "Body": "المحتوى",
+    "Created at": "تاريخ الانشاء",
+    "Notifications": "الاشعارات",
+    "Notification": "اشعار",
+    "Services Management": "ادارة الخدمات",
+    "Management": "ادارة التطبيق",
+    "Current Orders": "الطلبات الحالية",
+    "clients chart": "مخطط العملاء",
+    "orders chart": "معدل نمو الطلبات",
+    "orders": "الطلبات",
+    "clients": "العملاء"
 }

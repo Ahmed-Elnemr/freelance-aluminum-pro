@@ -15,6 +15,10 @@ use Livewire\WithFileUploads;
 class ChatPage extends Page
 {
     use WithFileUploads;
+    public static function getNavigationSort(): ?int
+    {
+        return 4;
+    }
 
 //    protected static ?string $title = 'Chat Page';
     public static function getNavigationLabel(): string
