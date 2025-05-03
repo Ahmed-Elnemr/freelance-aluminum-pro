@@ -70,7 +70,7 @@ class User extends Authenticatable
 
 
     //todo:relation
-    public function devices(): \Illuminate\Database\Eloquent\Relations\MorphMany
+        public function devices(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(UserDevice::class, 'user', 'user_type', 'user_id')->latest();
     }

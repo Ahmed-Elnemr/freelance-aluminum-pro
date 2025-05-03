@@ -70,5 +70,13 @@
     "notification_order_completed_title": "تم إنهاء الطلب",
     "notification_order_completed_body": ":service_name تم إنهاء الطلب على الخدمة",
     "notification_new_admin_message_title": "رسالة جديدة",
-    "notification_new_admin_message_body": "لديك رسالة جديدة من المسؤول"
+    "notification_new_admin_message_body": "لديك رسالة جديدة من المسؤول",
+    "Clients": "العملاء",
+    "Client": "عميل",
+    "Mobile Number": "رقم الهاتف",
+    "Name": "الاسم",
+    "Active": "نشط",
+    "Is active": "نشط",
+    "Mobile": "رقم الهاتف",
+    "Name": "الاسم"
 }
