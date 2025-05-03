@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Exceptions\CustomException;
 use App\Models\User;
+use App\Observers\UserObserver;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
@@ -24,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        User::observe(UserObserver::class);
         Gate::define('use-translation-manager', function (?User $user) {
             // Your authorization logic
             return 1;
