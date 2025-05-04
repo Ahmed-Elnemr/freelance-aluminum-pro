@@ -48,4 +48,13 @@ class UserLoginRequest extends FormRequest
             'device_type.string' => __('validation.device_type_string'),
         ];
     }
+    public function attributes(): array
+    {
+        return [
+            'mobile' => __('mobile'),
+            'uuid' => __('uuid'),
+            'device_token' => __('device_token'),
+            'device_type' => __('device_type'),
+        ];
+    }
 }

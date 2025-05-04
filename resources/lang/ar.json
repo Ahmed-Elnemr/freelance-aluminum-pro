@@ -13,16 +13,13 @@
     "validation.name_regex": "الاسم يجب ان يبدا بحرف كبيرة",
     "mobile": "رقم الهاتف",
     "name": "الاسم",
-
     "validation.mobile_regex": "رقم الهاتف يجب أن يبدأ بـ 05 ويتكون من 10 أرقام.",
     "validation.name_regex": "الاسم يجب أن يحتوي فقط على حروف عربية أو إنجليزية ومسافات.",
-
     "validation.required": "حقل :attribute مطلوب.",
     "validation.unique": "قيمة :attribute مستخدمة من قبل.",
     "validation.regex": "تنسيق :attribute غير صالح.",
     "validation.max.string": "يجب ألا يتجاوز :attribute :max حرفًا.",
     "validation.min.string": "يجب ألا يقل :attribute عن :min حروف.",
-
     "attributes.mobile": "رقم الهاتف",
     "attributes.name": "الاسم",
     "code": "كود التفعيل",
@@ -82,8 +79,8 @@
     "Users": "المستخدمين",
     "User": "مستخدم",
     "Rating": "التقييم",
-    "Rateable Name":"اسم الخدمة",
-    "Ratings":"التقييمات",
+    "Rateable Name": "اسم الخدمة",
+    "Ratings": "التقييمات",
     "Rating": "التقييم",
     "Send to all users": "إرسال إلى جميع المستخدمين",
     "Recipients": "المستلمون",
@@ -103,5 +100,8 @@
     "open map": " الموقع",
     "location info": "معلومات الموقع",
     "images and videos": "الصور والفيديوهات",
-    "media": "الوسائط"
+    "media": "الوسائط",
+    "mobile": "رقم الجوال",
+    "uuid": "المعرف الفريد",
+    "device": "نوع الجهاز"
 }
