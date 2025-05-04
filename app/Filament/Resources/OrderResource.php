@@ -10,17 +10,27 @@ use App\Models\Service;
 use App\Models\User;
 use App\Notifications\OrderCompletedNotification;
 use Filament\Forms;
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Forms\Components\ViewField;
 
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
+
     public static function getNavigationSort(): ?int
     {
         return 3;
@@ -30,6 +40,7 @@ class OrderResource extends Resource
     {
         return static::getModel()::active()->where('status', OrderStatusEnum::CURRENT->value)->count() ?? 0;
     }
+
     public static function getNavigationBadgeColor(): ?string
     {
         return static::getModel()::active()->where('status', OrderStatusEnum::CURRENT->value)->count()
@@ -40,9 +51,10 @@ class OrderResource extends Resource
     {
         return __('Current Orders');
     }
+
     public static function getNavigationGroup(): ?string
     {
-        return __('Services Management' );
+        return __('Services Management');
     }
 
     public static function getNavigationLabel(): string
@@ -70,30 +82,54 @@ class OrderResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('user_id')
                             ->label(__('dashboard.user'))
-                            ->options(User::where('type', UserTypeEnum::CLIENT->value)
-                                ->active()
-                                ->get()
-                                ->pluck('name', 'id')
-                                ->filter(fn($label) => !is_null($label)))
+                            ->options(
+                                User::where('type', UserTypeEnum::CLIENT->value)
+                                    ->active()
+                                    ->latest()
+                                    ->get()
+                                    ->pluck('name', 'id')
+                                    ->filter(fn($label) => !is_null($label))
+                            )
                             ->searchable()
                             ->required(),
 
                         Forms\Components\Select::make('service_id')
                             ->label(__('dashboard.service'))
-                            ->options(Service::active()->get()->pluck('name', 'id')
-                                ->filter(fn($label) => !is_null($label)))
+                            ->options(
+                                Service::active()->latest()->get()->pluck('name', 'id')
+                                    ->filter(fn($label) => !is_null($label))
+                            )
                             ->searchable()
                             ->required(),
                     ])->columns(3),
 
-                Section::make(__('dashboard.location'))
+                Section::make(__('location info'))
                     ->schema([
-                        Forms\Components\TextInput::make('google_maps_url')
-                            ->label(__('dashboard.location_url'))
-                            ->placeholder('https://maps.app.goo.gl/...')
-                            ->columnSpanFull()
-                            ->required(),
-                    ]),
+                        TextInput::make('map_link')
+                            ->label(__('map link'))
+                            ->formatStateUsing(fn (?Order $record): string => $record && $record->latitude && $record->longitude
+                                ? 'https://www.google.com/maps?q=' . $record->latitude . ',' . $record->longitude
+                                : __('dashboard.no_location_available'))
+                            ->disabled()
+                            ->dehydrated()
+                            ->suffixAction(
+                                Action::make(__('open map'))
+                                    ->icon('heroicon-o-arrow-top-right-on-square')
+                                    ->url(fn (?Order $record): string => $record && $record->latitude && $record->longitude
+                                        ? 'https://www.google.com/maps?q=' . $record->latitude . ',' . $record->longitude
+                                        : '#')
+                                    ->hidden(fn (?Order $record): bool => !($record && $record->latitude && $record->longitude))
+                                    ->openUrlInNewTab()
+                            )
+                            ->columnSpan(1),
+
+                        Placeholder::make('location_name')
+                            ->label(__('dashboard.location_name'))
+                            ->content(fn (?Order $record) => $record?->location_name ?? '-')
+                            ->columnSpan(1),
+                    ])
+                    ->columns(2),
+
 
                 Section::make(__('dashboard.additional_info'))
                     ->schema([
@@ -122,6 +158,37 @@ class OrderResource extends Resource
                             ->onColor('success')
                             ->offColor('danger'),
                     ]),
+
+                Section::make(__('media'))
+                    ->schema([
+                        SpatieMediaLibraryFileUpload::make('media')
+                            ->label(__('images and videos'))
+                            ->collection('media')
+                            ->multiple()
+                            ->reorderable()
+                            ->downloadable()
+                            ->openable()
+                            ->previewable(true)
+                            ->responsiveImages()
+                            ->imageEditor()
+                            ->imageEditorEmptyFillColor('#000000')
+//                            ->imageEditorMode(2)
+                            ->maxSize(256 * 10240)
+                            ->maxFiles(10)
+                            ->acceptedFileTypes([
+                                'image/jpeg',
+                                'image/png',
+                                'image/webp',
+                                'video/mp4',
+                                'video/quicktime'
+                            ])
+                            ->imagePreviewHeight('250')
+                            ->panelLayout('grid')
+                            ->appendFiles()
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible()
+                    ->collapsed(false) ,
             ]);
     }
 
@@ -136,19 +203,37 @@ class OrderResource extends Resource
 
                 Tables\Columns\TextColumn::make('service.name')
                     ->label(__('dashboard.service'))
+                    ->formatStateUsing(function ($state, $record) {
+                        return $record->service?->getTranslation('name', 'ar') . "\n" . $record->service?->getTranslation('name', 'en');
+                    })
+                    ->html()
                     ->sortable()
                     ->searchable(),
 
+                SpatieMediaLibraryImageColumn::make('media')
+                    ->label(__('media'))
+                    ->collection('media')
+                    ->circular()
+                    ->stacked()
+                    ->limit(3)
+                    ->limitedRemainingText()
+                    ->extraImgAttributes(['class' => 'object-cover']),
+
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('dashboard.status'))
-                    ->formatStateUsing(fn (OrderStatusEnum $state) => $state->label())
+                    ->badge()
+                    ->formatStateUsing(fn(OrderStatusEnum $state) => $state->label())
+                    ->color(fn (OrderStatusEnum $state): string => match ($state) {
+                        OrderStatusEnum::CURRENT => 'success',
+                        OrderStatusEnum::EXPIRED => 'danger',
+                    })
                     ->sortable()
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('location_name')
                     ->label(__('dashboard.location_name'))
                     ->limit(30)
-                    ->tooltip(fn ($record) => $record->location_name),
+                    ->tooltip(fn($record) => $record->location_name),
 
                 Tables\Columns\BooleanColumn::make('is_active')
                     ->label(__('dashboard.active'))
@@ -157,14 +242,18 @@ class OrderResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('user_id')
                     ->label(__('dashboard.user'))
-                    ->options(User::all()->pluck('name', 'id')
-                        ->filter(fn($label) => !is_null($label)))
+                    ->options(
+                        User::all()->pluck('name', 'id')
+                            ->filter(fn($label) => !is_null($label))
+                    )
                     ->searchable(),
 
                 Tables\Filters\SelectFilter::make('service_id')
                     ->label(__('dashboard.service'))
-                    ->options(Service::all()->pluck('name', 'id')
-                        ->filter(fn($label) => !is_null($label)))
+                    ->options(
+                        Service::all()->pluck('name', 'id')
+                            ->filter(fn($label) => !is_null($label))
+                    )
                     ->searchable(),
 
                 Tables\Filters\SelectFilter::make('status')

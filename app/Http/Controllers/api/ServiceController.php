@@ -17,7 +17,7 @@ class ServiceController extends Controller
 {
     public function products()
     {
-        $services = Service::active()->whereCategory(CategoryEnum::PRODUCTS)->get();
+        $services = Service::active()->whereCategory(CategoryEnum::PRODUCTS)->latest()->get();
         return ApiResponder::loaded([
             'services' => ServiceListResource::collection($services)
         ]);
@@ -25,7 +25,7 @@ class ServiceController extends Controller
 
     public function maintenance()
     {
-        $services = Service::active()->whereCategory(CategoryEnum::MAINTENANCE)->get();
+        $services = Service::active()->whereCategory(CategoryEnum::MAINTENANCE)->latest()->get();
         return ApiResponder::loaded([
             'services' => ServiceListResource::collection($services)
         ]);
@@ -55,6 +55,7 @@ class ServiceController extends Controller
     {
         $services = Service::active()
             ->whereCategory(CategoryEnum::PRODUCTS)
+            ->latest()
             ->get(['id', 'name'])
             ->map(fn($service) => [
                 'id' => $service->id,
@@ -69,6 +70,7 @@ class ServiceController extends Controller
         $services = Service::active()
             ->whereCategory(CategoryEnum::MAINTENANCE)
             ->get(['id', 'name'])
+            ->latest()
             ->map(fn($service) => [
                 'id' => $service->id,
                 'name' => $service->getTranslation('name', app()->getLocale()),
@@ -92,6 +94,7 @@ class ServiceController extends Controller
                         ->orWhere('price', 'like', "%{$search}%");
                 });
             })
+            ->latest()
             ->get();
 
         return ApiResponder::loaded([
