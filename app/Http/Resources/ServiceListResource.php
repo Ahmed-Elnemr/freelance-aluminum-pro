@@ -16,6 +16,8 @@ class ServiceListResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'category_type' =>(string) $this->category?->value,
+            'category_label' =>(string) $this->category?->label(),
             'name' => (string)$this->name,
             'content' => (string)$this->content,
             'final_price' =>(double) $this->final_price,
