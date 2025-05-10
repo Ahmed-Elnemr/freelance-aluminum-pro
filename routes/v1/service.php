@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\FavoriteController;
+use App\Http\Controllers\api\PaymentController;
 use App\Http\Controllers\api\RateController;
 use App\Http\Controllers\api\ServiceController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,8 @@ Route::prefix('services')->group(function () {
         Route::get('my-favorites/get', [FavoriteController::class, 'myFavoriteServices']);
 
     });
+    Route::post('client/payment', [PaymentController::class, 'createPayment'])->middleware('auth:sanctum');
+
 });
 
 
