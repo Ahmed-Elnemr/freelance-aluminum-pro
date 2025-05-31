@@ -56,7 +56,7 @@ class ServiceController extends Controller
         $services = Service::active()
             ->whereCategory(CategoryEnum::PRODUCTS)
             ->latest()
-            ->get(['id', 'name'])
+            ->paginate(10,['id', 'name'])
             ->map(fn($service) => [
                 'id' => $service->id,
                 'name' => $service->getTranslation('name', app()->getLocale()),
@@ -69,13 +69,13 @@ class ServiceController extends Controller
     {
         $services = Service::active()
             ->whereCategory(CategoryEnum::MAINTENANCE)
-            ->get(['id', 'name'])
+            ->paginate(10,(['id', 'name'])
             ->latest()
             ->map(fn($service) => [
                 'id' => $service->id,
                 'name' => $service->getTranslation('name', app()->getLocale()),
             ])
-            ->toArray();
+            ->toArray());
 
         return ApiResponder::loaded($services);
     }
