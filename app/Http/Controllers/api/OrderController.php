@@ -66,7 +66,7 @@ class OrderController extends Controller
     public function currentOrders()
     {
         $user = auth('sanctum')->user();
-        $orders = $user->orders()->whereStatus(OrderStatusEnum::CURRENT)->latest()->get();
+        $orders = $user->orders()->whereStatus(OrderStatusEnum::CURRENT)->latest()->paginate(10);
         return ApiResponder::loaded(OrderListResource::collection($orders));
     }
 
@@ -74,7 +74,7 @@ class OrderController extends Controller
     public function expiredOrders()
     {
         $user = auth('sanctum')->user();
-        $orders = $user->orders()->whereStatus(OrderStatusEnum::EXPIRED)->latest()->get();
+        $orders = $user->orders()->whereStatus(OrderStatusEnum::EXPIRED)->latest()->paginate(10);
         return ApiResponder::loaded(OrderListResource::collection($orders));
     }
 
