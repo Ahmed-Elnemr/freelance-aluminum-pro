@@ -6,52 +6,60 @@ use App\Enum\PaymentMethodEnum;
 use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePaymentRequest;
+use App\Models\Order;
 use App\Models\Service;
 use App\Models\ServicePaymentMethod;
+use App\Notifications\OrderCreatedNotification;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 class PaymentController extends Controller
 {
-    public function paymentPage($id)
+    public function paymentPage(Request $request)
     {
-        $service = Service::find($id);
+        $userId = $request->user_id;
 
-        return view('payments.payments-moyasar', get_defined_vars());
-    }
+        $cacheKey = 'pending_order_' . $userId;
+        $cached = Cache::get($cacheKey);
 
-
-    //todo: add payment method
-    public function createPayment(StorePaymentRequest $request)
-    {
-        $user = auth('sanctum')->user();
-        $userId = $user->id;
-        $service = Service::findOrFail($request->service_id);
-        if ((int)$request->paymentmethod === PaymentMethodEnum::moyasar->value) {
-            return ApiResponder::get(
-                '',
-                ["payment_url" => route('payment-page', ['id' => $service->id, 'user_id' => $userId])]
-            );
-        } else {
-            return ApiResponder::failed('payment method not found');
+        if (!$cached) {
+            abort(404, 'Order not found or expired.');
         }
+
+        $service = Service::find($cached['order_data']['service_id']);
+
+        return view('payments.payments-moyasar', compact('service', 'userId'));
     }
 
-    //todo: paymentCallback
+
     public function paymentCallback(Request $request)
     {
         $request->validate([
-            'service_id' => 'required|exists:services,id,deleted_at,NULL',
             'user_id' => 'required|exists:users,id,deleted_at,NULL',
+            'status' => 'required|in:paid,failed',
         ]);
-        if ($request->status == 'paid') {
-            $userReservation = ServicePaymentMethod::create([
-                'user_id' => $request->user_id,
-                'service_id' => $request->service_id,
-                'paymentmethod' => PaymentMethodEnum::moyasar->value,
-            ]);
-            return ApiResponder::success(
-                'The service has been booked successfully.'
-            );
+
+        $userId = $request->user_id;
+        $cacheKey = 'pending_order_' . $userId;
+        $cached = Cache::pull($cacheKey);
+
+        if ($request->status === 'paid') {
+            $order = Order::create($cached['order_data']);
+
+            if (!empty($cached['images'])) {
+                foreach ($cached['images'] as $imagePath) {
+                    $fullPath = storage_path("app/{$imagePath}");
+                    if (file_exists($fullPath)) {
+                        $order->addMedia($fullPath)->toMediaCollection('media');
+//                        unlink($fullPath); // حذف الصورة من المجلد المؤقت
+                    }
+                }
+            }
+
+            $order->user->notify(new OrderCreatedNotification($order));
+
+            return ApiResponder::success('The service has been booked successfully.');
         }
 
         return ApiResponder::failed('An error occurred while booking the service. Try again.');

@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\api;
 
 use App\Enum\OrderStatusEnum;
+use App\Enum\PaymentMethodEnum;
 use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\OrderListResource;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
-use App\Notifications\OrderCreatedNotification;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
@@ -19,7 +20,7 @@ class OrderController extends Controller
     {
         $user = auth('sanctum')->user();
 
-        $order = Order::create([
+        $orderData = [
             'user_id' => $user->id,
             'service_id' => $request->service_id,
             'latitude' => $request->latitude,
@@ -28,17 +29,38 @@ class OrderController extends Controller
             'description' => $request->description,
             'status' => OrderStatusEnum::CURRENT,
             'is_active' => true,
-        ]);
-        $user->notify(new OrderCreatedNotification($order));
+        ];
+
+        $imagePaths = [];
+
         if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $media) {
-                $order->addMedia($media)->toMediaCollection('media');
+            $tempPath = storage_path("app/temp-user-uploads/{$user->id}/");
+            if (!file_exists($tempPath)) {
+                mkdir($tempPath, 0755, true);
+            }
+
+            foreach ($request->file('images') as $index => $image) {
+                $filename = "image_$index." . $image->getClientOriginalExtension();
+                $image->move($tempPath, $filename);
+                $imagePaths[] = "temp-user-uploads/{$user->id}/{$filename}";
             }
         }
 
+        $cacheKey = 'pending_order_' . $user->id;
+        Cache::put($cacheKey, [
+            'order_data' => $orderData,
+            'images' => $imagePaths
+        ], now()->addMinutes(5));
 
-        return ApiResponder::created($order, __('Order created successfully'));
+        if ((int)$request->paymentmethod === PaymentMethodEnum::moyasar->value) {
+            return ApiResponder::get(
+                '',
+                ['payment_url' => route('payment-page', ['user_id' => $user->id])]
+            );
+        }
+        return ApiResponder::failed('Payment method not supported');
     }
+
 
     //todo:currentOrders
     public function currentOrders()

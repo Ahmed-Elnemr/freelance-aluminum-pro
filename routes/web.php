@@ -13,6 +13,6 @@ Route::get('/', function () {
 });
 Route::get('/admin/chat', ChatPage::class)->name('admin.chat');
 
-Route::get('payment-page/{id}', [PaymentController::class, 'paymentPage'])->name('payment-page');
+Route::get('payment-page/{user_id}', [PaymentController::class, 'paymentPage'])->name('payment-page');
 Route::any('payment-callback', [PaymentController::class, 'paymentCallback'])->name('payment.callback');
 
