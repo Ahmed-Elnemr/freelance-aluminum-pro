@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api;
 use App\Enum\MessageTypeEnum;
 use App\Events\MessageSentEvent;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MessageResource;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
@@ -162,11 +163,10 @@ class ChatController extends Controller
         $messages = Message::with(['sender', 'attachments'])
             ->where('conversation_id', $conversation->id)
             ->latest()
-            ->paginate(40);
+            ->paginate(15);
 
         return ApiResponder::loaded([
-            'conversation' => $conversation,
-            'messages' => $messages,
+            'messages' => MessageResource::collection($messages),
         ]);
     }
 
