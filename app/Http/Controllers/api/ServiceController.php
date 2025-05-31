@@ -17,7 +17,7 @@ class ServiceController extends Controller
 {
     public function products()
     {
-        $services = Service::active()->whereCategory(CategoryEnum::PRODUCTS)->latest()->get();
+        $services = Service::active()->whereCategory(CategoryEnum::PRODUCTS)->latest()->paginate(10);
         return ApiResponder::loaded([
             'services' => ServiceListResource::collection($services)
         ]);
@@ -25,7 +25,7 @@ class ServiceController extends Controller
 
     public function maintenance()
     {
-        $services = Service::active()->whereCategory(CategoryEnum::MAINTENANCE)->latest()->get();
+        $services = Service::active()->whereCategory(CategoryEnum::MAINTENANCE)->latest()->paginate(10);
         return ApiResponder::loaded([
             'services' => ServiceListResource::collection($services)
         ]);
@@ -56,7 +56,7 @@ class ServiceController extends Controller
         $services = Service::active()
             ->whereCategory(CategoryEnum::PRODUCTS)
             ->latest()
-            ->paginate(10,['id', 'name'])
+            ->get(['id', 'name'])
             ->map(fn($service) => [
                 'id' => $service->id,
                 'name' => $service->getTranslation('name', app()->getLocale()),
@@ -69,13 +69,13 @@ class ServiceController extends Controller
     {
         $services = Service::active()
             ->whereCategory(CategoryEnum::MAINTENANCE)
-            ->paginate(10,(['id', 'name'])
+            ->get(['id', 'name'])
             ->latest()
             ->map(fn($service) => [
                 'id' => $service->id,
                 'name' => $service->getTranslation('name', app()->getLocale()),
             ])
-            ->toArray());
+            ->toArray();
 
         return ApiResponder::loaded($services);
     }
