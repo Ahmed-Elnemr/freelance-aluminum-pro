@@ -46,7 +46,7 @@ class ServiceController extends Controller
             [
                 'service' => ServiceResource::make($service),
 //                'similar_services' => ServiceResource::collection($service->similar()),
-            ]هةه
+            ]
         );
     }
 
