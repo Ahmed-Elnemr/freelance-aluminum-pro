@@ -12,18 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('services', function (Blueprint $table) {
-            $table->foreignIdFor(\App\Models\MainService::class)->nullable()->constrained()
-                ->onDelete('cascade')->after('category_service_id');
+            $table->unsignedBigInteger('main_service_id')->nullable()->after('category_service_id');
+            $table->foreign('main_service_id')->references('id')->on('main_services')->onDelete('cascade');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('services', function (Blueprint $table) {
-            //
+            $table->dropForeign(['main_service_id']);
+            $table->dropColumn('main_service_id');
         });
     }
 };
