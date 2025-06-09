@@ -109,5 +109,12 @@
     "An error occurred while booking the service. Try again.": "حدث خطأ اثناء حجز الخدمة. حاول مرة اخرى.",
     "home": "الصفحة الرئيسية",
     "services": "الخدمات",
-    "list type": "نوع العرض "
+    "list type": "نوع العرض ",
+    "Original price (must be higher than final price)": "السعر الاصلي (يجب ان يكون اعلى من السعر النهائي)",
+    "Discounted price (must be less than regular price)": "السعر المخفض (يجب ان يكون اقل من السعر العادي)",
+    "main service": "الخدمة الرئيسية",
+    "Select main service for home page display": "حدد الخدمة الرئيسية لعرضها في الصفحة الرئيسية",
+    "type list": "نوع العرض"
+
+
 }

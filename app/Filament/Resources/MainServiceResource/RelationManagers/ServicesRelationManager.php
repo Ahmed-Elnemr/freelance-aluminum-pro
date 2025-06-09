@@ -1,41 +1,23 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\MainServiceResource\RelationManagers;
 
 use App\Enum\CategoryEnum;
 use App\Enum\TypeEnum;
-use App\Filament\Resources\ServiceResource\Pages;
-use App\Filament\Resources\ServiceResource\RelationManagers;
-use App\Models\MainService;
-use App\Models\Service;
 use App\Models\CategoryService;
 use Filament\Forms;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
-use Filament\Resources\Concerns\Translatable;
-use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-    use Filament\Forms\Get;
-    use Filament\Forms\Components\Select;
-use Illuminate\Validation\Rule;
 
-class ServiceResource extends Resource
+class ServicesRelationManager extends RelationManager
 {
-    use Translatable;
-
-    protected static ?string $model = Service::class;
-
-    public static function getNavigationSort(): ?int
-    {
-        return 2;
-    }
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Services Management' );
-    }
+    protected static string $relationship = 'services';
     public static function getNavigationLabel(): string
     {
         return __('dashboard.services');
@@ -50,16 +32,13 @@ class ServiceResource extends Resource
     {
         return __('dashboard.services');
     }
-
-    protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
-
-    public static function getTranslatableLocales(): array
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return ['ar', 'en'];
+        return __('services connected');
     }
 
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -80,9 +59,7 @@ class ServiceResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('category_service_id')
                             ->label(__('dashboard.category_service'))
-                            ->options(
-                                CategoryService::active()->pluck('name', 'id')
-                            )
+                            ->options(CategoryService::active()->pluck('name', 'id'))
                             ->searchable()
                             ->required(),
 
@@ -98,28 +75,8 @@ class ServiceResource extends Resource
                             ->options(TypeEnum::options())
                             ->required()
                             ->native(false)
-                            ->searchable()
-                            ->live()
-                            ->afterStateUpdated(function ($state, Forms\Set $set) {
-                                if ($state !== TypeEnum::HOME->value) {
-                                    $set('main_service_id', null);
-                                }
-                            }),
+                            ->searchable(),
                     ]),
-
-                Select::make('main_service_id')
-                    ->label(__('main service'))
-                    ->options(
-                        fn (Get $get): array => MainService::query()
-                          ->active()
-                            ->pluck('name', 'id')
-                            ->toArray()
-                    )
-                    ->required(fn (Get $get): bool => $get('type') === TypeEnum::HOME->value)
-                    ->hidden(fn (Get $get): bool => $get('type') !== TypeEnum::HOME->value)
-                    ->helperText(__('Select main service for home page display'))
-                    ->searchable()
-                    ->native(false),
 
                 Forms\Components\TextInput::make('name.ar')
                     ->label(__('dashboard.arabic_name'))
@@ -134,40 +91,24 @@ class ServiceResource extends Resource
                 Forms\Components\Textarea::make('content.ar')
                     ->label(__('dashboard.arabic_content'))
                     ->required()
-                    ->columnSpanFull()
-                    ->rows(5),
+                    ->columnSpanFull(),
 
                 Forms\Components\Textarea::make('content.en')
                     ->label(__('dashboard.english_content'))
                     ->required()
-                    ->columnSpanFull()
-                    ->rows(5),
+                    ->columnSpanFull(),
 
-                Forms\Components\Grid::make(2)
-                    ->schema([
-                        Forms\Components\TextInput::make('price')
-                            ->label(__('dashboard.price'))
-                            ->numeric()
-                            ->required()
-                            ->prefix('SAR')
-                            ->minValue(0)
-                            ->rules([
-                                fn (Get $get) => Rule::when(
-                                    $get('final_price') && $get('price') <= $get('final_price'),
-                                    ['gt:final_price']
-                                )
-                            ])
-                            ->helperText(__('Original price (must be higher than final price)')),
+                Forms\Components\TextInput::make('price')
+                    ->label(__('dashboard.price'))
+                    ->numeric()
+                    ->required()
+                    ->prefix('SAR'),
 
-                        Forms\Components\TextInput::make('final_price')
-                            ->label(__('final price'))
-                            ->numeric()
-                            ->required()
-                            ->prefix('SAR')
-                            ->minValue(0)
-                            ->lt('price')
-                            ->helperText(__('Discounted price (must be less than regular price)')),
-                    ]),
+                Forms\Components\TextInput::make('final_price')
+                    ->label(__('final price'))
+                    ->numeric()
+                    ->required()
+                    ->prefix('SAR'),
 
                 Forms\Components\Toggle::make('is_active')
                     ->label(__('dashboard.active'))
@@ -176,28 +117,31 @@ class ServiceResource extends Resource
                     ->offColor('danger')
                     ->onIcon('heroicon-s-check')
                     ->offIcon('heroicon-s-x-mark')
-                    ->inline(false)
+                    ->inline(false),
             ]);
     }
-    public static function table(Table $table): Table
+
+    public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('categoryService.name')
                     ->label(__('dashboard.category'))
                     ->sortable()
                     ->searchable(),
+
                 Tables\Columns\TextColumn::make('category')
                     ->label(__('dashboard.type'))
                     ->formatStateUsing(fn (CategoryEnum $state) => $state->label())
                     ->sortable()
                     ->searchable(),
+
                 Tables\Columns\TextColumn::make('type')
                     ->label(__('list type'))
                     ->formatStateUsing(fn (TypeEnum $state) => $state->label())
                     ->sortable()
                     ->searchable(),
-
 
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('dashboard.name'))
@@ -223,16 +167,19 @@ class ServiceResource extends Resource
                     ->label(__('dashboard.category_service'))
                     ->options(CategoryService::all()->pluck('name', 'id'))
                     ->searchable(),
+
                 Tables\Filters\SelectFilter::make('category')
                     ->label(__('dashboard.type'))
                     ->options(CategoryEnum::options())
                     ->searchable()
                     ->native(false),
+
                 Tables\Filters\SelectFilter::make('type')
                     ->label(__('type list'))
                     ->options(TypeEnum::options())
                     ->searchable()
                     ->native(false),
+
                 Tables\Filters\SelectFilter::make('is_active')
                     ->label(__('dashboard.activation'))
                     ->options([
@@ -240,8 +187,10 @@ class ServiceResource extends Resource
                         0 => __('dashboard.inactive'),
                     ]),
 
-
                 Tables\Filters\TrashedFilter::make(),
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -254,29 +203,5 @@ class ServiceResource extends Resource
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-
-            RelationManagers\OrdersRelationManager::class,];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListServices::route('/'),
-            'create' => Pages\CreateService::route('/create'),
-            'edit' => Pages\EditService::route('/{record}/edit'),
-        ];
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ])->latest();
     }
 }

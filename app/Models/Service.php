@@ -20,6 +20,7 @@ class Service extends Model implements HasMedia
     public array $translatable = ['name', 'content'];
     protected $fillable = [
         'category_service_id',
+        'main_service_id',
         'category',
         'type',
         'name',
@@ -90,6 +91,12 @@ class Service extends Model implements HasMedia
     {
         return $this->belongsTo(CategoryService::class, 'category_service_id');
     }
+
+    public function mainService(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(MainService::class);
+    }
+
 
     public function orders(): HasMany
     {

@@ -50,5 +50,8 @@ return [
     'clients' => 'Clients',
     'Timeline of request types' => 'Timeline of request types',
     'orders_by_type' => 'Orders By Type',
+    'main_services' => 'Main Services',
+    'main_service' => 'Main Service',
+    'images' => 'Images',
 
 ];

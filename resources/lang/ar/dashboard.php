@@ -52,6 +52,9 @@ return [
     'Timeline of request types' => 'رسم زمني توضيحي لأنواع الطلبات',
     'orders_by_type' => 'طلبات بنوع',
 
+    'main_services' => 'الخدمات الرئيسية',
+    'main_service' => 'خدمة رئيسية',
+    'images' => 'الصور',
 
 
 ];
