@@ -7,22 +7,32 @@ use App\Enum\SliderTypeEnum;
 use App\Enum\TypeEnum;
 use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MainServiceResource;
 use App\Http\Resources\ServiceListResource;
 use App\Http\Resources\SliderResource;
+use App\Models\MainService;
 use App\Models\Service;
 use App\Models\Slider;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
+
     public function home(Request $request)
     {
+        $mainServices = MainService::active()->paginate(10);
+        return MainServiceResource::collection($mainServices);
+    }
+
+    public function ServicesByMian(Request $request, $id)
+    {
+
         $search = $request->get('search') ;
             $locale = app()->getLocale();
 
         $slidersInternal = Slider::active()->whereType(SliderTypeEnum::INTERNAL)->get();
 
-        $allServices = Service::active()
+        $allServices = Service::whereMainServiceId($id)->active()
             ->whereType(TypeEnum::HOME)
             ->whereCategory(CategoryEnum::PRODUCTS)
             ->when($search, function ($query) use ($search, $locale) {
@@ -31,7 +41,8 @@ class HomeController extends Controller
                         ->orWhere('price', 'like', "%{$search}%");
                 });
             })
-            ->get();
+            ->latest()
+            ->paginate(10);
 
         return ApiResponder::loaded([
             'sliders' => SliderResource::collection($slidersInternal),
