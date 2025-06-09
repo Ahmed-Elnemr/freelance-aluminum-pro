@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Enum\CategoryEnum;
 use App\Enum\SliderTypeEnum;
+use App\Enum\TypeEnum;
 use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ServiceListResource;
@@ -21,6 +23,8 @@ class HomeController extends Controller
         $slidersInternal = Slider::active()->whereType(SliderTypeEnum::INTERNAL)->get();
 
         $allServices = Service::active()
+            ->whereType(TypeEnum::HOME)
+            ->whereCategory(CategoryEnum::PRODUCTS)
             ->when($search, function ($query) use ($search, $locale) {
                 $query->where(function ($q) use ($search, $locale) {
                     $q->where("name->{$locale}", 'like', "%{$search}%")

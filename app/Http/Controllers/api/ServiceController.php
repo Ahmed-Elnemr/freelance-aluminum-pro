@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 use App\Enum\CategoryEnum;
 use App\Enum\SliderTypeEnum;
+use App\Enum\TypeEnum;
 use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ServiceListResource;
@@ -15,21 +16,31 @@ use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
-    public function products()
-    {
-        $services = Service::active()->whereCategory(CategoryEnum::PRODUCTS)->latest()->paginate(10);
-        return ApiResponder::loaded([
-            'services' => ServiceListResource::collection($services)
-        ]);
-    }
 
-    public function maintenance()
+    public function services()
     {
-        $services = Service::active()->whereCategory(CategoryEnum::MAINTENANCE)->latest()->paginate(10);
+        $services = Service::active()
+            ->whereType(TypeEnum::SERVICES)
+            ->whereCategory(CategoryEnum::PRODUCTS)->latest()->paginate(10);
         return ApiResponder::loaded([
             'services' => ServiceListResource::collection($services)
         ]);
     }
+//    public function products()
+//    {
+//        $services = Service::active()->whereCategory(CategoryEnum::PRODUCTS)->latest()->paginate(10);
+//        return ApiResponder::loaded([
+//            'services' => ServiceListResource::collection($services)
+//        ]);
+//    }
+//
+//    public function maintenance()
+//    {
+//        $services = Service::active()->whereCategory(CategoryEnum::MAINTENANCE)->latest()->paginate(10);
+//        return ApiResponder::loaded([
+//            'services' => ServiceListResource::collection($services)
+//        ]);
+//    }
 
     //todo:show
 
@@ -88,6 +99,8 @@ class ServiceController extends Controller
         $locale = app()->getLocale();
 
         $allServices = Service::active()
+            ->whereType(TypeEnum::HOME)
+            ->whereCategory(CategoryEnum::PRODUCTS)
             ->when($search, function ($query) use ($search, $locale) {
                 $query->where(function ($q) use ($search, $locale) {
                     $q->where("name->{$locale}", 'like', "%{$search}%")

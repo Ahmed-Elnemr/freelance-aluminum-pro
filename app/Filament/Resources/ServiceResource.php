@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Enum\CategoryEnum;
+use App\Enum\TypeEnum;
 use App\Filament\Resources\ServiceResource\Pages;
 use App\Filament\Resources\ServiceResource\RelationManagers;
 use App\Models\Service;
@@ -71,20 +72,31 @@ class ServiceResource extends Resource
                     ->columnSpanFull(),
 
 
-                Forms\Components\Select::make('category_service_id')
-                    ->label(__('dashboard.category_service'))
-                    ->options(
-                        CategoryService::active()->pluck('name', 'id')
-                    )
-                    ->searchable()
-                    ->required(),
+                Forms\Components\Grid::make(3)
+                    ->schema([
+                        Forms\Components\Select::make('category_service_id')
+                            ->label(__('dashboard.category_service'))
+                            ->options(
+                                CategoryService::active()->pluck('name', 'id')
+                            )
+                            ->searchable()
+                            ->required(),
 
-                Forms\Components\Select::make('category')
-                    ->label(__('dashboard.type'))
-                    ->options(CategoryEnum::options())
-                    ->required()
-                    ->native(false)
-                    ->searchable(),
+                        Forms\Components\Select::make('category')
+                            ->label(__('dashboard.type'))
+                            ->options(CategoryEnum::options())
+                            ->required()
+                            ->native(false)
+                            ->searchable(),
+
+                        Forms\Components\Select::make('type')
+                            ->label(__('list type'))
+                            ->options(TypeEnum::options())
+                            ->required()
+                            ->native(false)
+                            ->searchable(),
+                    ]),
+
 
                 Forms\Components\TextInput::make('name.ar')
                     ->label(__('dashboard.arabic_name'))
@@ -143,6 +155,12 @@ class ServiceResource extends Resource
                     ->formatStateUsing(fn (CategoryEnum $state) => $state->label())
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('type')
+                    ->label(__('list type'))
+                    ->formatStateUsing(fn (TypeEnum $state) => $state->label())
+                    ->sortable()
+                    ->searchable(),
+
 
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('dashboard.name'))
@@ -171,6 +189,11 @@ class ServiceResource extends Resource
                 Tables\Filters\SelectFilter::make('category')
                     ->label(__('dashboard.type'))
                     ->options(CategoryEnum::options())
+                    ->searchable()
+                    ->native(false),
+                Tables\Filters\SelectFilter::make('type')
+                    ->label(__('type list'))
+                    ->options(TypeEnum::options())
                     ->searchable()
                     ->native(false),
                 Tables\Filters\SelectFilter::make('is_active')

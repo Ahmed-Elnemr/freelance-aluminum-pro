@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('services')->group(function () {
     Route::controller(ServiceController::class)->group(function () {
-        Route::get('products', 'products');
-        Route::get('maintenance', 'maintenance');
+        Route::get('', 'services');
+//        Route::get('products', 'products');
+//        Route::get('maintenance', 'maintenance');
         Route::get('{service}', 'show');
         Route::get('products/list', 'listProducts');
         Route::get('maintenance/list', 'listMaintenance');

@@ -106,5 +106,8 @@
     "device": "نوع الجهاز",
     "moyasar": "ميسر",
     "The service has been booked successfully.": "تم حجز الخدمة بنجاح.",
-    "An error occurred while booking the service. Try again.": "حدث خطأ اثناء حجز الخدمة. حاول مرة اخرى."
+    "An error occurred while booking the service. Try again.": "حدث خطأ اثناء حجز الخدمة. حاول مرة اخرى.",
+    "home": "الصفحة الرئيسية",
+    "services": "الخدمات",
+    "list type": "نوع العرض "
 }

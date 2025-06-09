@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enum\CategoryEnum;
+use App\Enum\TypeEnum;
 use App\Traits\HasActiveScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,6 +21,7 @@ class Service extends Model implements HasMedia
     protected $fillable = [
         'category_service_id',
         'category',
+        'type',
         'name',
         'content',
         'price',
@@ -29,6 +31,7 @@ class Service extends Model implements HasMedia
 
     protected $casts = [
         'category' => CategoryEnum::class,
+        'type' => TypeEnum::class,
     ];
 
     public function registerMediaCollections(): void
