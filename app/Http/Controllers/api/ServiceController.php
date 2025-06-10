@@ -130,7 +130,6 @@ class ServiceController extends Controller
         $locale = app()->getLocale();
 
         $allServices = Service::active()
-            ->whereType(TypeEnum::HOME)
             ->whereCategory(CategoryEnum::PRODUCTS)
             ->when($search, function ($query) use ($search, $locale) {
                 $query->where(function ($q) use ($search, $locale) {
