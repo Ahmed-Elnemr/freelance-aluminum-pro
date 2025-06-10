@@ -20,7 +20,7 @@ class HomeController extends Controller
 
     public function home(Request $request)
     {
-        $mainServices = MainService::active()->paginate(10);
+        $mainServices = MainService::whereType(TypeEnum::HOME)->active()->paginate(10);
         $slidersInternal = Slider::active()->whereType(SliderTypeEnum::INTERNAL)->get();
         return ApiResponder::loaded([
             'sliders' => SliderResource::collection($slidersInternal),

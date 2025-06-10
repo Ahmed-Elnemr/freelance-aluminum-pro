@@ -7,16 +7,46 @@ use App\Enum\SliderTypeEnum;
 use App\Enum\TypeEnum;
 use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MainServiceResource;
 use App\Http\Resources\ServiceListResource;
 use App\Http\Resources\ServiceResource;
 use App\Http\Resources\SliderResource;
+use App\Models\MainService;
 use App\Models\Service;
 use App\Models\Slider;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
+    public function mainServices(Request $request)
+    {
+        $mainServices = MainService::whereType(TypeEnum::SERVICES)->active()->paginate(10);
+        return ApiResponder::loaded([
+            'main_services'=> MainServiceResource::collection($mainServices)
+        ]);
+    }
 
+    public function ServicesByMian(Request $request, $id)
+    {
+
+        $search = $request->get('search') ;
+        $locale = app()->getLocale();
+        $allServices = Service::whereMainServiceId($id)->active()
+            ->whereType(TypeEnum::SERVICES)
+            ->whereCategory(CategoryEnum::PRODUCTS)
+            ->when($search, function ($query) use ($search, $locale) {
+                $query->where(function ($q) use ($search, $locale) {
+                    $q->where("name->{$locale}", 'like', "%{$search}%")
+                        ->orWhere('price', 'like', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate(10);
+
+        return ApiResponder::loaded([
+            'services' => ServiceListResource::collection($allServices),
+        ]);
+    }
     public function services()
     {
         $services = Service::active()
@@ -26,6 +56,7 @@ class ServiceController extends Controller
             'services' => ServiceListResource::collection($services)
         ]);
     }
+
 //    public function products()
 //    {
 //        $services = Service::active()->whereCategory(CategoryEnum::PRODUCTS)->latest()->paginate(10);

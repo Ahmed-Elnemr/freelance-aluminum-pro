@@ -76,7 +76,7 @@ class ServiceResource extends Resource
                     ->imageEditor()
                     ->columnSpanFull(),
 
-                Forms\Components\Grid::make(3)
+                Forms\Components\Grid::make(4)
                     ->schema([
                         Forms\Components\Select::make('category_service_id')
                             ->label(__('dashboard.category_service'))
@@ -105,21 +105,30 @@ class ServiceResource extends Resource
                                     $set('main_service_id', null);
                                 }
                             }),
+
+                        Select::make('main_service_id')
+                            ->label(__('main service'))
+                            ->options(function (Get $get) {
+                                $type = $get('type');
+
+                                if (!in_array($type, [TypeEnum::HOME->value, TypeEnum::SERVICES->value])) {
+                                    return [];
+                                }
+
+                                return MainService::query()
+                                    ->where('type', $type)
+                                    ->active()
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            })
+                            ->required(fn (Get $get): bool => in_array($get('type'), [TypeEnum::HOME->value, TypeEnum::SERVICES->value]))
+                            ->hidden(fn (Get $get): bool => !in_array($get('type'), [TypeEnum::HOME->value, TypeEnum::SERVICES->value]))
+                            ->searchable()
+                            ->native(false)
+                            ->reactive(),
                     ]),
 
-                Select::make('main_service_id')
-                    ->label(__('main service'))
-                    ->options(
-                        fn (Get $get): array => MainService::query()
-                          ->active()
-                            ->pluck('name', 'id')
-                            ->toArray()
-                    )
-                    ->required(fn (Get $get): bool => $get('type') === TypeEnum::HOME->value)
-                    ->hidden(fn (Get $get): bool => $get('type') !== TypeEnum::HOME->value)
-                    ->helperText(__('Select main service for home page display'))
-                    ->searchable()
-                    ->native(false),
+
 
                 Forms\Components\TextInput::make('name.ar')
                     ->label(__('dashboard.arabic_name'))

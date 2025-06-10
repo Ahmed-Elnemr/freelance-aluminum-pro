@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enum\TypeEnum;
 use App\Traits\HasActiveScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -17,9 +18,12 @@ class MainService extends Model  implements HasMedia
     protected $fillable = [
         'name',
         'content',
+        'type',
         'is_active'
     ];
-
+    protected $casts = [
+        'type' => TypeEnum::class,
+    ];
     public function services(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Service::class);

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enum\TypeEnum;
 use App\Filament\Resources\MainServiceResource\Pages;
 use App\Models\MainService;
 use Filament\Forms;
@@ -60,6 +61,20 @@ class MainServiceResource extends Resource
                     ->openable()
                     ->downloadable()
                     ->columnSpanFull(),
+                Forms\Components\Grid::make(1)
+                    ->schema([
+                        Forms\Components\Select::make('type')
+                            ->label(__('list type'))
+                            ->options(TypeEnum::options())
+                            ->required()
+                            ->native(false)
+                            ->searchable()
+                            ->live()
+                            ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                if ($state !== TypeEnum::HOME->value) {
+                                    $set('main_service_id', null);
+                                }
+                            }),]),
 
                 Forms\Components\TextInput::make('name.ar')
                     ->label(__('dashboard.arabic_name'))
@@ -97,7 +112,11 @@ class MainServiceResource extends Resource
                     ->label(__('dashboard.name'))
                     ->sortable()
                     ->searchable(),
-
+                Tables\Columns\TextColumn::make('type')
+                    ->label(__('list type'))
+                    ->formatStateUsing(fn (TypeEnum $state) => $state->label())
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\BooleanColumn::make('is_active')
                     ->label(__('dashboard.active'))
                     ->sortable(),
@@ -109,6 +128,11 @@ class MainServiceResource extends Resource
                         1 => __('dashboard.active'),
                         0 => __('dashboard.inactive'),
                     ]),
+                Tables\Filters\SelectFilter::make('type')
+                    ->label(__('type list'))
+                    ->options(TypeEnum::options())
+                    ->searchable()
+                    ->native(false),
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
