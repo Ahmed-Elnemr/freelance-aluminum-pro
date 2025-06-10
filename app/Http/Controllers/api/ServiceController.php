@@ -139,7 +139,7 @@ class ServiceController extends Controller
                 });
             })
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return ApiResponder::loaded([
             'services' => ServiceListResource::collection($allServices),
