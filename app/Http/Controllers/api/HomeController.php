@@ -21,7 +21,11 @@ class HomeController extends Controller
     public function home(Request $request)
     {
         $mainServices = MainService::active()->paginate(10);
-        return MainServiceResource::collection($mainServices);
+        $slidersInternal = Slider::active()->whereType(SliderTypeEnum::INTERNAL)->get();
+        return ApiResponder::loaded([
+            'sliders' => SliderResource::collection($slidersInternal),
+            'main_services'=> MainServiceResource::collection($mainServices)
+        ]);
     }
 
     public function ServicesByMian(Request $request, $id)
@@ -30,7 +34,7 @@ class HomeController extends Controller
         $search = $request->get('search') ;
             $locale = app()->getLocale();
 
-        $slidersInternal = Slider::active()->whereType(SliderTypeEnum::INTERNAL)->get();
+
 
         $allServices = Service::whereMainServiceId($id)->active()
             ->whereType(TypeEnum::HOME)
@@ -45,7 +49,6 @@ class HomeController extends Controller
             ->paginate(10);
 
         return ApiResponder::loaded([
-            'sliders' => SliderResource::collection($slidersInternal),
             'services' => ServiceListResource::collection($allServices),
         ]);
     }
