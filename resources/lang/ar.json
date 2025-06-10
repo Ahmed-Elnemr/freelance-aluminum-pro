@@ -114,7 +114,9 @@
     "Discounted price (must be less than regular price)": "السعر المخفض (يجب ان يكون اقل من السعر العادي)",
     "main service": "الخدمة الرئيسية",
     "Select main service for home page display": "حدد الخدمة الرئيسية لعرضها في الصفحة الرئيسية",
-    "type list": "نوع العرض"
+    "type list": "نوع العرض",
+    "You have already requested a preview of this service.": "لقد قمت بطلب معاينة هذه الخدمة من قبل.",
+    "Your preview request has been sent successfully.": "تم إرسال طلب المعاينة بنجاح."
 
 
 }

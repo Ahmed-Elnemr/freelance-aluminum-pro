@@ -4,6 +4,7 @@ use App\Http\Controllers\api\FavoriteController;
 use App\Http\Controllers\api\PaymentController;
 use App\Http\Controllers\api\RateController;
 use App\Http\Controllers\api\ServiceController;
+use App\Http\Controllers\Api\ServiceInspectionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('services')->group(function () {
@@ -17,8 +18,8 @@ Route::prefix('services')->group(function () {
         Route::get('products/list', 'listProducts');
         Route::get('maintenance/list', 'listMaintenance');
         Route::post('search', 'search');
-
     });
+    Route::middleware('auth:sanctum')->post('/request-inspection', [ServiceInspectionController::class, 'requestInspection']);
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('favourite', [FavoriteController::class, 'toggle']);
         Route::post('rate/{service}', [RateController::class, 'storeRate']);
