@@ -33,7 +33,7 @@ class ServiceController extends Controller
         $locale = app()->getLocale();
         $allServices = Service::whereMainServiceId($id)->active()
             ->whereType(TypeEnum::SERVICES)
-            ->whereCategory(CategoryEnum::PRODUCTS)
+            ->whereCategory(CategoryEnum::PRODUCTS->value)
             ->when($search, function ($query) use ($search, $locale) {
                 $query->where(function ($q) use ($search, $locale) {
                     $q->where("name->{$locale}", 'like', "%{$search}%")
@@ -51,7 +51,7 @@ class ServiceController extends Controller
     {
         $services = Service::active()
             ->whereType(TypeEnum::SERVICES)
-            ->whereCategory(CategoryEnum::PRODUCTS)->latest()->paginate(10);
+            ->whereCategory(CategoryEnum::PRODUCTS->value)->latest()->paginate(10);
         return ApiResponder::loaded([
             'services' => ServiceListResource::collection($services)
         ]);
@@ -96,7 +96,7 @@ class ServiceController extends Controller
     public function listProducts()
     {
         $services = Service::active()
-            ->whereCategory(CategoryEnum::PRODUCTS)
+            ->whereCategory(CategoryEnum::PRODUCTS->value)
             ->latest()
             ->get(['id', 'name'])
             ->map(fn($service) => [
@@ -110,7 +110,7 @@ class ServiceController extends Controller
     public function listMaintenance()
     {
         $services = Service::active()
-            ->whereCategory(CategoryEnum::MAINTENANCE)
+            ->whereCategory(CategoryEnum::MAINTENANCE->value)
             ->latest()
             ->get(['id', 'name'])
             ->map(fn($service) => [
@@ -130,7 +130,7 @@ class ServiceController extends Controller
         $locale = app()->getLocale();
 
         $allServices = Service::active()
-            ->whereCategory(CategoryEnum::PRODUCTS)
+            ->whereCategory(CategoryEnum::PRODUCTS->value)
             ->when($search, function ($query) use ($search, $locale) {
                 $query->where(function ($q) use ($search, $locale) {
                     $q->where("name->{$locale}", 'like', "%{$search}%")

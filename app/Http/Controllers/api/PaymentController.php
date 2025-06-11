@@ -31,7 +31,7 @@ class PaymentController extends Controller
 
         $finalPrice = $service->final_price;
 
-        if ($service->category === \App\Enum\CategoryEnum::MAINTENANCE && $finalPrice < 100) {
+        if ($service->category === \App\Enum\CategoryEnum::MAINTENANCE->value && $finalPrice < 100) {
             $finalPrice += 50;
         }
 

@@ -38,7 +38,7 @@ class HomeController extends Controller
 
         $allServices = Service::whereMainServiceId($id)->active()
             ->whereType(TypeEnum::HOME)
-            ->whereCategory(CategoryEnum::PRODUCTS)
+            ->whereCategory(CategoryEnum::PRODUCTS->value)
             ->when($search, function ($query) use ($search, $locale) {
                 $query->where(function ($q) use ($search, $locale) {
                     $q->where("name->{$locale}", 'like', "%{$search}%")
