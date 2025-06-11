@@ -20,6 +20,7 @@ class OrderResource extends JsonResource
             'location' => (string) $this->location_name,
             'latitude' => (float) $this->latitude,
             'longitude' => (float) $this->longitude,
+            'service_id' => (int) $this->service?->id,
             'category_type' => (string) $this->service?->category?->value,
             'category_label' => (string) $this->service?->category?->label(),
             'price' => (double) $this->service->price,

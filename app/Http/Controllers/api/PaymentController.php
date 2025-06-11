@@ -29,7 +29,17 @@ class PaymentController extends Controller
 
         $service = Service::find($cached['order_data']['service_id']);
 
-        return view('payments.payments-moyasar', compact('service', 'userId'));
+        $finalPrice = $service->final_price;
+
+        if ($service->category === \App\Enum\CategoryEnum::MAINTENANCE && $finalPrice < 100) {
+            $finalPrice += 50;
+        }
+
+        return view('payments.payments-moyasar', [
+            'service' => $service,
+            'userId' => $userId,
+            'finalPrice' => $finalPrice,
+        ]);
     }
 
 

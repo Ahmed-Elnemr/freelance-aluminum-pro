@@ -26,6 +26,7 @@ class Order extends Model implements HasMedia
         'longitude',
         'location_name',
         'description',
+        'internal_note',
         'status',
         'is_active',
     ];

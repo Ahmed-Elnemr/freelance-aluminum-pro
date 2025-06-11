@@ -27,6 +27,7 @@ class OrderController extends Controller
             'longitude' => $request->longitude,
             'location_name' => $request->location_name,
             'description' => $request->description,
+            'internal_note'=>$request->internal_note ?? null,
             'status' => OrderStatusEnum::CURRENT,
             'is_active' => true,
         ];
