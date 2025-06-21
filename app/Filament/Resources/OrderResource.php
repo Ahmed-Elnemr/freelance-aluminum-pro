@@ -157,6 +157,10 @@ class OrderResource extends Resource
                             ->default(true)
                             ->onColor('success')
                             ->offColor('danger'),
+                        Forms\Components\Textarea::make('internal_note')
+                            ->label(__('dashboard.internal_note'))
+                            ->rows(4)
+                            ->columnSpanFull()
                     ]),
 
                 Section::make(__('media'))

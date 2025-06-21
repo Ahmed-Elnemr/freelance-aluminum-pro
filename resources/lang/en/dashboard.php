@@ -57,5 +57,6 @@ return [
     'service_inspections' => 'معاينات الخدمات',
 
     'inspected_at' => 'وقت المعاينة',
+    'internal_note'=>'Notes before payment'
 
 ];
