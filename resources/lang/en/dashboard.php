@@ -53,5 +53,9 @@ return [
     'main_services' => 'Main Services',
     'main_service' => 'Main Service',
     'images' => 'Images',
+    'service_inspection' => 'معاينة الخدمة',
+    'service_inspections' => 'معاينات الخدمات',
+
+    'inspected_at' => 'وقت المعاينة',
 
 ];
