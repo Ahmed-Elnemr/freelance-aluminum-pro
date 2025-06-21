@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasActiveScope;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
@@ -23,5 +24,17 @@ class CategoryService extends Model  implements HasMedia
     }
     //todo: # end relation  #
 
-
+    //todo:filament
+    protected static function booted(): void
+    {
+        static::deleting(function ($categorySerice) {
+            if ($categorySerice->services()->exists()) {
+                Notification::make()
+                    ->title(__('This category cannot be deleted because it contains services.'))
+                    ->danger()
+                    ->send();
+                return false;
+            }
+        });
+    }
 }

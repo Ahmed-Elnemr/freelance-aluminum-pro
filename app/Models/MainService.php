@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Translatable\HasTranslations;
+use Filament\Notifications\Notification;
 
 class MainService extends Model  implements HasMedia
 {
@@ -34,4 +35,17 @@ class MainService extends Model  implements HasMedia
         $this->addMediaCollection('main_services');
     }
 
+    //todo:filament
+    protected static function booted(): void
+    {
+        static::deleting(function ($mainService) {
+            if ($mainService->services()->exists()) {
+                Notification::make()
+                    ->title(__('This main services cannot be deleted because they contain services.'))
+                    ->danger()
+                    ->send();
+                return false;
+            }
+        });
+    }
 }

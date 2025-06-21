@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enum\CategoryEnum;
 use App\Enum\TypeEnum;
 use App\Traits\HasActiveScope;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -101,8 +102,6 @@ class Service extends Model implements HasMedia
     public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
-
-
     }
 
     public function ratings(): \Illuminate\Database\Eloquent\Relations\MorphMany
@@ -115,8 +114,19 @@ class Service extends Model implements HasMedia
         return $this->morphMany(Favorite::class, 'favouritable');
     }
 
-
-
-
     //todo: # end relation  #
+
+    //todo:filament
+    protected static function booted(): void
+    {
+        static::deleting(function ($service) {
+            if ($service->orders()->exists()) {
+                Notification::make()
+                    ->title(__('This service cannot be deleted because it contains requests.'))
+                    ->danger()
+                    ->send();
+                return false;
+            }
+        });
+    }
 }

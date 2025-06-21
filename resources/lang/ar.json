@@ -116,7 +116,10 @@
     "Select main service for home page display": "حدد الخدمة الرئيسية لعرضها في الصفحة الرئيسية",
     "type list": "نوع العرض",
     "You have already requested a preview of this service.": "لقد قمت بطلب معاينة هذه الخدمة من قبل.",
-    "Your preview request has been sent successfully.": "تم إرسال طلب المعاينة بنجاح."
+    "Your preview request has been sent successfully.": "تم إرسال طلب المعاينة بنجاح.",
+    "This main services cannot be deleted because they contain services.": "لايمكن مسح هذة الخدمة الرئيسية لانها تحتوي ع خدمات ",
+    "This category cannot be deleted because it contains services.": "لايمكن مسح  هذا القسم لانه يحتوي ع خدمات ",
+    "This service cannot be deleted because it contains requests.": "لايمكن مسح  هذه الخدمة لانها تحتوي ع طلبات  "
 
 
 }
