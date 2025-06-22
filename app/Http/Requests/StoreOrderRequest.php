@@ -30,7 +30,9 @@ class StoreOrderRequest extends FormRequest
             'description' => 'nullable|string|max:1000',
             'internal_note'=>'nullable|string|max:1000',
             'images' => 'nullable|array',
-            'images.*' => 'nullable|mimes:jpg,jpeg,png,gif,webp,mp4,avi,mkv|max:10240',
+            'images.*' => 'nullable|mimes:jpg,jpeg,png,gif,webp,avi,mkv|max:10240',
+            'sounds' => 'nullable|array',
+            'sounds.*' => 'nullable|mimes:mp3,wav,ogg,m4a|max:10240',
 
             'paymentmethod' =>'required','integer|in:'.PaymentMethodEnum::moyasar->value.'',
 

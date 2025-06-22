@@ -190,6 +190,25 @@ class OrderResource extends Resource
                             ->panelLayout('grid')
                             ->appendFiles()
                             ->columnSpanFull(),
+                        SpatieMediaLibraryFileUpload::make('sounds')
+                            ->label(__('dashboard.audio_records'))
+                            ->collection('sounds')
+                            ->multiple()
+                            ->reorderable()
+                            ->downloadable()
+                            ->openable()
+                            ->previewable(false)
+                            ->maxSize(10240)
+                            ->maxFiles(10)
+                            ->acceptedFileTypes([
+                                'audio/mpeg',
+                                'audio/wav',
+                                'audio/x-wav',
+                                'audio/x-m4a',
+                                'audio/ogg',
+                            ])
+                            ->appendFiles()
+                            ->columnSpanFull(),
                     ])
                     ->collapsible()
                     ->collapsed(false) ,

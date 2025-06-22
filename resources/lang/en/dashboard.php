@@ -57,6 +57,8 @@ return [
     'service_inspections' => 'معاينات الخدمات',
 
     'inspected_at' => 'وقت المعاينة',
-    'internal_note'=>'Notes before payment'
+    'internal_note'=>'Notes before payment',
+    'audio_records' => 'audio records',
+
 
 ];

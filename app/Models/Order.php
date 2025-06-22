@@ -47,6 +47,8 @@ class Order extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('media')->useDisk('public');
+        $this->addMediaCollection('sounds')->useDisk('public');
+
     }
 //todo:api method end #
 

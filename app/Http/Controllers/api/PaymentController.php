@@ -66,6 +66,16 @@ class PaymentController extends Controller
                     }
                 }
             }
+            if (!empty($cached['sounds'])) {
+                foreach ($cached['sounds'] as $soundPath) {
+                    $fullPath = storage_path("app/{$soundPath}");
+                    if (file_exists($fullPath)) {
+                        $order->addMedia($fullPath)->toMediaCollection('sounds');
+                        // unlink($fullPath); // احذف الملف بعد التخزين لو حابب
+                    }
+                }
+            }
+
 
             $order->user->notify(new OrderCreatedNotification($order));
 

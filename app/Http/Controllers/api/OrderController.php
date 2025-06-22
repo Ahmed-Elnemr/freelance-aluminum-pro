@@ -47,10 +47,28 @@ class OrderController extends Controller
             }
         }
 
+        $soundPaths = [];
+
+        if ($request->hasFile('sounds')) {
+            $tempPath = storage_path("app/temp-user-uploads/{$user->id}/sounds/");
+            if (!file_exists($tempPath)) {
+                mkdir($tempPath, 0755, true);
+            }
+
+            foreach ($request->file('sounds') as $index => $sound) {
+                $filename = "sound_$index." . $sound->getClientOriginalExtension();
+                $sound->move($tempPath, $filename);
+                $soundPaths[] = "temp-user-uploads/{$user->id}/sounds/{$filename}";
+            }
+        }
+
+
+
         $cacheKey = 'pending_order_' . $user->id;
         Cache::put($cacheKey, [
             'order_data' => $orderData,
-            'images' => $imagePaths
+            'images' => $imagePaths,
+                'sounds' => $soundPaths
         ], now()->addMinutes(5));
 
         if ((int)$request->paymentmethod === PaymentMethodEnum::moyasar->value) {
