@@ -27,13 +27,13 @@ class CheckMobileOtpRequest extends FormRequest
         ];
     }
 
-    public function messages(): array
-    {
-        return [
-            'mobile.required' => __('validation.mobile_required'),
-            'mobile.exists' => __('validation.mobile_exists'),
-            'code.required' => __('validation.code_required'),
-            'code.digits' => __('validation.code_digits'),
-        ];
-    }
+//    public function messages(): array
+//    {
+//        return [
+//            'mobile.required' => __('validation.mobile_required'),
+//            'mobile.exists' => __('validation.mobile_exists'),
+//            'code.required' => __('validation.code_required'),
+//            'code.digits' => __('validation.code_digits'),
+//        ];
+//    }
 }

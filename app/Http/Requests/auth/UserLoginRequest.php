@@ -36,25 +36,25 @@ class UserLoginRequest extends FormRequest
     }
 
 
-    public function messages(): array
-    {
-        return [
-            'mobile_required' => __('validation.mobile_required'),
-            'mobile.exists' => __('validation.mobile_exists'),
-            'uuid.required' => __('validation.uuid_required'),
-            'uuid.string' => __('validation.uuid_string'),
-            'device_token.required' => __('validation.device_token_required'),
-            'device_type.required' => __('validation.device_type_required'),
-            'device_type.string' => __('validation.device_type_string'),
-        ];
-    }
-    public function attributes(): array
-    {
-        return [
-            'mobile' => __('mobile'),
-            'uuid' => __('uuid'),
-            'device_token' => __('device_token'),
-            'device_type' => __('device_type'),
-        ];
-    }
+//    public function messages(): array
+//    {
+//        return [
+//            'mobile_required' => __('validation.mobile_required'),
+//            'mobile.exists' => __('validation.mobile_exists'),
+//            'uuid.required' => __('validation.uuid_required'),
+//            'uuid.string' => __('validation.uuid_string'),
+//            'device_token.required' => __('validation.device_token_required'),
+//            'device_type.required' => __('validation.device_type_required'),
+//            'device_type.string' => __('validation.device_type_string'),
+//        ];
+//    }
+//    public function attributes(): array
+//    {
+//        return [
+//            'mobile' => __('mobile'),
+//            'uuid' => __('uuid'),
+//            'device_token' => __('device_token'),
+//            'device_type' => __('device_type'),
+//        ];
+//    }
 }

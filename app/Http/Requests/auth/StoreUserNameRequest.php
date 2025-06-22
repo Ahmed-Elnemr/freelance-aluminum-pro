@@ -27,14 +27,14 @@ class StoreUserNameRequest extends FormRequest
         ];
     }
 
-    public function messages(): array
-    {
-        return [
-            'name.required' => __('api.validation.name.required'),
-            'name.string' => __('api.validation.name.string'),
-            'name.max' => __('api.validation.name.max'),
-            'name.min' => __('api.validation.name.min'),
-            'name.regex' => __('api.validation.name.format'),
-        ];
-    }
+//    public function messages(): array
+//    {
+//        return [
+//            'name.required' => __('api.validation.name.required'),
+//            'name.string' => __('api.validation.name.string'),
+//            'name.max' => __('api.validation.name.max'),
+//            'name.min' => __('api.validation.name.min'),
+//            'name.regex' => __('api.validation.name.format'),
+//        ];
+//    }
 }
