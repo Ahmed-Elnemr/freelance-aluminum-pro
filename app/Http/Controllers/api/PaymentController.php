@@ -30,21 +30,10 @@ class PaymentController extends Controller
         $service = Service::find($cached['order_data']['service_id']);
 
         $finalPrice = $service->final_price;
-      $x=  $finalPrice<100;
-        if ($service->category === \App\Enum\CategoryEnum::MAINTENANCE) {
 
-            dd($service->category,\App\Enum\CategoryEnum::MAINTENANCE , $x);
+        if ($service->category === \App\Enum\CategoryEnum::MAINTENANCE && $finalPrice < 100) {
+            $finalPrice += 50;
         }
-        if ($service->category == \App\Enum\CategoryEnum::MAINTENANCE->value ) {
-            dd('hh');
-        }
-        if ($finalPrice<100) {
-            dd('ii');
-        }
-
-//        if ($service->category === \App\Enum\CategoryEnum::MAINTENANCE->value && $finalPrice < 100) {
-//            $finalPrice += 50;
-//        }
 
         return view('payments.payments-moyasar', [
             'service' => $service,
