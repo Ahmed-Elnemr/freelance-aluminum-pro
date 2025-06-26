@@ -30,9 +30,10 @@ class PaymentController extends Controller
         $service = Service::find($cached['order_data']['service_id']);
 
         $finalPrice = $service->final_price;
+      $x=  $finalPrice<100;
         if ($service->category === \App\Enum\CategoryEnum::MAINTENANCE) {
 
-            dd('ff');
+            dd($service->category,\App\Enum\CategoryEnum::MAINTENANCE , $x);
         }
         if ($service->category == \App\Enum\CategoryEnum::MAINTENANCE->value ) {
             dd('hh');
