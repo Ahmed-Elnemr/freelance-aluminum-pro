@@ -33,6 +33,7 @@ class PaymentController extends Controller
 
         if ($service->category === \App\Enum\CategoryEnum::MAINTENANCE->value && $finalPrice < 100) {
             $finalPrice += 50;
+            dd($finalPrice);
         }
 
         return view('payments.payments-moyasar', [
