@@ -6,7 +6,7 @@
 <script>
     Moyasar.init({
         element: '.mysr-form',
-        amount: parseFloat("{{ $service->final_price * 100 }}"),
+        amount: parseFloat("{{ $finalPrice * 100 }}"),
         currency: 'SAR',
         description: "{{ __('Payment for service #: ') . $service->id }}",
             publishable_api_key: 'pk_test_3XBxAM3Mb6e7qALnJGvKaw4WYyrB9k3YPdXQcwHb',
