@@ -1,7 +1,11 @@
 <x-filament::page>
     <div class="flex flex-col md:flex-row gap-4">
+
         {{-- قائمة المحادثات --}}
-        <div class="w-full md:w-1/4 space-y-2 border p-4 rounded-md flex-shrink-0 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 max-h-screen overflow-y-auto">
+        <div
+            class="w-full md:w-1/4 space-y-2 border p-4 rounded-md flex-shrink-0 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700"
+            style="max-height: calc(100vh - 150px); overflow-y: auto;"
+        >
             <h3 class="text-lg font-bold mb-2">المحادثات</h3>
             @foreach($conversations as $conversation)
                 <div
@@ -25,8 +29,10 @@
                     المحادثة مع {{ $selectedConversation->client->name }}
                 </h2>
 
+                {{-- صندوق الرسائل --}}
                 <div
-                    class="border p-4 rounded-md overflow-y-auto bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 max-h-[500px] flex flex-col space-y-2"
+                    class="border p-4 rounded-md bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 flex flex-col space-y-2"
+                    style="max-height: 500px; overflow-y: auto;"
                     x-data
                     x-init="
                         const container = $el;
@@ -39,7 +45,7 @@
                         });
                     "
                 >
-                    {{-- زر عرض المزيد فوق الرسائل --}}
+                    {{-- زر عرض المزيد --}}
                     @if($messages->count() >= $perPage)
                         <div class="text-center mb-2">
                             <button wire:click="loadMoreMessages" class="text-sm text-blue-600 hover:underline">
@@ -76,7 +82,7 @@
                     @endforeach
                 </div>
 
-                {{-- إدخال الرسائل --}}
+                {{-- إرسال رسالة جديدة --}}
                 <form wire:submit.prevent="sendMessage" class="mt-4 flex items-center gap-2 w-full">
                     <input
                         wire:model.defer="newMessage"
