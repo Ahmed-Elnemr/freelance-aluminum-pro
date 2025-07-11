@@ -10,10 +10,6 @@ use App\Models\Service;
 use App\Models\User;
 use App\Notifications\OrderCompletedNotification;
 use Filament\Forms;
-use Filament\Forms\Components\Actions;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -22,10 +18,11 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Forms\Components\ViewField;
 
 class OrderResource extends Resource
 {
@@ -43,8 +40,7 @@ class OrderResource extends Resource
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return static::getModel()::active()->where('status', OrderStatusEnum::CURRENT->value)->count()
-        > 10 ? 'warning' : 'primary';
+        return static::getModel()::active()->where('status', OrderStatusEnum::CURRENT->value)->count() > 10 ? 'warning' : 'primary';
     }
 
     public static function getNavigationBadgeTooltip(): ?string
@@ -88,7 +84,7 @@ class OrderResource extends Resource
                                     ->latest()
                                     ->get()
                                     ->pluck('name', 'id')
-                                    ->filter(fn($label) => !is_null($label))
+                                    ->filter(fn ($label) => !is_null($label))
                             )
                             ->searchable()
                             ->required(),
@@ -97,7 +93,7 @@ class OrderResource extends Resource
                             ->label(__('dashboard.service'))
                             ->options(
                                 Service::active()->latest()->get()->pluck('name', 'id')
-                                    ->filter(fn($label) => !is_null($label))
+                                    ->filter(fn ($label) => !is_null($label))
                             )
                             ->searchable()
                             ->required(),
@@ -130,7 +126,6 @@ class OrderResource extends Resource
                     ])
                     ->columns(2),
 
-
                 Section::make(__('dashboard.additional_info'))
                     ->schema([
                         Forms\Components\Textarea::make('description.ar')
@@ -157,10 +152,11 @@ class OrderResource extends Resource
                             ->default(true)
                             ->onColor('success')
                             ->offColor('danger'),
+
                         Forms\Components\Textarea::make('internal_note')
                             ->label(__('dashboard.internal_note'))
                             ->rows(4)
-                            ->columnSpanFull()
+                            ->columnSpanFull(),
                     ]),
 
                 Section::make(__('media'))
@@ -176,7 +172,6 @@ class OrderResource extends Resource
                             ->responsiveImages()
                             ->imageEditor()
                             ->imageEditorEmptyFillColor('#000000')
-//                            ->imageEditorMode(2)
                             ->maxSize(256 * 10240)
                             ->maxFiles(10)
                             ->acceptedFileTypes([
@@ -184,12 +179,13 @@ class OrderResource extends Resource
                                 'image/png',
                                 'image/webp',
                                 'video/mp4',
-                                'video/quicktime'
+                                'video/quicktime',
                             ])
                             ->imagePreviewHeight('250')
                             ->panelLayout('grid')
                             ->appendFiles()
                             ->columnSpanFull(),
+
                         SpatieMediaLibraryFileUpload::make('sounds')
                             ->label(__('dashboard.audio_records'))
                             ->collection('sounds')
@@ -211,7 +207,7 @@ class OrderResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->collapsible()
-                    ->collapsed(false) ,
+                    ->collapsed(false),
             ]);
     }
 
@@ -233,6 +229,11 @@ class OrderResource extends Resource
                     ->sortable()
                     ->searchable(),
 
+                Tables\Columns\TextColumn::make('location_name')
+                    ->label(__('dashboard.location_name'))
+                    ->limit(30)
+                    ->tooltip(fn($record) => $record->location_name),
+
                 SpatieMediaLibraryImageColumn::make('media')
                     ->label(__('media'))
                     ->collection('media')
@@ -241,6 +242,8 @@ class OrderResource extends Resource
                     ->limit(3)
                     ->limitedRemainingText()
                     ->extraImgAttributes(['class' => 'object-cover']),
+
+
 
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('dashboard.status'))
@@ -253,11 +256,6 @@ class OrderResource extends Resource
                     ->sortable()
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('location_name')
-                    ->label(__('dashboard.location_name'))
-                    ->limit(30)
-                    ->tooltip(fn($record) => $record->location_name),
-
                 Tables\Columns\BooleanColumn::make('is_active')
                     ->label(__('dashboard.active'))
                     ->sortable(),
@@ -266,16 +264,14 @@ class OrderResource extends Resource
                 Tables\Filters\SelectFilter::make('user_id')
                     ->label(__('dashboard.user'))
                     ->options(
-                        User::all()->pluck('name', 'id')
-                            ->filter(fn($label) => !is_null($label))
+                        User::all()->pluck('name', 'id')->filter(fn($label) => !is_null($label))
                     )
                     ->searchable(),
 
                 Tables\Filters\SelectFilter::make('service_id')
                     ->label(__('dashboard.service'))
                     ->options(
-                        Service::all()->pluck('name', 'id')
-                            ->filter(fn($label) => !is_null($label))
+                        Service::all()->pluck('name', 'id')->filter(fn($label) => !is_null($label))
                     )
                     ->searchable(),
 
@@ -294,8 +290,16 @@ class OrderResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
+                Tables\Actions\Action::make('view_user')
+                    ->label('العميل')
+                    ->icon('heroicon-o-user')
+                    ->color('info')
+                    ->url(fn ($record) => UserResource::getUrl('edit', ['record' => $record->user_id]))
+                    ->tooltip('عرض بيانات المستخدم')
+                    ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -12,22 +12,23 @@ use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user';
+
     public static function getNavigationSort(): ?int
     {
         return 7;
     }
-    public static function getNavigationGroup( ): ?string
-    {
-        return __('Management' );
 
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Management');
     }
+
     public static function getNavigationLabel(): string
     {
         return __('Clients');
@@ -42,6 +43,7 @@ class UserResource extends Resource
     {
         return __('Clients');
     }
+
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->where('type', UserTypeEnum::CLIENT->value)->latest();
@@ -74,15 +76,11 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->label(__('Name'))->searchable(),
-                Tables\Columns\TextColumn::make('mobile')
+                Tables\Columns\TextColumn::make('name')->label(__('Name'))->searchable(),
+                Tables\Columns\TextColumn::make('mobile')->label(__('Mobile'))->searchable(),
 
-                    ->label(__('Mobile'))->searchable(),
+                Tables\Columns\IconColumn::make('is_active')->label(__('Is active'))->boolean(),
 
-                Tables\Columns\IconColumn::make('is_active')
-                    ->label(__('Is active'))
-                    ->boolean(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('حالة التحقق')
                     ->formatStateUsing(fn ($state) => match ((int) $state) {
@@ -114,10 +112,16 @@ class UserResource extends Resource
                         '0' => 'في انتظار التفعيل',
                     ]),
             ])
-
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+
+                Tables\Actions\Action::make('chat')
+                    ->label('محادثة')
+                    ->icon('heroicon-o-chat-bubble-left-right')
+                    ->color('primary')
+                    ->url(fn ($record) => route('filament.pages.chat-page', ['userId' => $record->id]))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
@@ -127,7 +131,7 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            OrdersRelationManager::make()
+            OrdersRelationManager::make(),
         ];
     }
 
@@ -139,6 +143,4 @@ class UserResource extends Resource
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
-
-
 }

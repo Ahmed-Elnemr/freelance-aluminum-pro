@@ -14,6 +14,14 @@ class EditUser extends EditRecord
     {
         return [
             Actions\DeleteAction::make(),
+            Actions\Action::make('go_to_chat')
+                ->label('المحادثة')
+                ->icon('heroicon-o-chat-bubble-left-right')
+                ->url(fn ($record) => route('filament.pages.chat-page', ['userId' => $record->id]))
+                ->openUrlInNewTab()
+                ->color('primary'),
         ];
     }
+
+
 }

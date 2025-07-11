@@ -6,6 +6,7 @@ use App\Models\Message;
 use App\Models\Conversation;
 use App\Models\ChatAttachment;
 use App\Events\MessageSentEvent;
+use App\Models\User;
 use App\Notifications\NewMessageFromAdminNotification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
@@ -33,9 +34,20 @@ class ChatPage extends Page
 
     protected $listeners = ['loadMoreMessages'];
 
-    public function mount(): void
+    public static function getRouteParameters(): array
+    {
+        return ['userId' => null];
+    }
+
+    public function mount(?int $userId = null): void
     {
         $this->conversations = Conversation::with('client', 'admin')->latest()->get();
+
+        if ($userId) {
+            $user = User::findOrFail($userId);
+            $conversation = Conversation::firstOrCreateBetween(auth()->id(), $user->id);
+            $this->showConversation($conversation->id);
+        }
     }
 
     public function showConversation($id): void
@@ -58,7 +70,7 @@ class ChatPage extends Page
             ->with('sender', 'attachments')
             ->take($this->page * $this->perPage)
             ->get()
-            ->reverse(); // نخلي الرسائل الأحدث تحت
+            ->reverse();
     }
 
     public function loadMoreMessages(): void
