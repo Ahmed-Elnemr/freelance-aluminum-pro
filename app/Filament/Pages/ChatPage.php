@@ -18,7 +18,6 @@ class ChatPage extends Page
     use WithFileUploads;
 
     protected static string $view = 'filament.pages.chat-page';
-
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
     public $conversations;
@@ -54,28 +53,17 @@ class ChatPage extends Page
     public function loadMessages(): void
     {
         $this->messages = Message::where('conversation_id', $this->selectedConversationId)
-            ->latest()
-            ->skip(($this->page - 1) * $this->perPage)
-            ->take($this->perPage)
+            ->orderBy('created_at', 'asc')
             ->with('sender', 'attachments')
-            ->get()
-            ->reverse()
-            ->values();
+            ->skip(0)
+            ->take($this->page * $this->perPage)
+            ->get();
     }
 
     public function loadMoreMessages(): void
     {
         $this->page++;
-        $moreMessages = Message::where('conversation_id', $this->selectedConversationId)
-            ->latest()
-            ->skip(($this->page - 1) * $this->perPage)
-            ->take($this->perPage)
-            ->with('sender', 'attachments')
-            ->get()
-            ->reverse()
-            ->values();
-
-        $this->messages = $moreMessages->concat($this->messages)->values();
+        $this->loadMessages();
     }
 
     public function sendMessage(): void
