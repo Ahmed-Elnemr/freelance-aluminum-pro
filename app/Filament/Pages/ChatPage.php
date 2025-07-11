@@ -2,10 +2,10 @@
 
 namespace App\Filament\Pages;
 
-use App\Events\MessageSentEvent;
-use App\Models\ChatAttachment;
-use App\Models\Conversation;
 use App\Models\Message;
+use App\Models\Conversation;
+use App\Models\ChatAttachment;
+use App\Events\MessageSentEvent;
 use App\Notifications\NewMessageFromAdminNotification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
@@ -23,10 +23,11 @@ class ChatPage extends Page
     public $conversations;
     public $selectedConversation = null;
     public $selectedConversationId = null;
+
+    public $messages;
     public $newMessage = '';
     public $attachments = [];
 
-    public $messages;
     public $perPage = 20;
     public $page = 1;
 
@@ -53,11 +54,11 @@ class ChatPage extends Page
     public function loadMessages(): void
     {
         $this->messages = Message::where('conversation_id', $this->selectedConversationId)
-            ->orderBy('created_at', 'asc')
+            ->latest()
             ->with('sender', 'attachments')
-            ->skip(0)
             ->take($this->page * $this->perPage)
-            ->get();
+            ->get()
+            ->reverse(); // نخلي الرسائل الأحدث تحت
     }
 
     public function loadMoreMessages(): void
@@ -104,7 +105,6 @@ class ChatPage extends Page
 
         $this->newMessage = '';
         $this->attachments = [];
-
         $this->showConversation($this->selectedConversation->id);
     }
 }

@@ -1,8 +1,7 @@
 <x-filament::page>
     <div class="flex flex-col md:flex-row gap-4">
-        {{-- المحادثات --}}
-        <div
-            class="w-full md:w-1/4 space-y-2 border p-4 rounded-md flex-shrink-0 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 max-h-screen overflow-y-auto">
+        {{-- قائمة المحادثات --}}
+        <div class="w-full md:w-1/4 space-y-2 border p-4 rounded-md flex-shrink-0 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 max-h-screen overflow-y-auto">
             <h3 class="text-lg font-bold mb-2">المحادثات</h3>
             @foreach($conversations as $conversation)
                 <div
@@ -27,19 +26,20 @@
                 </h2>
 
                 <div
-                    class="border p-4 rounded-md flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col space-y-2 message-container border-gray-300 dark:border-gray-700 max-h-[500px]"
+                    class="border p-4 rounded-md overflow-y-auto bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 max-h-[500px] flex flex-col space-y-2"
                     x-data
                     x-init="
                         const container = $el;
                         container.scrollTop = container.scrollHeight;
 
                         container.addEventListener('scroll', function () {
-                            if (container.scrollTop === 0) {
+                            if (container.scrollTop <= 10) {
                                 Livewire.dispatch('loadMoreMessages');
                             }
                         });
                     "
                 >
+                    {{-- زر عرض المزيد فوق الرسائل --}}
                     @if($messages->count() >= $perPage)
                         <div class="text-center mb-2">
                             <button wire:click="loadMoreMessages" class="text-sm text-blue-600 hover:underline">
@@ -48,6 +48,7 @@
                         </div>
                     @endif
 
+                    {{-- الرسائل --}}
                     @foreach($messages as $message)
                         <div class="{{ $message->sender_id === auth()->id() ? 'text-right' : 'text-left' }}">
                             <div class="inline-block bg-white dark:bg-gray-700 text-black dark:text-white px-4 py-2 rounded shadow">
@@ -75,7 +76,7 @@
                     @endforeach
                 </div>
 
-                {{-- الإدخال --}}
+                {{-- إدخال الرسائل --}}
                 <form wire:submit.prevent="sendMessage" class="mt-4 flex items-center gap-2 w-full">
                     <input
                         wire:model.defer="newMessage"
