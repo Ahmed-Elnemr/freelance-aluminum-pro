@@ -20,6 +20,15 @@ class ChatPage extends Page
 
     protected static string $view = 'filament.pages.chat-page';
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
+    public static function getNavigationLabel(): string
+    {
+        return __('Chat Page');
+    }
+    public  function getTitle(): string
+    {
+        return __('Chat Page');
+    }
+
 
     public $conversations;
     public $selectedConversation = null;
