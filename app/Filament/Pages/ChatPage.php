@@ -1,11 +1,10 @@
 <?php
-
 namespace App\Filament\Pages;
 
-use App\Models\Message;
-use App\Models\Conversation;
-use App\Models\ChatAttachment;
 use App\Events\MessageSentEvent;
+use App\Models\ChatAttachment;
+use App\Models\Conversation;
+use App\Models\Message;
 use App\Models\User;
 use App\Notifications\NewMessageFromAdminNotification;
 use Filament\Pages\Page;
@@ -19,26 +18,33 @@ class ChatPage extends Page
     use WithFileUploads;
 
     protected static string $view = 'filament.pages.chat-page';
+
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
+
     public static function getNavigationLabel(): string
     {
         return __('Chat Page');
     }
-    public  function getTitle(): string
+
+    public function getTitle(): string
     {
         return __('Chat Page');
     }
 
-
     public $conversations;
+
     public $selectedConversation = null;
+
     public $selectedConversationId = null;
 
     public $messages;
+
     public $newMessage = '';
+
     public $attachments = [];
 
     public $perPage = 20;
+
     public $page = 1;
 
     protected $listeners = ['loadMoreMessages'];
@@ -53,8 +59,8 @@ class ChatPage extends Page
         $this->conversations = Conversation::with('client', 'admin')->latest()->get();
 
         if ($userId) {
-            $user = User::findOrFail($userId);
-            $conversation = Conversation::firstOrCreateBetween(auth()->id(), $user->id);
+            $user         = User::findOrFail($userId);
+            $conversation = Conversation::firstOrCreateBetween(Auth::id(), $user->id);
             $this->showConversation($conversation->id);
         }
     }
@@ -62,12 +68,12 @@ class ChatPage extends Page
     public function showConversation($id): void
     {
         $this->selectedConversationId = $id;
-        $this->selectedConversation = Conversation::with('client', 'admin')->findOrFail($id);
-        $this->page = 1;
+        $this->selectedConversation   = Conversation::with('client', 'admin')->findOrFail($id);
+        $this->page                   = 1;
         $this->loadMessages();
 
         Message::where('conversation_id', $id)
-            ->where('receiver_id', auth()->id())
+            ->where('receiver_id', Auth::id())
             ->whereNull('seen_at')
             ->update(['seen_at' => now()]);
     }
@@ -90,18 +96,20 @@ class ChatPage extends Page
 
     public function sendMessage(): void
     {
-        if (!$this->newMessage && !$this->attachments) return;
+        if (! $this->newMessage && ! $this->attachments) {
+            return;
+        }
 
-        $senderId = Auth::id();
+        $senderId   = Auth::id();
         $receiverId = $this->selectedConversation->client_id === $senderId
             ? $this->selectedConversation->admin_id
             : $this->selectedConversation->client_id;
 
         $message = Message::create([
-            'id' => Str::uuid(),
-            'message' => $this->newMessage,
-            'sender_id' => $senderId,
-            'receiver_id' => $receiverId,
+            'id'              => Str::uuid(),
+            'message'         => $this->newMessage,
+            'sender_id'       => $senderId,
+            'receiver_id'     => $receiverId,
             'conversation_id' => $this->selectedConversation->id,
         ]);
 
@@ -111,20 +119,20 @@ class ChatPage extends Page
             $path = match (true) {
                 str_starts_with($attachment->getMimeType(), 'image/') => $attachment->storeAs('attachments/images', $fileName, 'public'),
                 str_starts_with($attachment->getMimeType(), 'video/') => $attachment->storeAs('attachments/videos', $fileName, 'public'),
-                default => $attachment->storeAs('attachments/others', $fileName, 'public'),
+                default                                               => $attachment->storeAs('attachments/others', $fileName, 'public'),
             };
 
             ChatAttachment::create([
                 'message_id' => $message->id,
-                'file_path' => Storage::url($path),
-                'mime_type' => $attachment->getMimeType(),
+                'file_path'  => Storage::url($path),
+                'mime_type'  => $attachment->getMimeType(),
             ]);
         }
 
         broadcast(new MessageSentEvent($message));
-        $this->selectedConversation->client?->notify(new NewMessageFromAdminNotification());
+        $this->selectedConversation->client?->notify(new NewMessageFromAdminNotification);
 
-        $this->newMessage = '';
+        $this->newMessage  = '';
         $this->attachments = [];
         $this->showConversation($this->selectedConversation->id);
     }
