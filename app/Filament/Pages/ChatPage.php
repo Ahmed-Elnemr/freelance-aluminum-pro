@@ -76,6 +76,8 @@ class ChatPage extends Page
             ->where('receiver_id', Auth::id())
             ->whereNull('seen_at')
             ->update(['seen_at' => now()]);
+
+        $this->dispatch('chat:conversation-selected', conversationId: $id);
     }
 
     public function loadMessages(): void
