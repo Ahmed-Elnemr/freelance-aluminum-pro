@@ -626,33 +626,50 @@
 
                 setupEcho() {
                     if (!window.Echo || !this.userId) {
+                        console.warn('Echo or userId not available', {
+                            hasEcho: !!window.Echo,
+                            userId: this.userId
+                        });
                         return;
                     }
 
                     const name = `chat.${this.userId}`;
+                    console.log('Setting up Echo channel:', name);
 
                     if (this.channelName === name && this.echoChannel) {
+                        console.log('Echo channel already set up');
                         return;
                     }
 
                     if (this.channelName && window.Echo) {
+                        console.log('Leaving previous channel:', this.channelName);
                         window.Echo.leave(this.channelName);
                     }
 
                     this.channelName = name;
+                    console.log('Subscribing to private channel:', name);
+
                     this.echoChannel = window.Echo.private(name)
                         .stopListening('.chat_message')
                         .listen('.chat_message', (payload) => {
+                            console.log('Received chat message via Echo:', payload);
+
                             if (!payload || !this.currentConversationId) {
+                                console.log('Ignoring message - no payload or conversation');
                                 return;
                             }
 
                             if (payload.conversation_id === this.currentConversationId) {
+                                console.log('Message for current conversation, reloading...');
                                 this.$wire.call('loadMessages').then(() => {
                                     this.$nextTick(() => this.scrollToBottom());
                                 });
+                            } else {
+                                console.log('Message for different conversation:', payload.conversation_id);
                             }
                         });
+
+                    console.log('Echo channel setup complete');
                 },
 
                 scrollToBottom() {
@@ -667,4 +684,3 @@
         }
     </script>
 </x-filament::page>
-                                                                                                                                                                                                                                                                                                                                                                
