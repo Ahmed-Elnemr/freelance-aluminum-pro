@@ -14,20 +14,20 @@ return [
     |
     */
 
-    'broadcasting' => [
+    'broadcasting'            => [
 
-        // 'echo' => [
-        //     'broadcaster' => 'pusher',
-        //     'key' => env('VITE_PUSHER_APP_KEY'),
-        //     'cluster' => env('VITE_PUSHER_APP_CLUSTER'),
-        //     'wsHost' => env('VITE_PUSHER_HOST'),
-        //     'wsPort' => env('VITE_PUSHER_PORT'),
-        //     'wssPort' => env('VITE_PUSHER_PORT'),
-        //     'authEndpoint' => '/broadcasting/auth',
-        //     'disableStats' => true,
-        //     'encrypted' => true,
-        //     'forceTLS' => true,
-        // ],
+        'echo' => array_filter([
+            'broadcaster'  => 'pusher',
+            'key'          => env('PUSHER_APP_KEY'),
+            'cluster'      => env('PUSHER_APP_CLUSTER'),
+            'wsHost'       => env('PUSHER_HOST') ?: null,
+            'wsPort'       => (int) env('PUSHER_PORT', 443),
+            'wssPort'      => (int) env('PUSHER_PORT', 443),
+            'authEndpoint' => '/broadcasting/auth',
+            'disableStats' => true,
+            'encrypted'    => true,
+            'forceTLS'     => env('PUSHER_SCHEME', 'https') === 'https',
+        ], static fn($value) => $value !== null),
 
     ],
 
@@ -55,7 +55,7 @@ return [
     |
     */
 
-    'assets_path' => null,
+    'assets_path'             => null,
 
     /*
     |--------------------------------------------------------------------------
@@ -69,7 +69,7 @@ return [
     |
     */
 
-    'cache_path' => base_path('bootstrap/cache/filament'),
+    'cache_path'              => base_path('bootstrap/cache/filament'),
 
     /*
     |--------------------------------------------------------------------------
@@ -84,7 +84,7 @@ return [
     |
     */
 
-    'livewire_loading_delay' => 'default',
+    'livewire_loading_delay'  => 'default',
 
     /*
     |--------------------------------------------------------------------------
@@ -96,13 +96,13 @@ return [
     |
     */
 
-    'system_route_prefix' => 'filament',
-    'middleware' => [
+    'system_route_prefix'     => 'filament',
+    'middleware'              => [
         'auth' => [/* ... */],
         'base' => [
             // ...
             // Add the middleware to the array
             \Kenepa\TranslationManager\Http\Middleware\SetLanguage::class,
-        ]
-    ]
+        ],
+    ],
 ];

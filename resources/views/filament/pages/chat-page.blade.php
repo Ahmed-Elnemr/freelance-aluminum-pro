@@ -86,8 +86,7 @@
                 <div class="flex items-center justify-between px-4 sm:px-6 py-3 border-b"
                     style="background-color: #111b21; border-color: #0f171c;">
                     <div class="flex items-center gap-3">
-                        <button type="button"
-                            class="p-2 rounded-lg bg-[#202c33] text-gray-200 hover:bg-[#2a3942]"
+                        <button type="button" class="p-2 rounded-lg bg-[#202c33] text-gray-200 hover:bg-[#2a3942]"
                             @click="sidebarOpen = true">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
@@ -259,7 +258,8 @@
                                 <div class="flex items-center gap-2">
                                     <span class="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
                                     <span class="text-xs">جارٍ التسجيل...</span>
-                                    <span class="text-xs font-mono bg-[#111b21] px-1.5 py-0.5 rounded" x-text="recordTimer"></span>
+                                    <span class="text-xs font-mono bg-[#111b21] px-1.5 py-0.5 rounded"
+                                        x-text="recordTimer"></span>
                                 </div>
                                 <div class="flex gap-1">
                                     <button type="button"
@@ -667,3 +667,4 @@
         }
     </script>
 </x-filament::page>
+                                                                                                                                                                                                                                                                                                                                                                
