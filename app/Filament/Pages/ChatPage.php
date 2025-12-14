@@ -33,6 +33,8 @@ class ChatPage extends Page
 
     public $conversations;
 
+    public string $search = '';
+
     public $selectedConversation = null;
 
     public $selectedConversationId = null;
@@ -56,13 +58,18 @@ class ChatPage extends Page
 
     public function mount(?int $userId = null): void
     {
-        $this->conversations = Conversation::with('client', 'admin')->latest()->get();
+        $this->loadConversations();
 
         if ($userId) {
             $user         = User::findOrFail($userId);
             $conversation = Conversation::firstOrCreateBetween(Auth::id(), $user->id);
             $this->showConversation($conversation->id);
         }
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->loadConversations();
     }
 
     public function showConversation($id): void
@@ -137,5 +144,20 @@ class ChatPage extends Page
         $this->newMessage  = '';
         $this->attachments = [];
         $this->showConversation($this->selectedConversation->id);
+    }
+
+    protected function loadConversations(): void
+    {
+        $search = trim($this->search);
+
+        $this->conversations = Conversation::query()
+            ->with('client', 'admin')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->whereHas('client', function ($query) use ($search) {
+                    $query->where('name', 'like', '%' . $search . '%');
+                });
+            })
+            ->orderByDesc('last_message_at')
+            ->get();
     }
 }

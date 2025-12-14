@@ -4,12 +4,12 @@
         style="background-color: #0b141a; border-color: #0f171c;" x-init="initHooks()">
 
         {{-- قائمة المحادثات --}}
-        <div class="conversation-sidebar w-full md:w-80 lg:w-96 flex-shrink-0 flex flex-col h-full md:relative fixed inset-y-0 left-0 z-40 md:z-0 max-h-full transition-transform duration-300 ease-in-out"
-            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+        <div class="conversation-sidebar w-full md:w-80 lg:w-96 flex-shrink-0 flex flex-col h-full fixed inset-y-0 left-0 z-40 max-h-full transition-transform duration-300 ease-in-out"
+            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
             style="background-color: #111b21; border-right: 1px solid #0f171c;">
 
-            {{-- Header للمحادثات في الموبايل --}}
-            <div class="flex items-center justify-between px-4 py-3 border-b md:hidden" style="border-color: #0f171c;">
+            {{-- Header للسايدبار --}}
+            <div class="flex items-center justify-between px-4 py-3 border-b" style="border-color: #0f171c;">
                 <div class="text-gray-300 text-sm font-medium">المحادثات</div>
                 <button @click="sidebarOpen = false" class="p-1 rounded-lg text-gray-400 hover:text-white">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -18,12 +18,6 @@
                             d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
-            </div>
-
-            {{-- عنوان الشريط في الشاشات الكبيرة --}}
-            <div class="hidden md:block px-4 py-3 text-gray-300 text-xs uppercase tracking-wide border-b"
-                style="border-color: #0f171c;">
-                المحادثات
             </div>
 
             {{-- مربع البحث --}}
@@ -42,14 +36,12 @@
             {{-- قائمة المحادثات --}}
             <div class="flex-1 overflow-y-auto">
                 @forelse ($conversations as $conversation)
-                    <div
-                        wire:key="conversation-{{ $conversation->id }}"
+                    <div wire:key="conversation-{{ $conversation->id }}"
                         @click="selectConversation({{ $conversation->id }})"
                         class="flex items-center gap-3 px-3 sm:px-4 py-3 cursor-pointer transition border-b border-[#0f171c]/50 hover:bg-[#2a3942]"
                         :class="{
-                            'bg-[#202c33]': {{ $selectedConversationId }} === {{ $conversation->id }},
-                            'md:opacity-100': {{ $selectedConversationId }} === {{ $conversation->id }},
-                            'md:opacity-90 md:hover:opacity-100': {{ $selectedConversationId }} !== {{ $conversation->id }}
+                            'bg-[#202c33] md:opacity-100': selectedConversationId === {{ $conversation->id }},
+                            'md:opacity-90 md:hover:opacity-100': selectedConversationId !== {{ $conversation->id }}
                         }">
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center justify-between gap-2">
@@ -73,14 +65,13 @@
             </div>
         </div>
 
-        {{-- Overlay للموبايل --}}
-        <div x-show="sidebarOpen && !isDesktop" x-transition.opacity
-            class="fixed inset-0 bg-black/70 z-30 md:hidden"
+        {{-- Overlay لجميع الأحجام --}}
+        <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 bg-black/70 z-30"
             @click="sidebarOpen = false"></div>
 
-        {{-- زر عام لفتح/إغلاق القائمة في الموبايل --}}
+        {{-- زر عام لفتح/إغلاق القائمة في جميع الأحجام --}}
         <button type="button"
-            class="md:hidden fixed bottom-4 left-4 z-50 h-12 w-12 rounded-full bg-[#00a884] text-white flex items-center justify-center shadow-lg ring-2 ring-white/60"
+            class="fixed bottom-4 left-4 z-50 h-12 w-12 rounded-full bg-[#00a884] text-white flex items-center justify-center shadow-lg ring-2 ring-white/60"
             @click="sidebarOpen = !sidebarOpen" x-cloak x-show="!sidebarOpen">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
@@ -96,7 +87,7 @@
                     style="background-color: #111b21; border-color: #0f171c;">
                     <div class="flex items-center gap-3">
                         <button type="button"
-                            class="md:hidden p-2 rounded-lg bg-[#202c33] text-gray-200 hover:bg-[#2a3942]"
+                            class="p-2 rounded-lg bg-[#202c33] text-gray-200 hover:bg-[#2a3942]"
                             @click="sidebarOpen = true">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
@@ -169,7 +160,8 @@
                                         @endif
                                     @endforeach
 
-                                    <div class="text-[9px] sm:text-[10px] text-gray-200/80 mt-0.5 sm:mt-1 flex justify-end">
+                                    <div
+                                        class="text-[9px] sm:text-[10px] text-gray-200/80 mt-0.5 sm:mt-1 flex justify-end">
                                         {{ $message->created_at->diffForHumans() }}
                                     </div>
                                 </div>
@@ -187,8 +179,8 @@
                                 class="flex items-center justify-center h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12 rounded-full text-gray-300 cursor-pointer transition flex-shrink-0"
                                 style="background-color: #202c33;" onmouseover="this.style.backgroundColor='#2a3942'"
                                 onmouseout="this.style.backgroundColor='#202c33'">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-5 sm:w-5 md:h-6 md:w-6" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-5 sm:w-5 md:h-6 md:w-6"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                         d="M21 12.75V6.75A2.25 2.25 0 0018.75 4.5h-7.5A2.25 2.25 0 009 6.75v10.5a3.75 3.75 0 007.5 0V7.5" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -198,14 +190,31 @@
                             <input id="attachments" type="file" wire:model="attachments" multiple
                                 class="hidden" />
 
+                            {{-- زر تسجيل الصوت --}}
+                            <button type="button"
+                                class="flex items-center justify-center h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12 rounded-full text-gray-300 transition flex-shrink-0"
+                                style="background-color: #202c33;" onmouseover="this.style.backgroundColor='#2a3942'"
+                                onmouseout="this.style.backgroundColor='#202c33'"
+                                :class="recording || recordedUrl ? 'bg-red-600 hover:bg-red-700' : ''"
+                                :disabled="uploadingVoice"
+                                @click.prevent="recording ? stopRecordingManual() : startRecording()">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-5 sm:w-5 md:h-6 md:w-6"
+                                    fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 2a2 2 0 00-2 2v5a2 2 0 104 0V4a2 2 0 00-2-2z" />
+                                    <path fill-rule="evenodd"
+                                        d="M5.5 8a.75.75 0 00-1.5 0 6 6 0 005 5.917V16.5H7a.75.75 0 000 1.5h6a.75.75 0 000-1.5h-2V13.917A6 6 0 0016 8a.75.75 0 00-1.5 0 4.5 4.5 0 11-9 0z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </button>
+
                             {{-- زر الإيموجي --}}
                             <button type="button"
                                 class="flex items-center justify-center h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12 rounded-full text-gray-300 transition flex-shrink-0"
                                 style="background-color: #202c33;" onmouseover="this.style.backgroundColor='#2a3942'"
                                 onmouseout="this.style.backgroundColor='#202c33'"
                                 @click.prevent="emojiOpen = !emojiOpen">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-5 sm:w-5 md:h-6 md:w-6" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-5 sm:w-5 md:h-6 md:w-6"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                         d="M12 21a9 9 0 100-18 9 9 0 000 18z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -243,29 +252,14 @@
                             </button>
                         </form>
 
-                        {{-- زر تسجيل الصوت للموبايل --}}
-                        <div class="flex justify-center mt-2 sm:hidden">
-                            <button type="button"
-                                class="h-10 w-full max-w-[200px] rounded-full text-gray-100 flex items-center justify-center shadow-sm transition"
-                                :class="recording || recordedUrl ? 'bg-red-600 hover:bg-red-700' : 'bg-[#202c33] hover:bg-[#2a3942]'"
-                                :disabled="uploadingVoice" @click.prevent="recording ? stopRecordingManual() : startRecording()">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 2a2 2 0 00-2 2v5a2 2 0 104 0V4a2 2 0 00-2-2z" />
-                                    <path fill-rule="evenodd"
-                                        d="M5.5 8a.75.75 0 00-1.5 0 6 6 0 005 5.917V16.5H7a.75.75 0 000 1.5h6a.75.75 0 000-1.5h-2V13.917A6 6 0 0016 8a.75.75 0 00-1.5 0 4.5 4.5 0 11-9 0z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                                <span class="text-sm" x-text="recording ? 'جارٍ التسجيل...' : (recordedUrl ? 'معاينة' : 'تسجيل صوتي')"></span>
-                            </button>
-                        </div>
-
-                        {{-- حالة التسجيل للموبايل --}}
-                        <template x-if="recording && !isDesktop">
+                        {{-- حالة التسجيل لجميع الأحجام --}}
+                        <template x-if="recording">
                             <div
                                 class="mt-2 flex items-center justify-between text-sm text-red-200 bg-[#202c33] p-2 rounded-lg">
                                 <div class="flex items-center gap-2">
                                     <span class="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
                                     <span class="text-xs">جارٍ التسجيل...</span>
+                                    <span class="text-xs font-mono bg-[#111b21] px-1.5 py-0.5 rounded" x-text="recordTimer"></span>
                                 </div>
                                 <div class="flex gap-1">
                                     <button type="button"
@@ -282,17 +276,19 @@
                             </div>
                         </template>
 
-                        {{-- معاينة التسجيل للموبايل --}}
-                        <template x-if="recordedUrl && !isDesktop">
-                            <div
-                                class="mt-2 flex flex-col gap-2 text-sm text-gray-200 bg-[#202c33] p-3 rounded-lg">
+                        {{-- معاينة التسجيل لجميع الأحجام --}}
+                        <template x-if="recordedUrl">
+                            <div class="mt-2 flex flex-col gap-2 text-sm text-gray-200 bg-[#202c33] p-3 rounded-lg">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-gray-300">تسجيل صوتي جاهز للإرسال</span>
+                                </div>
                                 <audio controls :src="recordedUrl"
                                     class="w-full rounded border border-[#1c2a32] bg-[#111b21]"></audio>
                                 <div class="flex gap-2">
                                     <button type="button"
                                         class="flex-1 px-3 py-2 rounded bg-[#00a884] hover:bg-[#02926e] text-white text-sm disabled:opacity-60 disabled:cursor-not-allowed"
                                         :disabled="uploadingVoice" @click.prevent="sendRecording">
-                                        <span x-show="!uploadingVoice">إرسال</span>
+                                        <span x-show="!uploadingVoice">إرسال التسجيل</span>
                                         <span x-show="uploadingVoice">جاري الإرسال...</span>
                                     </button>
                                     <button type="button"
@@ -308,15 +304,15 @@
             @else
                 {{-- حالة عدم وجود محادثة مختارة --}}
                 <div class="flex flex-1 flex-col items-center justify-center text-gray-400 px-4 py-8 text-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 sm:h-16 sm:w-16 mb-4 opacity-50" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 sm:h-16 sm:w-16 mb-4 opacity-50"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                     <p class="text-base sm:text-lg mb-2">اختر محادثة لعرض الرسائل</p>
                     <p class="text-xs sm:text-sm opacity-75">من القائمة الجانبية، اختر محادثة للبدء</p>
                     <button @click="sidebarOpen = true"
-                        class="mt-4 md:hidden px-4 py-2 rounded-lg bg-[#00a884] text-white text-sm">
+                        class="mt-4 px-4 py-2 rounded-lg bg-[#00a884] text-white text-sm">
                         عرض المحادثات
                     </button>
                 </div>
@@ -327,9 +323,10 @@
         <div x-show="previewOpen" x-transition
             class="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-2 sm:p-4" @click="closePreview">
             <div class="relative max-w-full max-h-full">
-                <button @click="closePreview" class="absolute -top-8 sm:-top-10 right-0 text-white p-1 sm:p-2 hover:text-gray-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
+                <button @click="closePreview"
+                    class="absolute -top-8 sm:-top-10 right-0 text-white p-1 sm:p-2 hover:text-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -366,12 +363,13 @@
                 uploadingVoice: false,
                 sidebarOpen: false,
                 isDesktop: false,
+                selectedConversationId: @entangle('selectedConversationId').live,
                 echoChannel: null,
                 channelName: null,
                 userId: {{ auth()->id() }},
 
                 initHooks() {
-                    this.currentConversationId = this.$wire.get('selectedConversationId');
+                    this.currentConversationId = this.selectedConversationId;
 
                     // عند تغيير المحادثة من Livewire
                     Livewire.hook('message.processed', ({
@@ -381,6 +379,7 @@
                         const currentId = component.get('selectedConversationId');
 
                         this.currentConversationId = currentId;
+                        this.selectedConversationId = currentId;
                         this.setupEcho();
 
                         if (!container) {
@@ -391,6 +390,9 @@
                         if (this.lastConversationId !== currentId) {
                             this.lastConversationId = currentId;
                             this.initialScrollNeeded = true;
+
+                            // إغلاق السايدبار بعد اختيار محادثة
+                            this.sidebarOpen = false;
                         }
 
                         if (this.loadingOlder) {
@@ -418,11 +420,8 @@
                 initResponsive() {
                     const checkDesktop = () => {
                         this.isDesktop = window.innerWidth >= 768;
-                        if (this.isDesktop) {
-                            this.sidebarOpen = true; // الشريط مفتوح دائمًا في الشاشات الكبيرة
-                        } else {
-                            this.sidebarOpen = false; // الشريط مخفي افتراضيًا في الموبايل
-                        }
+                        // لا نفتح السايدبار تلقائيًا في أي حجم
+                        this.sidebarOpen = false;
                     };
 
                     checkDesktop();
@@ -437,17 +436,14 @@
                     }
                 },
 
-                // الدالة الجديدة لاختيار المحادثة
                 selectConversation(id) {
                     console.log('Selecting conversation:', id);
 
                     // حفظ ID المحادثة الحالية
                     this.currentConversationId = id;
 
-                    // في الموبايل فقط نقوم بإغلاق الشريط
-                    if (!this.isDesktop) {
-                        this.sidebarOpen = false;
-                    }
+                    // إغلاق السايدبار بعد اختيار المحادثة
+                    this.sidebarOpen = false;
 
                     // استدعاء دالة Livewire لتحميل المحادثة
                     if (this.$wire && typeof this.$wire.call === 'function') {
