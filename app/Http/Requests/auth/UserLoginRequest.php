@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\auth;
 
+use Illuminate\Foundation\Http\FormRequest;
 
 class UserLoginRequest extends FormRequest
 {
