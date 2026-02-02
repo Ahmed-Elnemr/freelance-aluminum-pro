@@ -13,9 +13,9 @@ return [
     |
     */
 
-    'failed' => 'These credentials do not match our records.',
-    'password' => 'The provided password is incorrect.',
-    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+    'failed' => 'بيانات التسجيل هذه غير متطابقة مع سجلاتنا.',
+    'password' => 'كلمة المرور المستخدمة غير صحيحة.',
+    'throttle' => 'عدد كبير جدا من محاولات الدخول. يرجى المحاولة مرة أخرى بعد :seconds ثانية.',
 
     'This mobile number is already registered' => 'رقم هاتفك مسجل مسبقا',
     'you are not allowed to do this action'=>'لا يجوز لك القيام بهذا الفعل',
@@ -23,4 +23,11 @@ return [
     'Verification code sent to your mobile'=>'تم إرسال رمز التحقق إلى هاتفك المحمول',
     'Logged out successfully'=>'تم تسجيل الخروج بنجاح',
     'Name created successfully'=>'تم انشاء الاسم بنجاح',
+
+    'Logged in successfully' => 'تم تسجيل الدخول بنجاح',
+    'Registration successful' => 'تم التسجيل بنجاح',
+    'invalid_credentials' => 'بيانات التسجيل غير صحيحة',
+    'Profile updated successfully' => 'تم تحديث الملف الشخصي بنجاح',
+    'current_password_required' => 'كلمة المرور الحالية مطلوبة',
+    'current_password_incorrect' => 'كلمة المرور الحالية غير صحيحة',
 ];
