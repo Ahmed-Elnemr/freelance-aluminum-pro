@@ -197,8 +197,18 @@ return [
     */
 
     'attributes' => [
+        'name' => 'name',
+        'email' => 'email address',
         'mobile' => 'mobile number',
-        'code' => 'verification code',
+        'password' => 'password',
+        'password_confirmation' => 'password confirmation',
+        'current_password' => 'current password',
+        'login' => 'email or mobile',
+        'uuid' => 'device identifier',
+        'device_token' => 'device token',
+        'device_type' => 'device type',
     ],
+    
+    'mobile_format' => 'Mobile number must start with 05 followed by 8 digits',
 
 ];

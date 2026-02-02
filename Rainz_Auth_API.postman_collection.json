@@ -1,0 +1,646 @@
+{
+    "info": {
+        "_postman_id": "rainz-auth-2026",
+        "name": "Rainz Auth API - New System",
+        "description": "نظام المصادقة الجديد - Email/Mobile + Password\n\nتم التحديث: 2026-02-02\nالنظام: Email/Mobile + Password (بدلاً من OTP)\n\nالتغييرات الرئيسية:\n- ✅ تسجيل جديد بـ Email, Mobile, Password\n- ✅ تسجيل دخول بـ Email/Mobile + Password\n- ✅ تحديث الملف الشخصي مع دعم Email و Password\n- ❌ حذف endpoints الـ OTP القديمة",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "1. Register (NEW) ✅",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    if (jsonData.data && jsonData.data.access_token) {",
+                                    "        pm.environment.set(\"access_token\", jsonData.data.access_token);",
+                                    "        pm.environment.set(\"user_id\", jsonData.data.user.id);",
+                                    "        console.log(\"Token saved: \" + jsonData.data.access_token);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar",
+                                "type": "text",
+                                "description": "ar or en"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"أحمد محمد\",\n    \"email\": \"ahmed@example.com\",\n    \"mobile\": \"0512345678\",\n    \"password\": \"Password@123\",\n    \"password_confirmation\": \"Password@123\",\n    \"uuid\": \"{{device_uuid}}\",\n    \"device_token\": \"{{device_token}}\",\n    \"device_type\": \"android\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "register"
+                            ]
+                        },
+                        "description": "تسجيل حساب جديد\n\n**الحقول المطلوبة:**\n- name: الاسم (2-255 حرف)\n- email: البريد الإلكتروني (فريد)\n- mobile: رقم الهاتف (05XXXXXXXX، فريد)\n- password: كلمة المرور (8+ أحرف، أحرف كبيرة/صغيرة، أرقام، رموز)\n- password_confirmation: تأكيد كلمة المرور\n- uuid: معرف الجهاز\n- device_token: FCM token\n- device_type: نوع الجهاز (android/ios)\n\n**الاستجابة:**\n- 201: تم التسجيل بنجاح + access_token\n- 422: خطأ في البيانات"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Login with Email (UPDATED) ✅",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    if (jsonData.data && jsonData.data.access_token) {",
+                                    "        pm.environment.set(\"access_token\", jsonData.data.access_token);",
+                                    "        pm.environment.set(\"user_id\", jsonData.data.user.id);",
+                                    "        console.log(\"Token saved: \" + jsonData.data.access_token);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"login\": \"ahmed@example.com\",\n    \"password\": \"Password@123\",\n    \"uuid\": \"{{device_uuid}}\",\n    \"device_token\": \"{{device_token}}\",\n    \"device_type\": \"android\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "login"
+                            ]
+                        },
+                        "description": "تسجيل الدخول بالبريد الإلكتروني\n\n**التغييرات:**\n- ❌ حذف: mobile (منفصل)\n- ✅ جديد: login (email أو mobile)\n- ✅ جديد: password\n- ❌ حذف: لا يوجد OTP\n\n**الحقول:**\n- login: البريد الإلكتروني\n- password: كلمة المرور\n- uuid, device_token, device_type\n\n**الاستجابة:**\n- 200: تم تسجيل الدخول + access_token\n- 401: بيانات خاطئة\n- 403: الحساب محظور"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Login with Mobile (UPDATED) ✅",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    if (jsonData.data && jsonData.data.access_token) {",
+                                    "        pm.environment.set(\"access_token\", jsonData.data.access_token);",
+                                    "        pm.environment.set(\"user_id\", jsonData.data.user.id);",
+                                    "        console.log(\"Token saved: \" + jsonData.data.access_token);",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"login\": \"0512345678\",\n    \"password\": \"Password@123\",\n    \"uuid\": \"{{device_uuid}}\",\n    \"device_token\": \"{{device_token}}\",\n    \"device_type\": \"android\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "login"
+                            ]
+                        },
+                        "description": "تسجيل الدخول برقم الهاتف\n\n**التغييرات:**\n- ✅ نفس endpoint السابق\n- ✅ login يقبل mobile أو email\n- ✅ password مطلوب\n\n**الحقول:**\n- login: رقم الهاتف (05XXXXXXXX)\n- password: كلمة المرور\n- uuid, device_token, device_type"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "4. Get Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "profile"
+                            ]
+                        },
+                        "description": "عرض الملف الشخصي للمستخدم\n\n**لم يتم تعديله** - يعمل كما هو"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "5. Update Profile - Name & Email (UPDATED) ✅",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"أحمد علي محمد\",\n    \"email\": \"ahmed.ali@example.com\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/edite-profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "edite-profile"
+                            ]
+                        },
+                        "description": "تحديث الاسم والبريد الإلكتروني\n\n**التغييرات:**\n- ✅ جديد: دعم تحديث email\n- ✅ محسّن: لا يحتاج OTP للتحديث\n- ✅ جميع الحقول اختيارية (sometimes)\n\n**الحقول:**\n- name: الاسم الجديد (اختياري)\n- email: البريد الإلكتروني الجديد (اختياري، فريد)\n- mobile: رقم الهاتف الجديد (اختياري، فريد)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "6. Update Profile - Mobile (UPDATED) ✅",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"mobile\": \"0598765432\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/edite-profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "edite-profile"
+                            ]
+                        },
+                        "description": "تحديث رقم الهاتف\n\n**التغييرات:**\n- ❌ حذف: نظام OTP للتأكيد\n- ✅ جديد: تحديث مباشر بدون OTP\n\n**الحقول:**\n- mobile: رقم الهاتف الجديد (05XXXXXXXX)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "7. Change Password (NEW) ✅",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"current_password\": \"Password@123\",\n    \"password\": \"NewPassword@456\",\n    \"password_confirmation\": \"NewPassword@456\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/edite-profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "edite-profile"
+                            ]
+                        },
+                        "description": "تغيير كلمة المرور\n\n**ميزة جديدة! ✅**\n\n**الحقول المطلوبة:**\n- current_password: كلمة المرور الحالية (للتحقق)\n- password: كلمة المرور الجديدة (8+ أحرف)\n- password_confirmation: تأكيد كلمة المرور الجديدة\n\n**الأمان:**\n- يتم التحقق من كلمة المرور الحالية\n- رسالة خطأ واضحة إذا كانت خاطئة"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "8. Store Name",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"أحمد محمد علي\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/store-name",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "store-name"
+                            ]
+                        },
+                        "description": "تخزين/تحديث الاسم\n\n**لم يتم تعديله** - يعمل كما هو"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "9. Logout",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/logout?uuid={{device_uuid}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "logout"
+                            ],
+                            "query": [
+                                {
+                                    "key": "uuid",
+                                    "value": "{{device_uuid}}"
+                                }
+                            ]
+                        },
+                        "description": "تسجيل الخروج\n\n**لم يتم تعديله** - يعمل كما هو"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "10. Delete Account",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{access_token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "ar",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/delete-account",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "delete-account"
+                            ]
+                        },
+                        "description": "حذف الحساب\n\n**لم يتم تعديله** - يعمل كما هو"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "جميع endpoints المصادقة\n\n**الجديدة:**\n- Register\n- Change Password\n\n**المعدلة:**\n- Login (يقبل email/mobile + password)\n- Update Profile (دعم email و password)\n\n**المحذوفة:**\n- Activate (OTP)\n- Resend Code (OTP)\n- Confirm Mobile Change (OTP)"
+        },
+        {
+            "name": "DELETED Endpoints (OTP System) ❌",
+            "item": [
+                {
+                    "name": "❌ Activate OTP (DELETED)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/activate",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "activate"
+                            ]
+                        },
+                        "description": "**تم حذف هذا الـ endpoint ❌**\n\nكان يستخدم لتأكيد OTP بعد تسجيل الدخول.\n\nالآن: تسجيل الدخول مباشر بـ password بدون OTP."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "❌ Resend OTP Code (DELETED)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/resend-code",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "resend-code"
+                            ]
+                        },
+                        "description": "**تم حذف هذا الـ endpoint ❌**\n\nكان يستخدم لإعادة إرسال OTP.\n\nالآن: لا يوجد OTP في النظام الجديد."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "❌ Confirm Mobile Change (DELETED)",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/confirm-new-mobile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "confirm-new-mobile"
+                            ]
+                        },
+                        "description": "**تم حذف هذا الـ endpoint ❌**\n\nكان يستخدم لتأكيد رقم الهاتف الجديد بـ OTP.\n\nالآن: تحديث الهاتف مباشر بدون OTP عبر edite-profile."
+                    },
+                    "response": []
+                }
+            ],
+            "description": "هذه الـ endpoints تم حذفها من النظام الجديد\n\nلا تستخدمها! ❌"
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost",
+            "type": "string"
+        },
+        {
+            "key": "access_token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "device_uuid",
+            "value": "550e8400-e29b-41d4-a716-446655440000",
+            "type": "string"
+        },
+        {
+            "key": "device_token",
+            "value": "fcm_token_example_12345",
+            "type": "string"
+        },
+        {
+            "key": "user_id",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}

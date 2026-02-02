@@ -17,19 +17,21 @@ return [
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
 
-    // Custom validation messages
-    'mobile_required' => 'Please enter your mobile number',
-    'mobile_format' => 'Mobile number must start with 05 followed by 8 digits',
-    'mobile_max' => 'Mobile number is too long',
-    'mobile_unique' => 'This mobile number is already registered',
-
-    'name_required' => 'Please enter your name',
-    'name_string' => 'Name must be text',
-    'name_max' => 'Name cannot be longer than 25 characters',
-    'name_min' => 'Name must be at least 5 characters',
-    'name_format' => 'Name can only contain Arabic letters, English letters, and spaces',
-
-
-
+    // Login & Registration
+    'invalid_credentials' => 'Invalid email/mobile or password',
+    'Your account is blocked' => 'Your account is blocked',
+    'Logged in successfully' => 'Logged in successfully',
+    'Registration successful' => 'Registration successful',
+    'Name created successfully' => 'Name created successfully',
+    'Logged out successfully' => 'Logged out successfully',
+    
+    // Profile
+    'Profile updated successfully' => 'Profile updated successfully',
+    'current_password_required' => 'Current password is required',
+    'current_password_incorrect' => 'Current password is incorrect',
+    
+    // Account
+    'Your account has been successfully deleted' => 'Your account has been successfully deleted',
 
 ];
+

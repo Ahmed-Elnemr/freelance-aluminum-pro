@@ -2,8 +2,6 @@
 
 namespace App\Http\Requests\auth;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UserLoginRequest extends FormRequest
 {
@@ -22,12 +20,15 @@ class UserLoginRequest extends FormRequest
      */
     public function rules(): array
     {
-
         return [
-            'mobile' => [
+            'login' => [
                 'required',
-                'regex:/^05\d{8}$/',
-                'max:15',
+                'string',
+            ],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
             ],
             'uuid' => 'required|string',
             'device_token' => 'required',
@@ -35,26 +36,44 @@ class UserLoginRequest extends FormRequest
         ];
     }
 
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'login' => __('validation.attributes.login'),
+            'password' => __('validation.attributes.password'),
+            'uuid' => __('validation.attributes.uuid'),
+            'device_token' => __('validation.attributes.device_token'),
+            'device_type' => __('validation.attributes.device_type'),
+        ];
+    }
 
-//    public function messages(): array
-//    {
-//        return [
-//            'mobile_required' => __('validation.mobile_required'),
-//            'mobile.exists' => __('validation.mobile_exists'),
-//            'uuid.required' => __('validation.uuid_required'),
-//            'uuid.string' => __('validation.uuid_string'),
-//            'device_token.required' => __('validation.device_token_required'),
-//            'device_type.required' => __('validation.device_type_required'),
-//            'device_type.string' => __('validation.device_type_string'),
-//        ];
-//    }
-//    public function attributes(): array
-//    {
-//        return [
-//            'mobile' => __('mobile'),
-//            'uuid' => __('uuid'),
-//            'device_token' => __('device_token'),
-//            'device_type' => __('device_type'),
-//        ];
-//    }
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'login.required' => __('validation.required', ['attribute' => __('validation.attributes.login')]),
+            'login.string' => __('validation.string', ['attribute' => __('validation.attributes.login')]),
+
+            'password.required' => __('validation.required', ['attribute' => __('validation.attributes.password')]),
+            'password.string' => __('validation.string', ['attribute' => __('validation.attributes.password')]),
+            'password.min' => __('validation.min.string', ['attribute' => __('validation.attributes.password'), 'min' => 8]),
+
+            'uuid.required' => __('validation.required', ['attribute' => __('validation.attributes.uuid')]),
+            'uuid.string' => __('validation.string', ['attribute' => __('validation.attributes.uuid')]),
+
+            'device_token.required' => __('validation.required', ['attribute' => __('validation.attributes.device_token')]),
+
+            'device_type.required' => __('validation.required', ['attribute' => __('validation.attributes.device_type')]),
+            'device_type.string' => __('validation.string', ['attribute' => __('validation.attributes.device_type')]),
+        ];
+    }
 }

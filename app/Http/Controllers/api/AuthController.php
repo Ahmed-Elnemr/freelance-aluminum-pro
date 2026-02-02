@@ -4,18 +4,16 @@ namespace App\Http\Controllers\api;
 
 use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\auth\ConfirmNewMobileRequest;
+use App\Http\Requests\auth\RegisterRequest;
 use App\Http\Requests\auth\StoreUserNameRequest;
 use App\Http\Requests\auth\UserEditeProfile;
 use App\Http\Requests\auth\UserLoginRequest;
-use App\Http\Requests\auth\UserRegisterRequest;
 use App\Http\Resources\user\UserResource;
-use App\Models\Otp;
 use App\Models\User;
-use App\Service\ConfirmationController;
+use App\Notifications\WelcomeNotification;
 use App\Service\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -30,34 +28,69 @@ class AuthController extends Controller
     public function login(UserLoginRequest $request)
     {
         $validatedData = $request->validated();
-        $user = User::whereMobile($request->mobile)->whereIsActive(1)->first();
+        
+        // Determine if login is email or mobile
+        $loginField = filter_var($validatedData['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'mobile';
+        
+        // Find user by email or mobile
+        $user = User::where($loginField, $validatedData['login'])
+            ->where('is_active', 1)
+            ->first();
+        
         if (!$user) {
-            do {
-                $generatedName = 'aluminum_' . rand(1000, 9999);
-            } while (User::where('name', $generatedName)->exists());
-            $user = User::create([
-                'mobile' => $validatedData['mobile'],
-                'name' => $generatedName,
-                'status' => 0,
-            ]);
-            $code = ConfirmationController::sendCode($user);
-            return ApiResponder::created([
-                'mobile' => $user->mobile,
-                'code' => $code,
-                'is_new' => true
-            ], __('auth.Verification code sent to your mobile'), 302);
+            return ApiResponder::failed(__('auth.invalid_credentials'), 401);
         }
+        
+        // Check if account is active
         if ($user->is_active == 0) {
-            return ApiResponder::failed(__('auth.Your account is blocked'));
+            return ApiResponder::failed(__('auth.Your account is blocked'), 403);
         }
-        $code = ConfirmationController::sendCode($user);
+        
+        // Verify password
+        if (!Hash::check($validatedData['password'], $user->password)) {
+            return ApiResponder::failed(__('auth.invalid_credentials'), 401);
+        }
+        
+        // Add device
         $this->userService->addDevice($user);
-        return ApiResponder::created([
-            'mobile' => $user->mobile,
-            'code' => $code,
-            'is_new' => false
+        
+        // Create access token
+        $access_token = $user->createToken('authToken')->plainTextToken;
+        
+        return ApiResponder::success(__('auth.Logged in successfully'), [
+            'user' => UserResource::make($user),
+            'access_token' => $access_token,
+        ]);
+    }
 
-        ], __('auth.Verification code sent to your mobile'), 302);
+    //todo:register
+    public function register(RegisterRequest $request)
+    {
+        $validatedData = $request->validated();
+        
+        // Create new user
+        $user = User::create([
+            'name' => $validatedData['name'],
+            'email' => $validatedData['email'],
+            'mobile' => $validatedData['mobile'],
+            'password' => Hash::make($validatedData['password']),
+            'status' => 1,
+            'is_active' => 1,
+        ]);
+        
+        // Add device
+        $this->userService->addDevice($user);
+        
+        // Send welcome notification
+        $user->notify(new WelcomeNotification());
+        
+        // Create access token
+        $access_token = $user->createToken('authToken')->plainTextToken;
+        
+        return ApiResponder::created([
+            'user' => UserResource::make($user),
+            'access_token' => $access_token,
+        ], __('auth.Registration successful'), 201);
     }
 
 //todo::storeName
@@ -86,51 +119,40 @@ class AuthController extends Controller
         return ApiResponder::loaded(['user' => UserResource::make(auth('sanctum')->user())]);
     }
 ////
-////    //todo: user editeProfile
+    //todo: user editeProfile
     public function editeProfile(UserEditeProfile $request)
     {
         $user = auth('sanctum')->user();
         $validatedData = $request->validated();
 
-        if (!empty($validatedData['mobile']) && $validatedData['mobile'] !== $user->mobile) {
-            $user->update(['new_mobile' => $validatedData['mobile']]);
-            $code= ConfirmationController::sendCode($user,$validatedData['mobile']);
-            return ApiResponder::created([
-                'new_mobile' => $validatedData['mobile'],
-                'code' => $code
-            ], __('Verification code sent to your mobile'), 302);
+        // If password is being changed, verify current password
+        if (!empty($validatedData['password'])) {
+            if (empty($validatedData['current_password'])) {
+                return ApiResponder::failed(__('auth.current_password_required'), 422);
+            }
+            
+            if (!Hash::check($validatedData['current_password'], $user->password)) {
+                return ApiResponder::failed(__('auth.current_password_incorrect'), 422);
+            }
+            
+            $validatedData['password'] = Hash::make($validatedData['password']);
+            unset($validatedData['current_password']);
+            unset($validatedData['password_confirmation']);
+        } else {
+            unset($validatedData['password']);
+            unset($validatedData['current_password']);
+            unset($validatedData['password_confirmation']);
         }
+
+        // Update user data
         $user->update($validatedData);
-        return ApiResponder::loaded(['user'=>UserResource::make($user)]);
-    }
-//
-//
-    public function confirmMobileChange(ConfirmNewMobileRequest $request)
-    {
-        $user = auth('sanctum')->user();
-
-        $token = Otp::where('otp', $request->code)
-            ->where('status', false)
-            ->whereRelation('user', 'new_mobile', $request->mobile)
-            ->latest()
-            ->first();
-
-        throw_if(!$token, ValidationException::withMessages(['msg' => __('Activation code is not correct')]));
-        throw_if($token->expired_at < now(), ValidationException::withMessages(['msg' => __('Activation code is expired')]));
-
-        $token->update(['status' => true]);
-
-        $user->update([
-            'mobile' => $request->mobile,
-            'new_mobile' => null,
-            'name' => $request->name ?? $user->name,
+        
+        return ApiResponder::success(__('auth.Profile updated successfully'), [
+            'user' => UserResource::make($user->fresh())
         ]);
-
-        return ApiResponder::loaded([
-            'user' => UserResource::make($user),
-        ], 200, __('Mobile number updated successfully'));
     }
-//###
+
+    // ###
     public function deleteAccount(Request $request)
     {
         $user = auth('sanctum')->user();
