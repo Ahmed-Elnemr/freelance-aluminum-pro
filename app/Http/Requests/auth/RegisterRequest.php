@@ -40,7 +40,7 @@ class RegisterRequest extends FormRequest
                 'string',
                 'regex:/^05\d{8}$/',
                 'max:15',
-                'unique:users,mobile',
+                // 'unique:users,mobile', // Removed to allow duplicate mobiles
             ],
             'password' => [
                 'required',

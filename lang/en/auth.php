@@ -33,5 +33,18 @@ return [
     // Account
     'Your account has been successfully deleted' => 'Your account has been successfully deleted',
 
+    // Password Reset & OTP
+    'Reset Password OTP' => 'Reset Password OTP',
+    'Your OTP for password reset is: :otp' => 'Your OTP for password reset is: :otp',
+    'This OTP acts as your temporary password.' => 'This OTP acts as your temporary password.',
+    'It will expire in 15 minutes.' => 'It will expire in 15 minutes.',
+    'user_not_found' => 'User not found',
+    'failed_to_send_email' => 'Failed to send email',
+    'otp_sent_successfully' => 'OTP sent successfully',
+    'invalid_or_expired_otp' => 'Invalid or expired OTP',
+    'otp_verified_successfully' => 'OTP verified successfully',
+    'password_reset_successfully' => 'Password reset successfully',
+    'otp_resent_successfully' => 'OTP resent successfully',
+    'password_changed_successfully' => 'Password changed successfully',
 ];
 

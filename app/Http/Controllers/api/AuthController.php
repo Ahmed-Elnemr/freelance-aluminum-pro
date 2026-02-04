@@ -14,12 +14,26 @@ use App\Notifications\WelcomeNotification;
 use App\Service\UserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Otp;
+use Carbon\Carbon;
+use App\Notifications\ResetPasswordOtpNotification;
+use Illuminate\Support\Facades\DB;
+use App\Service\AuthService;
+use App\Http\Requests\auth\ForgotPasswordRequest;
+use App\Http\Requests\auth\VerifyOtpRequest;
+use App\Http\Requests\auth\ResetPasswordRequest;
+use App\Http\Requests\auth\ResendOtpRequest;
+use App\Http\Requests\auth\ChangePasswordRequest;
 
 class AuthController extends Controller
 {
-    public function __construct(UserService $userService)
+    protected $userService;
+    protected $authService;
+
+    public function __construct(UserService $userService, AuthService $authService)
     {
         $this->userService = $userService;
+        $this->authService = $authService;
     }
 
 
@@ -30,9 +44,12 @@ class AuthController extends Controller
         $validatedData = $request->validated();
         
         // Determine if login is email or mobile
-        $loginField = filter_var($validatedData['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'mobile';
+        // $loginField = filter_var($validatedData['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'mobile';
         
-        // Find user by email or mobile
+        //  Restricting login to Email Only as per request (since mobile is not verified/unique)
+        $loginField = 'email';
+
+        // Find user by email
         $user = User::where($loginField, $validatedData['login'])
             ->where('is_active', 1)
             ->first();
@@ -158,5 +175,31 @@ class AuthController extends Controller
         $user = auth('sanctum')->user();
         $user->delete();
         return ApiResponder::deleted(200, __('Your account has been successfully deleted'));
+    }
+    //todo: forgot password & otp
+    //todo: forgot password & otp
+    public function forgotPassword(ForgotPasswordRequest $request)
+    {
+        return $this->authService->forgotPassword($request->email);
+    }
+
+    public function verifyOtp(VerifyOtpRequest $request)
+    {
+        return $this->authService->verifyOtp($request->email, $request->otp);
+    }
+
+    public function resetPassword(ResetPasswordRequest $request)
+    {
+        return $this->authService->resetPassword($request->email, $request->otp, $request->password);
+    }
+
+    public function resendOtp(ResendOtpRequest $request)
+    {
+        return $this->authService->resendOtp($request->email);
+    }
+
+    public function changePassword(ChangePasswordRequest $request)
+    {
+        return $this->authService->changePassword($request->user(), $request->current_password, $request->password);
     }
 }

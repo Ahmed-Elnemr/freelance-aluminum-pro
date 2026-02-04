@@ -18,6 +18,10 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(ExceptionHandler::class, CustomException::class);
+        $this->app->bind(
+            \App\Repositories\Contracts\AuthRepositoryInterface::class,
+            \App\Repositories\Eloquent\AuthRepository::class
+        );
     }
 
     /**
