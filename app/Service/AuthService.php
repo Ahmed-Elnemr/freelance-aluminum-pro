@@ -126,4 +126,21 @@ class AuthService
 
         return ApiResponder::success(__('auth.password_changed_successfully'));
     }
+
+    public function sendVerificationOtp(User $user)
+    {
+        // $otp = rand(100000, 999999);
+        $otp = 1111; // Fixed for testing
+
+        $this->authRepository->deleteOtps($user->id);
+        $this->authRepository->createOtp($user->id, (string)$otp);
+
+        try {
+            $user->notifyNow(new ResetPasswordOtpNotification($otp));
+        } catch (\Exception $e) {
+            Log::error("Failed to send OTP email: " . $e->getMessage());
+            // We suppress error here to not break the profile update response, 
+            // or we could throw specific exception.
+        }
+    }
 }

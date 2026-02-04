@@ -141,6 +141,12 @@ class AuthController extends Controller
     {
         $user = auth('sanctum')->user();
         $validatedData = $request->validated();
+        $emailChanged = false;
+
+        // If email is changing
+        if (isset($validatedData['email']) && $validatedData['email'] !== $user->email) {
+            $emailChanged = true;
+        }
 
         // If password is being changed, verify current password
         if (!empty($validatedData['password'])) {
@@ -164,9 +170,16 @@ class AuthController extends Controller
         // Update user data
         $user->update($validatedData);
         
-        return ApiResponder::success(__('auth.Profile updated successfully'), [
+        $responseData = [
             'user' => UserResource::make($user->fresh())
-        ]);
+        ];
+
+        if ($emailChanged) {
+            $this->authService->sendVerificationOtp($user);
+            $responseData['need_otp'] = true;
+        }
+        
+        return ApiResponder::success(__('auth.Profile updated successfully'), $responseData);
     }
 
     // ###

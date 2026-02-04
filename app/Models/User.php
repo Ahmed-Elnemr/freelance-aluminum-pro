@@ -61,6 +61,11 @@ class User extends Authenticatable
         return $this->type === 'client';
     }
 
+    public function scopeIsClient($query)
+    {
+        return $query->where('type', 'client');
+    }
+
     // Check if the user is a provider
     public function isAdmin(): bool
     {
