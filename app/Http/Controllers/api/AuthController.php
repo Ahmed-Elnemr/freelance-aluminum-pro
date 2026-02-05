@@ -59,6 +59,9 @@ class AuthController extends Controller
         
         // Check if email is verified
         if ($user->email_verified_at === null) {
+            // Send Verification OTP
+            $this->authService->sendVerificationOtp($user);
+
             return ApiResponder::failed(__('auth.account_not_verified'), 403, [
                 'need_token' => true,
                 'user' => UserResource::make($user)
