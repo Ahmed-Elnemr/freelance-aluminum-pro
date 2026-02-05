@@ -70,12 +70,33 @@ class AuthService
         if ($user->new_email === $email) {
             $user->update([
                 'email' => $user->new_email,
-                'new_email' => null
+                'new_email' => null,
+                'email_verified_at' => now(),
+                'is_active' => 1
             ]);
             $this->authRepository->markOtpAsUsed($otpRecord->id);
             return ApiResponder::success(__('auth.email_verified_successfully'));
         }
 
+        // Handle Initial Registration Verification
+        if ($user->email_verified_at === null) {
+            $user->update([
+                'email_verified_at' => now(),
+                'is_active' => 1
+            ]);
+            $this->authRepository->markOtpAsUsed($otpRecord->id);
+            
+            // Create access token for newly verified user
+            $access_token = $user->createToken('authToken')->plainTextToken;
+            $user->access_token = $access_token;
+            
+            return ApiResponder::success(__('auth.account_activated_successfully'), [
+                'user' => new \App\Http\Resources\user\UserResource($user)
+            ]);
+        }
+
+        // For password reset verification (email already verified)
+        $this->authRepository->markOtpAsUsed($otpRecord->id);
         return ApiResponder::success(__('auth.otp_verified_successfully'));
     }
 
@@ -117,9 +138,12 @@ class AuthService
 
         try {
             if ($user->new_email === $email) {
-                // It's an email verification resend
+                // It's an email verification resend (email change)
                 \Illuminate\Support\Facades\Notification::route('mail', $email)
                     ->notifyNow(new EmailVerificationOtpNotification($otp));
+            } elseif ($user->email_verified_at === null) {
+                // It's a registration verification resend
+                $user->notifyNow(new EmailVerificationOtpNotification($otp));
             } else {
                 // It's a password reset resend
                 $user->notifyNow(new ResetPasswordOtpNotification($otp));

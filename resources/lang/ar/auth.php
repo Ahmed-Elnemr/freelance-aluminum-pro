@@ -42,6 +42,12 @@ return [
     'password_changed_successfully' => 'تم تغيير كلمة المرور بنجاح',
     'email_verified_successfully' => 'تم التحقق من البريد الإلكتروني وتغييره بنجاح',
     'email_verification_failed' => 'فشل التحقق من البريد الإلكتروني',
+    
+    // Registration & Account Activation
+    'verification_code_sent' => 'تم إرسال كود التحقق على بريدك الإلكتروني',
+    'account_not_verified' => 'الحساب غير مُفعّل. يرجى التحقق من بريدك الإلكتروني',
+    'account_activated_successfully' => 'تم تفعيل حسابك بنجاح',
+    'email_already_verified' => 'البريد الإلكتروني مُفعّل بالفعل',
 
     // Email Notification
     'Reset Password OTP' => 'رمز استعادة كلمة المرور',
