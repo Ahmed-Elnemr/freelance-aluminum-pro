@@ -50,5 +50,5 @@ return [
     'otp_resent_successfully' => 'OTP resent successfully',
     'password_changed_successfully' => 'Password changed successfully',
     'email_verified_successfully' => 'Email verified and updated successfully',
+    'email_verification_failed' => 'Email verification failed',
 ];
-

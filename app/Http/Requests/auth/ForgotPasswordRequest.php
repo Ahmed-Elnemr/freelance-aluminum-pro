@@ -17,7 +17,7 @@ class ForgotPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email|exists:users,email',
+            'email' => 'required|email|exists:users,email,type,client',
         ];
     }
 
@@ -25,6 +25,13 @@ class ForgotPasswordRequest extends FormRequest
     {
         return [
             'email' => __('validation.attributes.email'),
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'email.exists' => __('auth.user_not_found'),
         ];
     }
 }
