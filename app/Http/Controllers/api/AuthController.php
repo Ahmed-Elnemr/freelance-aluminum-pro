@@ -74,9 +74,11 @@ class AuthController extends Controller
         // Create access token
         $access_token = $user->createToken('authToken')->plainTextToken;
         
+        // Set token on user model for resource
+        $user->access_token = $access_token;
+        
         return ApiResponder::success(__('auth.Logged in successfully'), [
             'user' => UserResource::make($user),
-            'access_token' => $access_token,
         ]);
     }
 
@@ -104,9 +106,11 @@ class AuthController extends Controller
         // Create access token
         $access_token = $user->createToken('authToken')->plainTextToken;
         
+        // Set token on user model for resource
+        $user->access_token = $access_token;
+
         return ApiResponder::created([
             'user' => UserResource::make($user),
-            'access_token' => $access_token,
         ], __('auth.Registration successful'), 201);
     }
 
@@ -133,7 +137,8 @@ class AuthController extends Controller
 //
     public function profile(): \Illuminate\Http\JsonResponse
     {
-        return ApiResponder::loaded(['user' => UserResource::make(auth('sanctum')->user())]);
+        // Data is null because the user is already in the top-level 'user' key
+        return ApiResponder::loaded();
     }
 ////
     //todo: user editeProfile
@@ -141,11 +146,16 @@ class AuthController extends Controller
     {
         $user = auth('sanctum')->user();
         $validatedData = $request->validated();
-        $emailChanged = false;
+        $needOtp = false;
 
         // If email is changing
         if (isset($validatedData['email']) && $validatedData['email'] !== $user->email) {
-            $emailChanged = true;
+            $user->new_email = $validatedData['email'];
+            $user->save();
+            
+            // Remove email from validated data so it's not updated immediately
+            unset($validatedData['email']);
+            $needOtp = true;
         }
 
         // If password is being changed, verify current password
@@ -167,16 +177,15 @@ class AuthController extends Controller
             unset($validatedData['password_confirmation']);
         }
 
-        // Update user data
+        // Update user data (name, mobile, etc.)
         $user->update($validatedData);
         
         $responseData = [
-            'user' => UserResource::make($user->fresh())
+            'need_token' => $needOtp
         ];
 
-        if ($emailChanged) {
+        if ($needOtp) {
             $this->authService->sendVerificationOtp($user);
-            $responseData['need_otp'] = true;
         }
         
         return ApiResponder::success(__('auth.Profile updated successfully'), $responseData);

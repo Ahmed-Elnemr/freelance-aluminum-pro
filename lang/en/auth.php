@@ -38,6 +38,9 @@ return [
     'Your OTP for password reset is: :otp' => 'Your OTP for password reset is: :otp',
     'This OTP acts as your temporary password.' => 'This OTP acts as your temporary password.',
     'It will expire in 15 minutes.' => 'It will expire in 15 minutes.',
+    'Email Verification OTP' => 'Email Verification OTP',
+    'Your OTP for email verification is: :otp' => 'Your OTP for email verification is: :otp',
+    'This OTP is used to verify your new email address.' => 'This OTP is used to verify your new email address.',
     'user_not_found' => 'User not found',
     'failed_to_send_email' => 'Failed to send email',
     'otp_sent_successfully' => 'OTP sent successfully',
@@ -46,5 +49,6 @@ return [
     'password_reset_successfully' => 'Password reset successfully',
     'otp_resent_successfully' => 'OTP resent successfully',
     'password_changed_successfully' => 'Password changed successfully',
+    'email_verified_successfully' => 'Email verified and updated successfully',
 ];
 

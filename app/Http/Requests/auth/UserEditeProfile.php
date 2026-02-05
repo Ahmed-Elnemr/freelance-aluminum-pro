@@ -43,7 +43,6 @@ class UserEditeProfile extends FormRequest
                 'string',
                 'regex:/^05\d{8}$/',
                 'max:15',
-                Rule::unique('users', 'mobile')->ignore(auth()->id())->whereNull('deleted_at'),
             ],
             'current_password' => [
                 'required_with:password',

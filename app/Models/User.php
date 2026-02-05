@@ -26,6 +26,7 @@ class User extends Authenticatable
         'status',
         'mobile',
         'new_mobile',
+        'new_email',
         'email',
         'password',
         'type',

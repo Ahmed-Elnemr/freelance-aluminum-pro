@@ -1,0 +1,437 @@
+{
+    "info": {
+        "_postman_id": "8e363079-c567-4a1e-821f-auth-v1-ar",
+        "name": "Alumnium Pro - User Authentication (Arabic)",
+        "description": "مجموعة واجهات برمجة التطبيقات (APIs) الخاصة بتسجيل ودخول المستخدمين (Clients). تشمل التسجيل، الدخول، استعادة كلمة المرور، وتعديل الملف الشخصي.\n\nتنبيه: تسجيل الدخول يتم عن طريق البريد الإلكتروني فقط.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Authentication (تسجيل ودخول)",
+            "item": [
+                {
+                    "name": "Register (إنشاء حساب جديد)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Ahmed User\",\n    \"email\": \"client@example.com\",\n    \"mobile\": \"0512345678\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"uuid\": \"device-uuid-123\",\n    \"device_token\": \"fcm-token-here\",\n    \"device_type\": \"android\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "register"
+                            ]
+                        },
+                        "description": "لإنشاء حساب مستخدم جديد.\n- يسمح بتكرار رقم الجوال.\n- البريد الإلكتروني يجب أن يكون غير مستخدم من قبل."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login (تسجيل الدخول)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"login\": \"client@example.com\",\n    \"password\": \"password123\",\n    \"uuid\": \"device-uuid-123\",\n    \"device_token\": \"fcm-token-here\",\n    \"device_type\": \"android\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "login"
+                            ]
+                        },
+                        "description": "لتسجيل الدخول والحصول على التوكن.\n- **ملاحظة هامة**: تسجيل الدخول بالبريد الإلكتروني فقط."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Password Reset (استعادة كلمة المرور)",
+            "item": [
+                {
+                    "name": "1. Forgot Password (نسيت كلمة المرور)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"client@example.com\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/forgot-password",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "forgot-password"
+                            ]
+                        },
+                        "description": "الخطوة الأولى: إرسال كود التحقق (OTP) إلى البريد الإلكتروني."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "2. Verify OTP (التحقق من الكود)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"client@example.com\",\n    \"otp\": \"123456\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/verify-otp",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "verify-otp"
+                            ]
+                        },
+                        "description": "الخطوة الثانية: التحقق من صحة الكود الذي أدخله المستخدم قبل نقله لشاشة تغيير كلمة المرور."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "3. Reset Password (تعيين كلمة مرور جديدة)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"client@example.com\",\n    \"otp\": \"123456\",\n    \"password\": \"newpass123\",\n    \"password_confirmation\": \"newpass123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/reset-password",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "reset-password"
+                            ]
+                        },
+                        "description": "الخطوة الثالثة والأخيرة: تغيير كلمة المرور باستخدام الكود الصحيح وكلمة المرور الجديدة."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Resend OTP (إعادة إرسال الكود)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"client@example.com\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/resend-otp",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "resend-otp"
+                            ]
+                        },
+                        "description": "لإرسال كود جديد في حال انتهاء صلاحية الكود القديم أو عدم وصوله."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Profile & Settings (الملف الشخصي والإعدادات)",
+            "item": [
+                {
+                    "name": "Get Profile (عرض الملف الشخصي)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "profile"
+                            ]
+                        },
+                        "description": "لجلب بيانات المستخدم الحالي."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Edit Profile (تعديل الملف الشخصي)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Ahmed Updated\",\n    \"mobile\": \"0512345678\",\n    \"email\": \"client@example.com\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/edite-profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "edite-profile"
+                            ]
+                        },
+                        "description": "لتحديث بيانات المستخدم (الاسم، الجوال، الإيميل)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Change Password (تغيير كلمة المرور)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"current_password\": \"oldpassword123\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/change-password",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "change-password"
+                            ]
+                        },
+                        "description": "لتغيير كلمة المرور للمستخدم المسجل دخوله (يتطلب كلمة المرور القديمة)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Logout (تسجيل الخروج)",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/logout?uuid=device-uuid-123",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "logout"
+                            ],
+                            "query": [
+                                {
+                                    "key": "uuid",
+                                    "value": "device-uuid-123"
+                                }
+                            ]
+                        },
+                        "description": "لتسجيل الخروج وحذف التوكن."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Account (حذف الحساب)",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{access_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/user-auth/delete-account",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "user-auth",
+                                "delete-account"
+                            ]
+                        },
+                        "description": "لحذف حساب المستخدم نهائياً."
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000",
+            "type": "string"
+        },
+        {
+            "key": "access_token",
+            "value": "YOUR_TOKEN_HERE",
+            "type": "string"
+        }
+    ]
+}

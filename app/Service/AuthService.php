@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Helpers\Response\ApiResponder;
 use App\Models\User;
 use App\Notifications\ResetPasswordOtpNotification;
+use App\Notifications\EmailVerificationOtpNotification;
 use App\Repositories\Contracts\AuthRepositoryInterface;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -53,7 +54,7 @@ class AuthService
 
     public function verifyOtp(string $email, string $otp)
     {
-        $user = $this->authRepository->findClientByEmail($email);
+        $user = User::where('email', $email)->orWhere('new_email', $email)->isClient()->first();
 
         if (!$user) {
             return ApiResponder::failed(__('auth.user_not_found'), 404);
@@ -63,6 +64,16 @@ class AuthService
 
         if (!$otpRecord) {
             return ApiResponder::failed(__('auth.invalid_or_expired_otp'), 400);
+        }
+
+        // Handle Email Change Verification
+        if ($user->new_email === $email) {
+            $user->update([
+                'email' => $user->new_email,
+                'new_email' => null
+            ]);
+            $this->authRepository->markOtpAsUsed($otpRecord->id);
+            return ApiResponder::success(__('auth.email_verified_successfully'));
         }
 
         return ApiResponder::success(__('auth.otp_verified_successfully'));
@@ -93,23 +104,28 @@ class AuthService
 
     public function resendOtp(string $email)
     {
-        $user = $this->authRepository->findClientByEmail($email);
+        $user = User::where('email', $email)->orWhere('new_email', $email)->isClient()->first();
 
         if (!$user) {
             return ApiResponder::failed(__('auth.user_not_found'), 404);
         }
 
-        // $otp = rand(100000, 999999);
         $otp = 1111; // Fixed for testing
 
         $this->authRepository->deleteOtps($user->id);
         $this->authRepository->createOtp($user->id, (string)$otp);
 
         try {
-            // Using notifyNow to send immediately (synchronously)
-            $user->notifyNow(new ResetPasswordOtpNotification($otp));
+            if ($user->new_email === $email) {
+                // It's an email verification resend
+                \Illuminate\Support\Facades\Notification::route('mail', $email)
+                    ->notifyNow(new EmailVerificationOtpNotification($otp));
+            } else {
+                // It's a password reset resend
+                $user->notifyNow(new ResetPasswordOtpNotification($otp));
+            }
         } catch (\Exception $e) {
-            Log::error("Failed to send OTP email: " . $e->getMessage());
+            Log::error("Failed to resend OTP email: " . $e->getMessage());
             return ApiResponder::failed(__('auth.failed_to_send_email'), 500);
         }
 
@@ -129,18 +145,19 @@ class AuthService
 
     public function sendVerificationOtp(User $user)
     {
-        // $otp = rand(100000, 999999);
         $otp = 1111; // Fixed for testing
 
         $this->authRepository->deleteOtps($user->id);
         $this->authRepository->createOtp($user->id, (string)$otp);
 
+        $targetEmail = $user->new_email ?? $user->email;
+
         try {
-            $user->notifyNow(new ResetPasswordOtpNotification($otp));
+            // Using Notification facade to route specifically to the target email
+            \Illuminate\Support\Facades\Notification::route('mail', $targetEmail)
+                ->notifyNow(new EmailVerificationOtpNotification($otp));
         } catch (\Exception $e) {
             Log::error("Failed to send OTP email: " . $e->getMessage());
-            // We suppress error here to not break the profile update response, 
-            // or we could throw specific exception.
         }
     }
 }
