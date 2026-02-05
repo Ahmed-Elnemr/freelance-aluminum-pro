@@ -1,0 +1,9 @@
+[90m= [39m{#7302
+    +"[1mid[22m": [35m110[39m,
+    +"[1mgroup[22m": "[32mvalidation[39m",
+    +"[1mkey[22m": "[32mconfirmed[39m",
+    +"[1mtext[22m": "[32m{"ar": "The :attribute field confirmation does not match.", "en": "The :attribute field confirmation does not match."}[39m",
+    +"[1mcreated_at[22m": "[32m2025-05-02 01:08:48[39m",
+    +"[1mupdated_at[22m": "[32m2025-05-02 01:08:48[39m",
+  }
+

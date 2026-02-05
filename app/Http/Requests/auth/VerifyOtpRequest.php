@@ -29,4 +29,11 @@ class VerifyOtpRequest extends FormRequest
             'otp' => __('validation.attributes.otp'),
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'email.exists' => __('auth.user_not_found'),
+        ];
+    }
 }

@@ -40,11 +40,16 @@ return [
     'password_reset_successfully' => 'تم إعادة تعيين كلمة المرور بنجاح',
     'otp_resent_successfully' => 'تم إعادة إرسال رمز التحقق بنجاح',
     'password_changed_successfully' => 'تم تغيير كلمة المرور بنجاح',
+    'email_verified_successfully' => 'تم التحقق من البريد الإلكتروني وتغييره بنجاح',
+    'email_verification_failed' => 'فشل التحقق من البريد الإلكتروني',
 
     // Email Notification
     'Reset Password OTP' => 'رمز استعادة كلمة المرور',
     'Your OTP for password reset is: :otp' => 'رمز التحقق لاستعادة كلمة المرور هو: :otp',
     'This OTP acts as your temporary password.' => 'هذا الرمز يستخدم للتحقق من هويتك.',
     'It will expire in 15 minutes.' => 'ستنتهي صلاحية الرمز خلال 15 دقيقة.',
+    'Email Verification OTP' => 'رمز التحقق من البريد الإلكتروني',
+    'Your OTP for email verification is: :otp' => 'رمز التحقق الخاص بك هو: :otp',
+    'This OTP is used to verify your new email address.' => 'يستخدم هذا الرمز للتحقق من بريدك الإلكتروني الجديد.',
     'Your account has been successfully deleted' => 'تم حذف حسابك بنجاح',
 ];

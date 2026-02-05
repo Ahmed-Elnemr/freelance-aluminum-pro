@@ -304,8 +304,21 @@ return [
     */
 
     'attributes' => [
-
-
+        'service_id' => 'service',
+        'paymentmethod' => 'payment method',
+        'user_name' => 'username',
+        'rating' => 'rating',
+        'name' => 'name',
+        'email' => 'email',
+        'mobile' => 'mobile number',
+        'password' => 'password',
+        'password_confirmation' => 'password confirmation',
+        'current_password' => 'current password',
+        'login' => 'email or mobile number',
+        'uuid' => 'device identifier',
+        'device_token' => 'device token',
+        'device_type' => 'device type',
+        'otp' => 'verification code',
         'code' => 'verification code',
     ],
 

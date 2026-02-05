@@ -17,7 +17,7 @@ class ResetPasswordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email|exists:users,email',
+            'email' => 'required|email|exists:users,email,type,client',
             'otp' => 'required|numeric',
             'password' => 'required|string|min:4|confirmed',
         ];
@@ -29,6 +29,14 @@ class ResetPasswordRequest extends FormRequest
             'email' => __('validation.attributes.email'),
             'otp' => __('validation.attributes.otp'),
             'password' => __('validation.attributes.password'),
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'email.exists' => __('auth.user_not_found'),
+            'password.confirmed' => __('validation.confirmed', ['attribute' => __('validation.attributes.password')]),
         ];
     }
 }

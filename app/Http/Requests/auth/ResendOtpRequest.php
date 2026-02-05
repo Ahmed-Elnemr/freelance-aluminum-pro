@@ -27,4 +27,11 @@ class ResendOtpRequest extends FormRequest
             'email' => __('validation.attributes.email'),
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'email.exists' => __('auth.user_not_found'),
+        ];
+    }
 }

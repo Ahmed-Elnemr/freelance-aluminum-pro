@@ -13,7 +13,7 @@ Route::group(['prefix' => 'user-auth'], function () {
     Route::post('verify-otp', [AuthController::class, 'verifyOtp']);
     Route::post('reset-password', [AuthController::class, 'resetPassword']);
     Route::post('resend-otp', [AuthController::class, 'resendOtp']);
-    
+
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('store-name', [AuthController::class, 'storeName']);
         Route::get('profile', [AuthController::class, 'profile']);
@@ -22,4 +22,15 @@ Route::group(['prefix' => 'user-auth'], function () {
         Route::get('logout', [AuthController::class, 'logout']);
         Route::delete('delete-account', [AuthController::class,'deleteAccount']);
     });
+});
+Route::get('/test-mail', function () {
+    try {
+        Mail::raw('Hello Mailtrap test!', function ($msg) {
+            $msg->to('ahmedelnemr064@gmail.com')
+            ->subject('Mailtrap Test');
+        });
+        return 'Mail sent!';
+    } catch (\Exception $e) {
+        return $e->getMessage();
+    }
 });

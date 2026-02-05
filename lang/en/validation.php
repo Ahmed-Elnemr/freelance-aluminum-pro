@@ -203,6 +203,7 @@ return [
         'password' => 'password',
         'password_confirmation' => 'password confirmation',
         'current_password' => 'current password',
+        'otp' => 'verification code',
         'login' => 'email or mobile',
         'uuid' => 'device identifier',
         'device_token' => 'device token',

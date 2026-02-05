@@ -50,5 +50,5 @@ return [
     'otp_resent_successfully' => 'تم إعادة إرسال رمز التحقق بنجاح',
     'password_changed_successfully' => 'تم تغيير كلمة المرور بنجاح',
     'email_verified_successfully' => 'تم التحقق من البريد الإلكتروني وتغييره بنجاح',
+    'email_verification_failed' => 'فشل التحقق من البريد الإلكتروني',
 ];
-
