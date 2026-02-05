@@ -61,7 +61,7 @@ class AuthController extends Controller
         if ($user->email_verified_at === null) {
             return ApiResponder::failed(__('auth.account_not_verified'), 403, [
                 'need_token' => true,
-                'email' => $user->email
+                'user' => UserResource::make($user)
             ]);
         }
         
@@ -85,6 +85,7 @@ class AuthController extends Controller
         $user->access_token = $access_token;
         
         return ApiResponder::success(__('auth.Logged in successfully'), [
+            'need_token' => false,
             'user' => UserResource::make($user),
         ]);
     }
