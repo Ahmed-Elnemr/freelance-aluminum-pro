@@ -58,9 +58,9 @@ class ApiResponder
         return self::make($data,__($message), $code);
     }
 
-    public static function failed($message, $code = 400)
+    public static function failed($message, $code = 400, $data = null)
     {
-        return self::make(null, $message, $code);
+        return self::make($data, $message, $code);
     }
 
     public static function updated($data = null,$code = 202,$message = 'Updated Successfully')
