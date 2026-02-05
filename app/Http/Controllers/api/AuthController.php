@@ -42,51 +42,51 @@ class AuthController extends Controller
     public function login(UserLoginRequest $request)
     {
         $validatedData = $request->validated();
-        
+
         // Determine if login is email or mobile
         // $loginField = filter_var($validatedData['login'], FILTER_VALIDATE_EMAIL) ? 'email' : 'mobile';
-        
+
         //  Restricting login to Email Only as per request (since mobile is not verified/unique)
         $loginField = 'email';
 
         // Find user by email
         $user = User::where($loginField, $validatedData['login'])
             ->first();
-        
+
         if (!$user) {
             return ApiResponder::failed(__('auth.invalid_credentials'), 401);
         }
-        
+
         // Check if email is verified
         if ($user->email_verified_at === null) {
             // Send Verification OTP
             $this->authService->sendVerificationOtp($user);
 
-            return ApiResponder::failed(__('auth.account_not_verified'), 403, [
+            return ApiResponder::failed(__('auth.account_not_verified'), 200, [
                 'need_token' => true,
                 'user' => UserResource::make($user)
             ]);
         }
-        
+
         // Check if account is active
         if ($user->is_active == 0) {
             return ApiResponder::failed(__('auth.Your account is blocked'), 403);
         }
-        
+
         // Verify password
         if (!Hash::check($validatedData['password'], $user->password)) {
             return ApiResponder::failed(__('auth.invalid_credentials'), 401);
         }
-        
+
         // Add device
         $this->userService->addDevice($user);
-        
+
         // Create access token
         $access_token = $user->createToken('authToken')->plainTextToken;
-        
+
         // Set token on user model for resource
         $user->access_token = $access_token;
-        
+
         return ApiResponder::success(__('auth.Logged in successfully'), [
             'need_token' => false,
             'user' => UserResource::make($user),
@@ -97,16 +97,16 @@ class AuthController extends Controller
     public function register(RegisterRequest $request)
     {
         $validatedData = $request->validated();
-        
+
         // Check if email already exists
         $existingUser = User::where('email', $validatedData['email'])->first();
-        
+
         if ($existingUser) {
             // If user exists and is verified (email_verified_at is not null)
             if ($existingUser->email_verified_at !== null) {
                 return ApiResponder::failed(__('validation.unique', ['attribute' => __('validation.attributes.email')]), 422);
             }
-            
+
             // If user exists but NOT verified, resend OTP
             // Update user data in case they changed name/mobile/password
             $existingUser->update([
@@ -114,19 +114,19 @@ class AuthController extends Controller
                 'mobile' => $validatedData['mobile'],
                 'password' => Hash::make($validatedData['password']),
             ]);
-            
+
             // Update device info
             $this->userService->addDevice($existingUser);
-            
+
             // Send OTP
             $this->authService->sendVerificationOtp($existingUser);
-            
+
             return ApiResponder::success(__('auth.verification_code_sent'), [
                 'need_token' => true,
                 'user' => UserResource::make($existingUser)
             ]);
         }
-        
+
         // Create new user (inactive by default)
         $user = User::create([
             'name' => $validatedData['name'],
@@ -137,13 +137,13 @@ class AuthController extends Controller
             'is_active' => 0, // Inactive until email is verified
             'email_verified_at' => null, // Not verified yet
         ]);
-        
+
         // Add device
         $this->userService->addDevice($user);
-        
+
         // Send OTP for email verification
         $this->authService->sendVerificationOtp($user);
-        
+
         return ApiResponder::success(__('auth.verification_code_sent'), [
             'need_token' => true,
             'user' => UserResource::make($user)
@@ -188,7 +188,7 @@ class AuthController extends Controller
         if (isset($validatedData['email']) && $validatedData['email'] !== $user->email) {
             $user->new_email = $validatedData['email'];
             $user->save();
-            
+
             // Remove email from validated data so it's not updated immediately
             unset($validatedData['email']);
             $needOtp = true;
@@ -199,11 +199,11 @@ class AuthController extends Controller
             if (empty($validatedData['current_password'])) {
                 return ApiResponder::failed(__('auth.current_password_required'), 422);
             }
-            
+
             if (!Hash::check($validatedData['current_password'], $user->password)) {
                 return ApiResponder::failed(__('auth.current_password_incorrect'), 422);
             }
-            
+
             $validatedData['password'] = Hash::make($validatedData['password']);
             unset($validatedData['current_password']);
             unset($validatedData['password_confirmation']);
@@ -215,7 +215,7 @@ class AuthController extends Controller
 
         // Update user data (name, mobile, etc.)
         $user->update($validatedData);
-        
+
         $responseData = [
             'need_token' => $needOtp
         ];
@@ -223,7 +223,7 @@ class AuthController extends Controller
         if ($needOtp) {
             $this->authService->sendVerificationOtp($user);
         }
-        
+
         return ApiResponder::success(__('auth.Profile updated successfully'), $responseData);
     }
 
