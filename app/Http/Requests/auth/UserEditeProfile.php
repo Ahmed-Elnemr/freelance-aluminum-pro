@@ -53,7 +53,7 @@ class UserEditeProfile extends FormRequest
                 'sometimes',
                 'required',
                 'string',
-                'min:8',
+                'min:4',
                 'confirmed',
             ],
             'password_confirmation' => [
@@ -98,7 +98,7 @@ class UserEditeProfile extends FormRequest
             
             'password.required' => __('validation.required', ['attribute' => __('validation.attributes.password')]),
             'password.string' => __('validation.string', ['attribute' => __('validation.attributes.password')]),
-            'password.min' => __('validation.min.string', ['attribute' => __('validation.attributes.password'), 'min' => 8]),
+            'password.min' => __('validation.min.string', ['attribute' => __('validation.attributes.password'), 'min' => 4]),
             'password.confirmed' => __('validation.confirmed', ['attribute' => __('validation.attributes.password')]),
             
             'password_confirmation.required_with' => __('validation.required_with', ['attribute' => __('validation.attributes.password_confirmation'), 'values' => __('validation.attributes.password')]),

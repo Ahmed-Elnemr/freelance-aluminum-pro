@@ -29,7 +29,7 @@ class UserLoginRequest extends FormRequest
             'password' => [
                 'required',
                 'string',
-                'min:8',
+                'min:4',
             ],
             'uuid' => 'required|string',
             'device_token' => 'required',
@@ -66,7 +66,7 @@ class UserLoginRequest extends FormRequest
 
             'password.required' => __('validation.required', ['attribute' => __('validation.attributes.password')]),
             'password.string' => __('validation.string', ['attribute' => __('validation.attributes.password')]),
-            'password.min' => __('validation.min.string', ['attribute' => __('validation.attributes.password'), 'min' => 8]),
+            'password.min' => __('validation.min.string', ['attribute' => __('validation.attributes.password'), 'min' => 4]),
 
             'uuid.required' => __('validation.required', ['attribute' => __('validation.attributes.uuid')]),
             'uuid.string' => __('validation.string', ['attribute' => __('validation.attributes.uuid')]),

@@ -45,13 +45,8 @@ class RegisterRequest extends FormRequest
             'password' => [
                 'required',
                 'string',
-                'min:8',
+                'min:4',
                 'confirmed',
-                Password::min(8)
-                    ->letters()
-                    ->mixedCase()
-                    ->numbers()
-                    ->symbols(),
             ],
             'password_confirmation' => [
                 'required',
@@ -108,7 +103,7 @@ class RegisterRequest extends FormRequest
             
             'password.required' => __('validation.required', ['attribute' => __('validation.attributes.password')]),
             'password.string' => __('validation.string', ['attribute' => __('validation.attributes.password')]),
-            'password.min' => __('validation.min.string', ['attribute' => __('validation.attributes.password'), 'min' => 8]),
+            'password.min' => __('validation.min.string', ['attribute' => __('validation.attributes.password'), 'min' => 4]),
             'password.confirmed' => __('validation.confirmed', ['attribute' => __('validation.attributes.password')]),
             
             'password_confirmation.required' => __('validation.required', ['attribute' => __('validation.attributes.password_confirmation')]),
