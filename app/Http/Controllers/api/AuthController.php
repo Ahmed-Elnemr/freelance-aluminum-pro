@@ -51,11 +51,18 @@ class AuthController extends Controller
 
         // Find user by email
         $user = User::where($loginField, $validatedData['login'])
-            ->where('is_active', 1)
             ->first();
         
         if (!$user) {
             return ApiResponder::failed(__('auth.invalid_credentials'), 401);
+        }
+        
+        // Check if email is verified
+        if ($user->email_verified_at === null) {
+            return ApiResponder::failed(__('auth.account_not_verified'), 403, [
+                'need_token' => true,
+                'email' => $user->email
+            ]);
         }
         
         // Check if account is active
@@ -87,31 +94,56 @@ class AuthController extends Controller
     {
         $validatedData = $request->validated();
         
-        // Create new user
+        // Check if email already exists
+        $existingUser = User::where('email', $validatedData['email'])->first();
+        
+        if ($existingUser) {
+            // If user exists and is verified (email_verified_at is not null)
+            if ($existingUser->email_verified_at !== null) {
+                return ApiResponder::failed(__('validation.unique', ['attribute' => __('validation.attributes.email')]), 422);
+            }
+            
+            // If user exists but NOT verified, resend OTP
+            // Update user data in case they changed name/mobile/password
+            $existingUser->update([
+                'name' => $validatedData['name'],
+                'mobile' => $validatedData['mobile'],
+                'password' => Hash::make($validatedData['password']),
+            ]);
+            
+            // Update device info
+            $this->userService->addDevice($existingUser);
+            
+            // Send OTP
+            $this->authService->sendVerificationOtp($existingUser);
+            
+            return ApiResponder::success(__('auth.verification_code_sent'), [
+                'need_token' => true,
+                'user' => UserResource::make($existingUser)
+            ]);
+        }
+        
+        // Create new user (inactive by default)
         $user = User::create([
             'name' => $validatedData['name'],
             'email' => $validatedData['email'],
             'mobile' => $validatedData['mobile'],
             'password' => Hash::make($validatedData['password']),
             'status' => 1,
-            'is_active' => 1,
+            'is_active' => 0, // Inactive until email is verified
+            'email_verified_at' => null, // Not verified yet
         ]);
         
         // Add device
         $this->userService->addDevice($user);
         
-        // Send welcome notification
-        $user->notify(new WelcomeNotification());
+        // Send OTP for email verification
+        $this->authService->sendVerificationOtp($user);
         
-        // Create access token
-        $access_token = $user->createToken('authToken')->plainTextToken;
-        
-        // Set token on user model for resource
-        $user->access_token = $access_token;
-
-        return ApiResponder::created([
-            'user' => UserResource::make($user),
-        ], __('auth.Registration successful'), 201);
+        return ApiResponder::success(__('auth.verification_code_sent'), [
+            'need_token' => true,
+            'user' => UserResource::make($user)
+        ]);
     }
 
 //todo::storeName

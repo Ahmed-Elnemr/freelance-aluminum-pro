@@ -33,7 +33,7 @@ class RegisterRequest extends FormRequest
                 'required',
                 'email',
                 'max:255',
-                'unique:users,email',
+                // Removed unique validation - handled manually in controller
             ],
             'mobile' => [
                 'required',
