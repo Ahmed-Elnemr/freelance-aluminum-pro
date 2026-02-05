@@ -75,7 +75,10 @@ class AuthService
                 'is_active' => 1
             ]);
             $this->authRepository->markOtpAsUsed($otpRecord->id);
-            return ApiResponder::success(__('auth.email_verified_successfully'));
+            return ApiResponder::success(__('auth.email_verified_successfully'), [
+                'need_token' => false,
+                'user' => new \App\Http\Resources\user\UserResource($user)
+            ]);
         }
 
         // Handle Initial Registration Verification
@@ -91,6 +94,7 @@ class AuthService
             $user->access_token = $access_token;
             
             return ApiResponder::success(__('auth.account_activated_successfully'), [
+                'need_token' => false,
                 'user' => new \App\Http\Resources\user\UserResource($user)
             ]);
         }
