@@ -31,6 +31,9 @@ class AuthService
             return ApiResponder::failed(__('auth.Your account is blocked'), 403);
         }
 
+
+        
+
         $otp = rand(1000, 9999);
 
         // Invalidate old OTPs
