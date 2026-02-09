@@ -31,8 +31,7 @@ class AuthService
             return ApiResponder::failed(__('auth.Your account is blocked'), 403);
         }
 
-        // $otp = rand(100000, 999999);
-        $otp = 1111; // Fixed for testing as requested
+        $otp = rand(1000, 9999);
 
         // Invalidate old OTPs
         $this->authRepository->deleteOtps($user->id);
@@ -135,7 +134,7 @@ class AuthService
             return ApiResponder::failed(__('auth.user_not_found'), 404);
         }
 
-        $otp = 1111; // Fixed for testing
+        $otp = rand(1000, 9999);
 
         $this->authRepository->deleteOtps($user->id);
         $this->authRepository->createOtp($user->id, (string)$otp);
@@ -173,7 +172,7 @@ class AuthService
 
     public function sendVerificationOtp(User $user)
     {
-        $otp = 1111; // Fixed for testing
+        $otp = rand(1000, 9999);
 
         $this->authRepository->deleteOtps($user->id);
         $this->authRepository->createOtp($user->id, (string)$otp);
