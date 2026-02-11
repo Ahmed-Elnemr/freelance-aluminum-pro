@@ -34,7 +34,7 @@ class StoreOrderRequest extends FormRequest
             'sounds' => 'nullable|array',
             'sounds.*' => 'nullable|mimes:mp3,wav,ogg,m4a|max:10240',
 
-            'paymentmethod' =>'required','integer|in:'.PaymentMethodEnum::moyasar->value.'',
+            'paymentmethod' => 'required|integer|in:'.PaymentMethodEnum::moyasar->value,
 
         ];
     }

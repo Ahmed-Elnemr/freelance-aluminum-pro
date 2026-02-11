@@ -14,9 +14,9 @@ Route::prefix('services')->group(function () {
 
 //        Route::get('products', 'products');
 //        Route::get('maintenance', 'maintenance');
-        Route::get('{service}', 'show');
         Route::get('products/list', 'listProducts');
         Route::get('maintenance/list', 'listMaintenance');
+        Route::get('{service}', 'show');
         Route::post('search', 'search');
     });
     Route::middleware('auth:sanctum')->post('/request-inspection', [ServiceInspectionController::class, 'requestInspection']);

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'user-auth'], function () {
     Route::post('register', [AuthController::class, 'register']);
-    Route::post('login', [AuthController::class, 'login']);
+    Route::post('login', [AuthController::class, 'login'])->name('login');
 
     // Password Reset Routes
     Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
