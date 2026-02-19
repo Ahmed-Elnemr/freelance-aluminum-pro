@@ -21,11 +21,20 @@ class ChatController extends Controller
     // todo: sendMessage
     public function sendMessage(Request $request)
     {
-        $request->validate([
+        $rules = [
             'message' => 'nullable|string',
-            'file.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mp3,mov,avi,pdf,doc,docx,m4a,wav,webm,ogg,3gp,amr,aac,m4v|max:10240',
             'is_record' => 'nullable|boolean',
-        ]);
+        ];
+
+        if ($request->hasFile('file')) {
+            if (is_array($request->file('file'))) {
+                $rules['file.*'] = 'file|mimes:jpg,jpeg,png,gif,mp4,mp3,mov,avi,pdf,doc,docx,m4a,wav,webm,ogg,3gp,amr,aac,m4v|max:10240';
+            } else {
+                $rules['file'] = 'file|mimes:jpg,jpeg,png,gif,mp4,mp3,mov,avi,pdf,doc,docx,m4a,wav,webm,ogg,3gp,amr,aac,m4v|max:10240';
+            }
+        }
+
+        $request->validate($rules);
 
         $sender = auth()->user();
         $receiver = User::where('type', 'admin')->first();
@@ -51,7 +60,8 @@ class ChatController extends Controller
             ]);
 
             if ($request->hasFile('file')) {
-                foreach ($request->file('file') as $file) {
+                $files = is_array($request->file('file')) ? $request->file('file') : [$request->file('file')];
+                foreach ($files as $file) {
                     $path = $file->store('chat_attachments', 'public');
                     $filePath = Storage::url($path);
 
