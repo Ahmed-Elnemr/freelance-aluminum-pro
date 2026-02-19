@@ -79,6 +79,12 @@ class PaymentController extends Controller
 
             $order->user->notify(new OrderCreatedNotification($order));
 
+            // Notify Admin
+            $admin = \App\Models\User::where('type', 'admin')->first();
+            if ($admin) {
+                $admin->notify(new OrderCreatedNotification($order));
+            }
+
             return ApiResponder::success('The service has been booked successfully.');
         }
 
