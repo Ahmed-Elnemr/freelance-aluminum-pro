@@ -6,6 +6,8 @@ use App\Filament\Resources\ServiceInspectionResource\Pages;
 use App\Models\ServiceInspection;
 use App\Models\Service;
 use App\Models\User;
+use App\Filament\Resources\UserResource;
+use App\Filament\Resources\ServiceResource;
 use Filament\Resources\Resource;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
@@ -14,6 +16,10 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Select;
+
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\Section;
 
 class ServiceInspectionResource extends Resource
 {
@@ -61,6 +67,35 @@ class ServiceInspectionResource extends Resource
                     ->required(),
             ]);
     }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Section::make()
+                    ->schema([
+                        TextEntry::make('user.name')
+                            ->label(__('dashboard.user'))
+                            ->url(fn ($record) => UserResource::getUrl('edit', ['record' => $record->user_id]))
+                            ->openUrlInNewTab()
+                            ->color('primary')
+                            ->weight('bold'),
+
+                        TextEntry::make('service.name')
+                            ->label(__('dashboard.service'))
+                            ->url(fn ($record) => ServiceResource::getUrl('edit', ['record' => $record->service_id]))
+                            ->openUrlInNewTab()
+                            ->color('info')
+                            ->weight('bold'),
+
+                        TextEntry::make('created_at')
+                            ->label(__('dashboard.inspected_at'))
+                            ->dateTime()
+                            ->color('gray'),
+                    ])->columns(2)
+            ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -98,6 +133,7 @@ class ServiceInspectionResource extends Resource
                     ->searchable(),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -116,6 +152,7 @@ class ServiceInspectionResource extends Resource
         return [
             'index' => Pages\ListServiceInspections::route('/'),
             'create' => Pages\CreateServiceInspection::route('/create'),
+            'view' => Pages\ViewServiceInspection::route('/{record}'),
             'edit' => Pages\EditServiceInspection::route('/{record}/edit'),
         ];
     }

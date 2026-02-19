@@ -76,7 +76,7 @@ class OrderCreatedNotification extends Notification
             ->actions([
                 \Filament\Notifications\Actions\Action::make('view')
                     ->label(__('dashboard.view'))
-                    ->url(\App\Filament\Resources\OrderResource::getUrl('edit', ['record' => $this->order])),
+                    ->url(\App\Filament\Resources\OrderResource::getUrl('view', ['record' => $this->order])),
             ])
             ->getDatabaseMessage();
     }
