@@ -290,12 +290,19 @@ class OrderResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
+                Tables\Actions\Action::make('chat')
+                    ->label(__('dashboard.chat'))
+                    ->icon('heroicon-o-chat-bubble-left-right')
+                    ->color('success')
+                    ->url(fn ($record) => route('filament.pages.chat-page', ['userId' => $record->user_id]))
+                    ->tooltip(__('dashboard.chat'))
+                    ->openUrlInNewTab(),
                 Tables\Actions\Action::make('view_user')
-                    ->label('العميل')
+                    ->label(__('dashboard.user'))
                     ->icon('heroicon-o-user')
                     ->color('info')
                     ->url(fn ($record) => UserResource::getUrl('edit', ['record' => $record->user_id]))
-                    ->tooltip('عرض بيانات المستخدم')
+                    ->tooltip(__('dashboard.user'))
                     ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
