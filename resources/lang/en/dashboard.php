@@ -59,6 +59,8 @@ return [
     'inspected_at' => 'وقت المعاينة',
     'internal_note'=>'Notes before payment',
     'audio_records' => 'audio records',
+    'chat' => 'Chat',
+    'view' => 'View',
 
 
 ];

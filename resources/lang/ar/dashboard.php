@@ -60,6 +60,8 @@ return [
     'inspected_at' => 'وقت المعاينة',
     'internal_note'=>' ملاحظات قبل الدفع',
     'audio_records' => 'تسجيلات صوتية',
+    'chat' => 'المحادثة',
+    'view' => 'عرض',
 
 
 ];
