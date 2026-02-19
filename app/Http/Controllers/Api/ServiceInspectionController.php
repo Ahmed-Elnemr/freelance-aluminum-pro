@@ -25,10 +25,17 @@ class ServiceInspectionController extends Controller
             return ApiResponder::failed(__('You have already requested a preview of this service.'));
         }
 
-        ServiceInspection::create([
+        $inspection = ServiceInspection::create([
             'user_id' => $user->id,
             'service_id' => $request->service_id,
         ]);
+
+        // Notify Admin
+        $admin = \App\Models\User::where('type', 'admin')->first();
+        if ($admin) {
+            $admin->notify(new \App\Notifications\ServiceInspectionRequestNotification($inspection));
+        }
+
         return ApiResponder::success(__('Your preview request has been sent successfully.'));
 
     }

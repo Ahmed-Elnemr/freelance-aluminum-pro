@@ -66,6 +66,14 @@ class WelcomeNotification extends Notification
         return $this->data;
     }
 
+    public function toDatabase(object $notifiable): array
+    {
+        return \Filament\Notifications\Notification::make()
+            ->title($this->data['title'][app()->getLocale()] ?? '')
+            ->body($this->data['body'][app()->getLocale()] ?? '')
+            ->getDatabaseMessage();
+    }
+
     public function toFcm($notifiable)
     {
         FCMAction::new($notifiable)

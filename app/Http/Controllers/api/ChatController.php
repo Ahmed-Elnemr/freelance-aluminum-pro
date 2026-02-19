@@ -84,6 +84,11 @@ class ChatController extends Controller
             Notification::make()
                 ->title('رسالة جديدة')
                 ->body($notificationBody)
+                ->actions([
+                    \Filament\Notifications\Actions\Action::make('view')
+                        ->label(__('dashboard.chat'))
+                        ->url(\App\Filament\Pages\ChatPage::getUrl(['userId' => $sender->id])),
+                ])
                 ->sendToDatabase($receiver);
             DB::commit();
 
