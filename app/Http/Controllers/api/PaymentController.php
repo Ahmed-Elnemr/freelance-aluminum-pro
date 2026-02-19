@@ -52,17 +52,17 @@ class PaymentController extends Controller
 
         $userId = $request->user_id;
         $cacheKey = 'pending_order_' . $userId;
-        $cached = Cache::pull($cacheKey);
+        $cached = Cache::get($cacheKey);
 
         if ($request->status === 'paid') {
             $order = Order::create($cached['order_data']);
+            Cache::forget($cacheKey);
 
             if (!empty($cached['images'])) {
                 foreach ($cached['images'] as $imagePath) {
                     $fullPath = storage_path("app/{$imagePath}");
                     if (file_exists($fullPath)) {
                         $order->addMedia($fullPath)->toMediaCollection('media');
-//                        unlink($fullPath); // حذف الصورة من المجلد المؤقت
                     }
                 }
             }
@@ -71,7 +71,6 @@ class PaymentController extends Controller
                     $fullPath = storage_path("app/{$soundPath}");
                     if (file_exists($fullPath)) {
                         $order->addMedia($fullPath)->toMediaCollection('sounds');
-                        // unlink($fullPath); // احذف الملف بعد التخزين لو حابب
                     }
                 }
             }
@@ -88,6 +87,7 @@ class PaymentController extends Controller
             return ApiResponder::success('The service has been booked successfully.');
         }
 
-        return ApiResponder::failed('An error occurred while booking the service. Try again.');
+        $errorMessage = $request->message ?? 'An error occurred while booking the service. Try again.';
+        return ApiResponder::failed($errorMessage);
     }
 }
