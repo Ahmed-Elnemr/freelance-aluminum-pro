@@ -50,7 +50,7 @@ class ServiceInspectionRequestNotification extends Notification
             ->actions([
                 \Filament\Notifications\Actions\Action::make('view')
                     ->label(__('dashboard.view'))
-                    ->url(\App\Filament\Resources\ServiceInspectionResource::getUrl('edit', ['record' => $this->inspection])),
+                    ->url(\App\Filament\Resources\ServiceInspectionResource::getUrl('view', ['record' => $this->inspection])),
             ])
             ->getDatabaseMessage();
     }

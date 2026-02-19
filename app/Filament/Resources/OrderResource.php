@@ -23,6 +23,11 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\Section as InfolistSection;
+use App\Filament\Resources\UserResource;
+use App\Filament\Resources\ServiceResource;
 
 class OrderResource extends Resource
 {
@@ -218,7 +223,10 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')
                     ->label(__('dashboard.user'))
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->url(fn ($record) => UserResource::getUrl('edit', ['record' => $record->user_id]))
+                    ->openUrlInNewTab()
+                    ->color('primary'),
 
                 Tables\Columns\TextColumn::make('service.name')
                     ->label(__('dashboard.service'))
@@ -227,7 +235,10 @@ class OrderResource extends Resource
                     })
                     ->html()
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->url(fn ($record) => ServiceResource::getUrl('edit', ['record' => $record->service_id]))
+                    ->openUrlInNewTab()
+                    ->color('info'),
 
                 Tables\Columns\TextColumn::make('location_name')
                     ->label(__('dashboard.location_name'))
@@ -304,6 +315,7 @@ class OrderResource extends Resource
                     ->url(fn ($record) => UserResource::getUrl('edit', ['record' => $record->user_id]))
                     ->tooltip(__('dashboard.user'))
                     ->openUrlInNewTab(),
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
 
@@ -327,6 +339,7 @@ class OrderResource extends Resource
         return [
             'index' => Pages\ListOrders::route('/'),
             'create' => Pages\CreateOrder::route('/create'),
+            'view' => Pages\ViewOrder::route('/{record}'),
             'edit' => Pages\EditOrder::route('/{record}/edit'),
         ];
     }
