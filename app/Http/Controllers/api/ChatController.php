@@ -23,7 +23,7 @@ class ChatController extends Controller
     {
         $request->validate([
             'message' => 'nullable|string',
-            'file.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mp3,mov,avi,pdf,doc,docx|max:10240',
+            'file.*' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4,mp3,mov,avi,pdf,doc,docx,m4a,wav,webm,ogg,3gp,amr,aac,m4v|max:10240',
             'is_record' => 'nullable|boolean',
         ]);
 
