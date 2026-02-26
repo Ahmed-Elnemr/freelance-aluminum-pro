@@ -56,7 +56,9 @@ class AuthService
 
     public function verifyOtp(string $email, string $otp)
     {
-        $user = User::where('email', $email)->orWhere('new_email', $email)->isClient()->first();
+        $user = User::where(function($q) use ($email) {
+            $q->where('email', $email)->orWhere('new_email', $email);
+        })->isClient()->first();
 
         if (!$user) {
             return ApiResponder::failed(__('auth.user_not_found'), 404);
@@ -102,7 +104,7 @@ class AuthService
         }
 
         // For password reset verification (email already verified)
-        $this->authRepository->markOtpAsUsed($otpRecord->id);
+        // We shouldn't mark it as used here, because resetPassword will need it.
         return ApiResponder::success(__('auth.otp_verified_successfully'));
     }
 
@@ -131,7 +133,9 @@ class AuthService
 
     public function resendOtp(string $email)
     {
-        $user = User::where('email', $email)->orWhere('new_email', $email)->isClient()->first();
+        $user = User::where(function($q) use ($email) {
+            $q->where('email', $email)->orWhere('new_email', $email);
+        })->isClient()->first();
 
         if (!$user) {
             return ApiResponder::failed(__('auth.user_not_found'), 404);
