@@ -103,13 +103,13 @@ class OrderResource extends Resource
                             ->searchable()
                             ->required(),
 
-                        Forms\Components\DatePicker::make('date')
+                        Forms\Components\DatePicker::make('scheduled_date')
                             ->label(__('dashboard.date'))
                             ->required()
                             ->native(false)
                             ->displayFormat('Y-m-d'),
 
-                        Forms\Components\TimePicker::make('time')
+                        Forms\Components\TimePicker::make('scheduled_time')
                             ->label(__('dashboard.time'))
                             ->required()
                             ->native(false)
@@ -252,14 +252,14 @@ class OrderResource extends Resource
                     ->openUrlInNewTab()
                     ->color('info'),
 
-                Tables\Columns\TextColumn::make('date')
+                Tables\Columns\TextColumn::make('scheduled_date')
                     ->label(__('dashboard.date'))
                     ->date()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('formatted_time')
                     ->label(__('dashboard.time'))
-                    ->sortable(['time']),
+                    ->sortable(['scheduled_time']),
 
                 Tables\Columns\TextColumn::make('location_name')
                     ->label(__('dashboard.location_name'))
