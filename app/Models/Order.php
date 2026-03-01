@@ -29,22 +29,32 @@ class Order extends Model implements HasMedia
         'internal_note',
         'status',
         'is_active',
-        'date',
-        'time',
+        'scheduled_date',
+        'scheduled_time',
     ];
 
     protected $casts = [
         'status' => OrderStatusEnum::class,
-        'date' => 'date',
+        'scheduled_date' => 'date',
     ];
+
+    public function getDateAttribute()
+    {
+        return $this->scheduled_date;
+    }
+
+    public function getTimeAttribute()
+    {
+        return $this->scheduled_time;
+    }
 
     public function getFormattedTimeAttribute(): ?string
     {
-        if (!$this->time) {
+        if (!$this->scheduled_time) {
             return null;
         }
 
-        return \Illuminate\Support\Carbon::createFromFormat('H:i:s', $this->time)
+        return \Illuminate\Support\Carbon::createFromFormat('H:i:s', $this->scheduled_time)
             ->translatedFormat('h:i A');
     }
 
