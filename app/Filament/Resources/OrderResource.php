@@ -102,7 +102,19 @@ class OrderResource extends Resource
                             )
                             ->searchable()
                             ->required(),
-                    ])->columns(3),
+
+                        Forms\Components\DatePicker::make('date')
+                            ->label(__('dashboard.date'))
+                            ->required()
+                            ->native(false)
+                            ->displayFormat('Y-m-d'),
+
+                        Forms\Components\TimePicker::make('time')
+                            ->label(__('dashboard.time'))
+                            ->required()
+                            ->native(false)
+                            ->displayFormat('H:i'),
+                    ])->columns(2),
 
                 Section::make(__('location info'))
                     ->schema([
@@ -239,6 +251,15 @@ class OrderResource extends Resource
                     ->url(fn ($record) => ServiceResource::getUrl('edit', ['record' => $record->service_id]))
                     ->openUrlInNewTab()
                     ->color('info'),
+
+                Tables\Columns\TextColumn::make('date')
+                    ->label(__('dashboard.date'))
+                    ->date()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('formatted_time')
+                    ->label(__('dashboard.time'))
+                    ->sortable(['time']),
 
                 Tables\Columns\TextColumn::make('location_name')
                     ->label(__('dashboard.location_name'))

@@ -29,6 +29,8 @@ class StoreOrderRequest extends FormRequest
             'location_name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
             'internal_note'=>'nullable|string|max:1000',
+            'date' => 'required|date_format:Y-m-d',
+            'time' => 'required|date_format:H:i',
             'images' => 'nullable|array',
             'images.*' => 'nullable|mimes:jpg,jpeg,png,gif,webp,avi,mkv|max:10240',
             'sounds' => 'nullable|array',

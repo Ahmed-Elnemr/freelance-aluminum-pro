@@ -17,19 +17,29 @@ class OrderResource extends JsonResource
         return [
             'id' => $this->id,
             'user_name' => (string) $this->user?->name,
+            'service_name' => (string) $this->service?->getTranslation('name', app()->getLocale()),
             'location' => (string) $this->location_name,
             'latitude' => (float) $this->latitude,
             'longitude' => (float) $this->longitude,
             'service_id' => (int) $this->service?->id,
             'category_type' => (string) $this->service?->category?->value,
             'category_label' => (string) $this->service?->category?->label(),
-            'price' => (double) $this->service->price,
-            'final_price' => (double) $this->service->final_price,
+            'price' => (double) $this->service?->price,
+            'final_price' => (double) $this->service?->final_price,
             'description' => (string) $this->description,
             'status' => (string) $this->status->value,
             'status_label' => (string) $this->status->label(),
+            'date' => (string) $this->date?->format('Y-m-d'),
+            'time' => (string) $this->time,
+            'formatted_time' => (string) $this->formatted_time,
             'created' => (string) $this->created_at?->format('d-m-Y'),
             'media' => $this->getMedia('media')->map(function ($media) {
+                return [
+                    'url' => $media->getUrl(),
+                    'type' => $media->mime_type,
+                ];
+            }),
+            'sounds' => $this->getMedia('sounds')->map(function ($media) {
                 return [
                     'url' => $media->getUrl(),
                     'type' => $media->mime_type,
