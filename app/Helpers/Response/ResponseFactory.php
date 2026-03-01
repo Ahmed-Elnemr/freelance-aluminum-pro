@@ -15,7 +15,7 @@ class ResponseFactory
             $userResource = \App\Http\Resources\user\UserResource::make($user);
             if (is_null($data)) {
                 $data = ['user' => $userResource];
-            } elseif (is_array($data)) {
+            } elseif (is_array($data) && \Illuminate\Support\Arr::isAssoc($data)) {
                 // Merge user if not already present to avoid double processing
                 if (!isset($data['user'])) {
                     $data['user'] = $userResource;

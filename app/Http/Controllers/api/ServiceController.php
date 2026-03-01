@@ -21,9 +21,7 @@ class ServiceController extends Controller
     public function mainServices(Request $request)
     {
         $mainServices = MainService::whereType(TypeEnum::SERVICES)->active()->paginate(10);
-        return ApiResponder::loaded([
-            'main_services'=> MainServiceResource::collection($mainServices)
-        ]);
+        return ApiResponder::loaded(MainServiceResource::collection($mainServices));
     }
 
     public function ServicesByMian(Request $request, $id)
@@ -43,18 +41,14 @@ class ServiceController extends Controller
             ->latest()
             ->paginate(10);
 
-        return ApiResponder::loaded([
-            'services' => ServiceListResource::collection($allServices),
-        ]);
+        return ApiResponder::loaded(ServiceListResource::collection($allServices));
     }
     public function services()
     {
         $services = Service::active()
             ->whereType(TypeEnum::SERVICES)
             ->whereCategory(CategoryEnum::PRODUCTS->value)->latest()->paginate(10);
-        return ApiResponder::loaded([
-            'services' => ServiceListResource::collection($services)
-        ]);
+        return ApiResponder::loaded(ServiceListResource::collection($services));
     }
 
 //    public function products()
@@ -83,13 +77,7 @@ class ServiceController extends Controller
 
         $service->loadCount('ratings')
             ->loadAvg('ratings', 'rating');
-        return ApiResponder::get(
-            '',
-            [
-                'service' => ServiceResource::make($service),
-//                'similar_services' => ServiceResource::collection($service->similar()),
-            ]
-        );
+        return ApiResponder::loaded(ServiceResource::make($service));
     }
 
     //todo:list two categories for services
@@ -102,7 +90,9 @@ class ServiceController extends Controller
             ->map(fn($service) => [
                 'id' => $service->id,
                 'name' => $service->getTranslation('name', app()->getLocale()),
-            ]);
+            ])
+            ->values()
+            ->toArray();
 
         return ApiResponder::loaded($services);
     }
@@ -117,6 +107,7 @@ class ServiceController extends Controller
                 'id' => $service->id,
                 'name' => $service->getTranslation('name', app()->getLocale()),
             ])
+            ->values()
             ->toArray();
 
         return ApiResponder::loaded($services);
@@ -140,9 +131,7 @@ class ServiceController extends Controller
             ->latest()
             ->paginate(10);
 
-        return ApiResponder::loaded([
-            'services' => ServiceListResource::collection($allServices),
-        ]);
+        return ApiResponder::loaded(ServiceListResource::collection($allServices));
     }
 
 
