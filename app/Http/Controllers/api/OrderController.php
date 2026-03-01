@@ -28,6 +28,8 @@ class OrderController extends Controller
             'location_name' => $request->location_name,
             'description' => $request->description,
             'internal_note'=>$request->internal_note ?? null,
+            'date' => $request->date,
+            'time' => $request->time,
             'status' => OrderStatusEnum::CURRENT,
             'is_active' => true,
         ];

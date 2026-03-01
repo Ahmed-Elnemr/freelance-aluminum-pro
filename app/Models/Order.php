@@ -29,18 +29,28 @@ class Order extends Model implements HasMedia
         'internal_note',
         'status',
         'is_active',
+        'date',
+        'time',
     ];
 
     protected $casts = [
         'status' => OrderStatusEnum::class,
+        'date' => 'date',
     ];
 
-    //todo: accessor
+    public function getFormattedTimeAttribute(): ?string
+    {
+        if (!$this->time) {
+            return null;
+        }
 
+        return \Illuminate\Support\Carbon::createFromFormat('H:i:s', $this->time)
+            ->translatedFormat('h:i A');
+    }
 
     public function getServiceTypeNameAttribute(): ?string
     {
-        return $this->serviceType?->getTranslation('name', app()->getLocale());
+        return $this->service?->getTranslation('name', app()->getLocale());
     }
 
 
