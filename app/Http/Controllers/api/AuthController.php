@@ -54,7 +54,7 @@ class AuthController extends Controller
             ->first();
 
         if (!$user) {
-            return ApiResponder::failed(__('auth.invalid_credentials'), 200);
+            return ApiResponder::failedStatusTrue(__('auth.invalid_credentials'), 200);
         }
 
         // Check if email is verified
@@ -62,7 +62,8 @@ class AuthController extends Controller
             // Send Verification OTP
             $this->authService->sendVerificationOtp($user);
 
-            return ApiResponder::failed(__('auth.account_not_verified'), 200, [
+
+            return ApiResponder::failedStatusTrue(__('auth.account_not_verified'), 200, [
                 'need_token' => true,
                 'user' => UserResource::make($user)
             ]);
@@ -70,12 +71,12 @@ class AuthController extends Controller
 
         // Check if account is active
         if ($user->is_active == 0) {
-            return ApiResponder::failed(__('auth.Your account is blocked'), 200);
+            return ApiResponder::failedStatusTrue(__('auth.Your account is blocked'), 200);
         }
 
         // Verify password
         if (!Hash::check($validatedData['password'], $user->password)) {
-            return ApiResponder::failed(__('auth.invalid_credentials'), 200);
+            return ApiResponder::failedStatusTrue(__('auth.invalid_credentials'), 200);
         }
 
         // Add device
