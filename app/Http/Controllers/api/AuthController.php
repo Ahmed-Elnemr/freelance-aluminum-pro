@@ -54,7 +54,7 @@ class AuthController extends Controller
             ->first();
 
         if (!$user) {
-            return ApiResponder::failed(__('auth.invalid_credentials'), 401);
+            return ApiResponder::failed(__('auth.invalid_credentials'), 200);
         }
 
         // Check if email is verified
@@ -70,12 +70,12 @@ class AuthController extends Controller
 
         // Check if account is active
         if ($user->is_active == 0) {
-            return ApiResponder::failed(__('auth.Your account is blocked'), 403);
+            return ApiResponder::failed(__('auth.Your account is blocked'), 200);
         }
 
         // Verify password
         if (!Hash::check($validatedData['password'], $user->password)) {
-            return ApiResponder::failed(__('auth.invalid_credentials'), 401);
+            return ApiResponder::failed(__('auth.invalid_credentials'), 200);
         }
 
         // Add device
