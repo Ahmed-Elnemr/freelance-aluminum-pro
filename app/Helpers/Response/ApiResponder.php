@@ -63,6 +63,11 @@ class ApiResponder
         return self::make($data, $message, $code);
     }
 
+    public static function failedStatusTrue($message, $code = 200, $data = null)
+    {
+        return self::get($message, $data, true, $code);
+    }
+
     public static function updated($data = null,$code = 202,$message = 'Updated Successfully')
     {
         return self::make($data, __($message),$code);
