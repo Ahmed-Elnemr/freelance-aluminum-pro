@@ -32,13 +32,31 @@ return new class extends Migration
 
         DB::table('orders')->delete();
 
+        $driver = Schema::getConnection()->getDriverName();
+        if ($driver === 'mysql') {
+            $tableName = Schema::getConnection()->getTablePrefix().'orders';
+            $fk = DB::selectOne(
+                "SELECT CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE 
+                 WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME = 'service_id' 
+                 AND REFERENCED_TABLE_NAME IS NOT NULL LIMIT 1",
+                [Schema::getConnection()->getDatabaseName(), $tableName]
+            );
+            if ($fk && ! empty($fk->CONSTRAINT_NAME)) {
+                DB::statement("ALTER TABLE `{$tableName}` DROP FOREIGN KEY `{$fk->CONSTRAINT_NAME}`");
+            }
+        } else {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->dropForeign(['service_id']);
+            });
+        }
+
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropForeign(['service_id']);
             $table->dropColumn('service_id');
         });
 
         Schema::table('orders', function (Blueprint $table) {
-            $table->foreignId('maintenance_id')->after('user_id')->constrained()->cascadeOnDelete();
+            $table->unsignedBigInteger('maintenance_id')->after('user_id');
+            $table->foreign('maintenance_id')->references('id')->on('maintenances')->cascadeOnDelete();
         });
 
         Schema::dropIfExists('service_inspections');
