@@ -8,9 +8,9 @@
         element: '.mysr-form',
         amount: parseFloat("{{ $finalPrice * 100 }}"),
         currency: 'SAR',
-        description: "{{ __('Payment for service #: ') . $service->id }}",
+        description: "{{ __('Payment for maintenance #: ') . $maintenance->id }}",
             publishable_api_key: 'pk_test_3XBxAM3Mb6e7qALnJGvKaw4WYyrB9k3YPdXQcwHb',
-        callback_url: "{{ route('payment.callback') }}?service_id={{ $service->id }}&user_id={{ request()->user_id }}",
+        callback_url: "{{ route('payment.callback') }}?maintenance_id={{ $maintenance->id }}&user_id={{ request()->user_id }}",
         methods: ['creditcard'],
     });
 </script>

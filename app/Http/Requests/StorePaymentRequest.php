@@ -23,8 +23,8 @@ class StorePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'service_id' => 'required|exists:services,id,deleted_at,NULL',
-            'paymentmethod' =>'integer|in:'.PaymentMethodEnum::moyasar->value.'',
+            'maintenance_id' => 'required|exists:maintenances,id,deleted_at,NULL',
+            'paymentmethod' => 'integer|in:'.PaymentMethodEnum::moyasar->value.'',
             'user_name' => 'nullable|string|max:255',
         ];
     }

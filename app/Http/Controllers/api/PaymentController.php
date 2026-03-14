@@ -2,46 +2,41 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Enum\PaymentMethodEnum;
 use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StorePaymentRequest;
+use App\Models\Maintenance;
 use App\Models\Order;
-use App\Models\Service;
-use App\Models\ServicePaymentMethod;
 use App\Notifications\OrderCreatedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
+
 class PaymentController extends Controller
 {
     public function paymentPage(Request $request)
     {
         $userId = $request->user_id;
 
-        $cacheKey = 'pending_order_' . $userId;
+        $cacheKey = 'pending_order_'.$userId;
         $cached = Cache::get($cacheKey);
 
-        if (!$cached) {
+        if (! $cached) {
             abort(404, 'Order not found or expired.');
         }
 
-        $service = Service::find($cached['order_data']['service_id']);
+        $maintenance = Maintenance::find($cached['order_data']['maintenance_id']);
 
-        $finalPrice = $service->final_price;
+        $finalPrice = $maintenance->final_price;
 
-        if ($service->category === \App\Enum\CategoryEnum::MAINTENANCE && $finalPrice < 100) {
+        if ($finalPrice < 100) {
             $finalPrice += 50;
         }
 
         return view('payments.payments-moyasar', [
-            'service' => $service,
+            'maintenance' => $maintenance,
             'userId' => $userId,
             'finalPrice' => $finalPrice,
         ]);
     }
-
 
     public function paymentCallback(Request $request)
     {
@@ -51,14 +46,14 @@ class PaymentController extends Controller
         ]);
 
         $userId = $request->user_id;
-        $cacheKey = 'pending_order_' . $userId;
+        $cacheKey = 'pending_order_'.$userId;
         $cached = Cache::get($cacheKey);
 
         if ($request->status === 'paid') {
             $order = Order::create($cached['order_data']);
             Cache::forget($cacheKey);
 
-            if (!empty($cached['images'])) {
+            if (! empty($cached['images'])) {
                 foreach ($cached['images'] as $imagePath) {
                     $fullPath = storage_path("app/{$imagePath}");
                     if (file_exists($fullPath)) {
@@ -66,7 +61,7 @@ class PaymentController extends Controller
                     }
                 }
             }
-            if (!empty($cached['sounds'])) {
+            if (! empty($cached['sounds'])) {
                 foreach ($cached['sounds'] as $soundPath) {
                     $fullPath = storage_path("app/{$soundPath}");
                     if (file_exists($fullPath)) {
@@ -74,7 +69,6 @@ class PaymentController extends Controller
                     }
                 }
             }
-
 
             $order->user->notify(new OrderCreatedNotification($order));
 
@@ -88,6 +82,7 @@ class PaymentController extends Controller
         }
 
         $errorMessage = $request->message ?? 'An error occurred while booking the service. Try again.';
+
         return ApiResponder::failed($errorMessage);
     }
 }

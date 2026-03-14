@@ -23,12 +23,12 @@ class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'service_id' => 'required|exists:services,id,deleted_at,NULL,is_active,1',
-            'latitude' => 'required|numeric',
-            'longitude' => 'required|numeric',
+            'maintenance_id' => 'required|exists:maintenances,id,deleted_at,NULL,is_active,1',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
             'location_name' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
-            'internal_note'=>'nullable|string|max:1000',
+            'internal_note' => 'nullable|string|max:1000',
             'date' => 'required|date_format:Y-m-d',
             'time' => 'required|date_format:H:i',
             'images' => 'nullable|array',
@@ -40,5 +40,4 @@ class StoreOrderRequest extends FormRequest
 
         ];
     }
-
 }

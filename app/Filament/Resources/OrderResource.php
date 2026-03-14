@@ -5,29 +5,22 @@ namespace App\Filament\Resources;
 use App\Enum\OrderStatusEnum;
 use App\Enum\UserTypeEnum;
 use App\Filament\Resources\OrderResource\Pages;
+use App\Models\Maintenance;
 use App\Models\Order;
-use App\Models\Service;
 use App\Models\User;
 use App\Notifications\OrderCompletedNotification;
 use Filament\Forms;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Infolists\Infolist;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\Section as InfolistSection;
-use App\Filament\Resources\UserResource;
-use App\Filament\Resources\ServiceResource;
 
 class OrderResource extends Resource
 {
@@ -89,16 +82,16 @@ class OrderResource extends Resource
                                     ->latest()
                                     ->get()
                                     ->pluck('name', 'id')
-                                    ->filter(fn ($label) => !is_null($label))
+                                    ->filter(fn ($label) => ! is_null($label))
                             )
                             ->searchable()
                             ->required(),
 
-                        Forms\Components\Select::make('service_id')
-                            ->label(__('dashboard.service'))
+                        Forms\Components\Select::make('maintenance_id')
+                            ->label(__('dashboard.maintenance'))
                             ->options(
-                                Service::active()->latest()->get()->pluck('name', 'id')
-                                    ->filter(fn ($label) => !is_null($label))
+                                Maintenance::active()->latest()->get()->pluck('name', 'id')
+                                    ->filter(fn ($label) => ! is_null($label))
                             )
                             ->searchable()
                             ->required(),
@@ -118,28 +111,44 @@ class OrderResource extends Resource
 
                 Section::make(__('location info'))
                     ->schema([
+                        TextInput::make('latitude')
+                            ->label(__('dashboard.latitude'))
+                            ->numeric()
+                            ->required()
+                            ->minValue(-90)
+                            ->maxValue(90),
+
+                        TextInput::make('longitude')
+                            ->label(__('dashboard.longitude'))
+                            ->numeric()
+                            ->required()
+                            ->minValue(-180)
+                            ->maxValue(180),
+
+                        TextInput::make('location_name')
+                            ->label(__('dashboard.location_name'))
+                            ->required()
+                            ->maxLength(255),
+
                         TextInput::make('map_link')
                             ->label(__('map link'))
                             ->formatStateUsing(fn (?Order $record): string => $record && $record->latitude && $record->longitude
-                                ? 'https://www.google.com/maps?q=' . $record->latitude . ',' . $record->longitude
-                                : __('dashboard.no_location_available'))
+                                ? 'https://www.google.com/maps?q='.$record->latitude.','.$record->longitude
+                                : '-')
                             ->disabled()
-                            ->dehydrated()
+                            ->dehydrated(false)
                             ->suffixAction(
-                                Action::make(__('open map'))
+                                Action::make('open_map')
+                                    ->label(__('open map'))
                                     ->icon('heroicon-o-arrow-top-right-on-square')
                                     ->url(fn (?Order $record): string => $record && $record->latitude && $record->longitude
-                                        ? 'https://www.google.com/maps?q=' . $record->latitude . ',' . $record->longitude
+                                        ? 'https://www.google.com/maps?q='.$record->latitude.','.$record->longitude
                                         : '#')
-                                    ->hidden(fn (?Order $record): bool => !($record && $record->latitude && $record->longitude))
                                     ->openUrlInNewTab()
+                                    ->visible(fn (?Order $record) => $record && $record->latitude && $record->longitude)
                             )
-                            ->columnSpan(1),
-
-                        Placeholder::make('location_name')
-                            ->label(__('dashboard.location_name'))
-                            ->content(fn (?Order $record) => $record?->location_name ?? '-')
-                            ->columnSpan(1),
+                            ->columnSpanFull()
+                            ->visible(fn (?Order $record) => $record && $record->latitude && $record->longitude),
                     ])
                     ->columns(2),
 
@@ -240,15 +249,15 @@ class OrderResource extends Resource
                     ->openUrlInNewTab()
                     ->color('primary'),
 
-                Tables\Columns\TextColumn::make('service.name')
-                    ->label(__('dashboard.service'))
+                Tables\Columns\TextColumn::make('maintenance.name')
+                    ->label(__('dashboard.maintenance'))
                     ->formatStateUsing(function ($state, $record) {
-                        return $record->service?->getTranslation('name', 'ar') . "\n" . $record->service?->getTranslation('name', 'en');
+                        return $record->maintenance?->getTranslation('name', 'ar')."\n".$record->maintenance?->getTranslation('name', 'en');
                     })
                     ->html()
                     ->sortable()
                     ->searchable()
-                    ->url(fn ($record) => ServiceResource::getUrl('edit', ['record' => $record->service_id]))
+                    ->url(fn ($record) => MaintenanceResource::getUrl('edit', ['record' => $record->maintenance_id]))
                     ->openUrlInNewTab()
                     ->color('info'),
 
@@ -264,7 +273,7 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('location_name')
                     ->label(__('dashboard.location_name'))
                     ->limit(30)
-                    ->tooltip(fn($record) => $record->location_name),
+                    ->tooltip(fn ($record) => $record->location_name),
 
                 SpatieMediaLibraryImageColumn::make('media')
                     ->label(__('media'))
@@ -275,12 +284,10 @@ class OrderResource extends Resource
                     ->limitedRemainingText()
                     ->extraImgAttributes(['class' => 'object-cover']),
 
-
-
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('dashboard.status'))
                     ->badge()
-                    ->formatStateUsing(fn(OrderStatusEnum $state) => $state->label())
+                    ->formatStateUsing(fn (OrderStatusEnum $state) => $state->label())
                     ->color(fn (OrderStatusEnum $state): string => match ($state) {
                         OrderStatusEnum::CURRENT => 'success',
                         OrderStatusEnum::EXPIRED => 'danger',
@@ -296,14 +303,14 @@ class OrderResource extends Resource
                 Tables\Filters\SelectFilter::make('user_id')
                     ->label(__('dashboard.user'))
                     ->options(
-                        User::all()->pluck('name', 'id')->filter(fn($label) => !is_null($label))
+                        User::all()->pluck('name', 'id')->filter(fn ($label) => ! is_null($label))
                     )
                     ->searchable(),
 
-                Tables\Filters\SelectFilter::make('service_id')
-                    ->label(__('dashboard.service'))
+                Tables\Filters\SelectFilter::make('maintenance_id')
+                    ->label(__('dashboard.maintenance'))
                     ->options(
-                        Service::all()->pluck('name', 'id')->filter(fn($label) => !is_null($label))
+                        Maintenance::all()->pluck('name', 'id')->filter(fn ($label) => ! is_null($label))
                     )
                     ->searchable(),
 

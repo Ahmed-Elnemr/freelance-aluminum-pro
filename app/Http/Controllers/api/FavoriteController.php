@@ -4,9 +4,9 @@ namespace App\Http\Controllers\api;
 
 use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\ServiceResource;
+use App\Http\Resources\MaintenanceResource;
 use App\Models\Favorite;
-use App\Models\Service;
+use App\Models\Maintenance;
 use Illuminate\Http\Request;
 
 class FavoriteController extends Controller
@@ -14,42 +14,41 @@ class FavoriteController extends Controller
     public function toggle(Request $request)
     {
         $request->validate([
-            'service_id' => 'required|exists:services,id,deleted_at,NULL,is_active,1',
+            'maintenance_id' => 'required|exists:maintenances,id,deleted_at,NULL,is_active,1',
         ]);
 
         $user = auth('sanctum')->user();
-        $service = Service::findOrFail($request->service_id);
+        $maintenance = Maintenance::findOrFail($request->maintenance_id);
 
-        $favorite = $service->favoritedByUsers()
+        $favorite = $maintenance->favoritedByUsers()
             ->where('user_id', $user->id)
             ->first();
 
         if ($favorite) {
             $favorite->delete();
+
             return ApiResponder::success(__('Removed from favorites successfully'));
         }
 
-        $service->favoritedByUsers()->create([
+        $maintenance->favoritedByUsers()->create([
             'user_id' => $user->id,
         ]);
 
         return ApiResponder::success(__('Added to favorites successfully'));
     }
 
-    //todo::getFavorites
-
-    public function myFavoriteServices()
+    public function myFavoriteMaintenances()
     {
         $user = auth('sanctum')->user();
 
         $favorites = Favorite::with('favouritable')
             ->where('user_id', $user->id)
-            ->where('favouritable_type', Service::class)
+            ->where('favouritable_type', Maintenance::class)
             ->latest()
             ->get()
-            ->filter(fn($fav) => $fav->favouritable)
-            ->map(fn($fav) => $fav->favouritable)
-       ;
-        return ApiResponder::loaded(ServiceResource::collection($favorites));
+            ->filter(fn ($fav) => $fav->favouritable)
+            ->map(fn ($fav) => $fav->favouritable);
+
+        return ApiResponder::loaded(MaintenanceResource::collection($favorites));
     }
 }

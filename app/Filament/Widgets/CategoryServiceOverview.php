@@ -2,12 +2,10 @@
 
 namespace App\Filament\Widgets;
 
-use App\Enum\CategoryEnum;
 use App\Enum\OrderStatusEnum;
 use App\Enum\UserTypeEnum;
-use App\Models\CategoryService;
+use App\Models\Maintenance;
 use App\Models\Order;
-use App\Models\Service;
 use App\Models\User;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -20,12 +18,8 @@ class CategoryServiceOverview extends BaseWidget
     {
         return [
             $this->getUserStats(),
-            $this->getCategoryServicesStats(),
-            $this->getMaintenanceServicesStats(),
-
-            $this->getProductServicesStats(),
+            $this->getMaintenanceStats(),
             $this->getCurrentOrdersStats(),
-
             $this->getExpiredOrdersStats(),
         ];
     }
@@ -47,35 +41,17 @@ class CategoryServiceOverview extends BaseWidget
             ->color($this->getTrendColor($increase));
     }
 
-    protected function getMaintenanceServicesStats(): Stat
+    protected function getMaintenanceStats(): Stat
     {
-        $currentCount = Service::where('category', CategoryEnum::MAINTENANCE->value)->count();
-        $lastMonthCount = Service::where('category', CategoryEnum::MAINTENANCE->value)
-            ->where('created_at', '<', Carbon::now()->subMonth())
-            ->count();
+        $currentCount = Maintenance::count();
+        $lastMonthCount = Maintenance::where('created_at', '<', Carbon::now()->subMonth())->count();
 
         $increase = $currentCount - $lastMonthCount;
 
         return Stat::make(__('dashboard.maintenance_services'), $currentCount)
             ->description($this->getTrendDescription($increase))
             ->descriptionIcon($this->getTrendIcon($increase))
-            ->chart($this->getWeeklyData(Service::class, ['category' => CategoryEnum::MAINTENANCE->value]))
-            ->color($this->getTrendColor($increase));
-    }
-
-    protected function getProductServicesStats(): Stat
-    {
-        $currentCount = Service::where('category', CategoryEnum::PRODUCTS->value)->count();
-        $lastMonthCount = Service::where('category', CategoryEnum::PRODUCTS->value)
-            ->where('created_at', '<', Carbon::now()->subMonth())
-            ->count();
-
-        $increase = $currentCount - $lastMonthCount;
-
-        return Stat::make(__('dashboard.products_services'), $currentCount)
-            ->description($this->getTrendDescription($increase))
-            ->descriptionIcon($this->getTrendIcon($increase))
-            ->chart($this->getWeeklyData(Service::class, ['category' => CategoryEnum::PRODUCTS->value]))
+            ->chart($this->getWeeklyData(Maintenance::class))
             ->color($this->getTrendColor($increase));
     }
 
@@ -111,8 +87,6 @@ class CategoryServiceOverview extends BaseWidget
             ->color($this->getTrendColor($increase));
     }
 
-    // ================ الدوال المساعدة ================ //
-
     protected function getTrendDescription(int $change, ?int $percentage = null): string
     {
         if ($percentage === null) {
@@ -120,8 +94,8 @@ class CategoryServiceOverview extends BaseWidget
         }
 
         return $change >= 0
-            ? __("dashboard.increase") . " {$percentage}% (▲ {$change})"
-            : __("dashboard.decrease") . " {$percentage}% (▼ " . abs($change) . ")";
+            ? __('dashboard.increase')." {$percentage}% (▲ {$change})"
+            : __('dashboard.decrease')." {$percentage}% (▼ ".abs($change).')';
     }
 
     protected function getTrendIcon(int $change): string
@@ -138,33 +112,19 @@ class CategoryServiceOverview extends BaseWidget
 
     protected function getWeeklyData(string $model, array $conditions = []): array
     {
-        return Cache::remember("weekly_stats_{$model}_" . implode('_', $conditions), 3600, function() use ($model, $conditions) {
-            return collect(range(6, 0)) // آخر 7 أيام
-            ->map(function ($days) use ($model, $conditions) {
-                $query = $model::query();
+        return Cache::remember("weekly_stats_{$model}_".implode('_', $conditions), 3600, function () use ($model, $conditions) {
+            return collect(range(6, 0))
+                ->map(function ($days) use ($model, $conditions) {
+                    $query = $model::query();
 
-                foreach ($conditions as $column => $value) {
-                    $query->where($column, $value);
-                }
+                    foreach ($conditions as $column => $value) {
+                        $query->where($column, $value);
+                    }
 
-                return $query->whereDate('created_at', today()->subDays($days))
-                    ->count();
-            })
+                    return $query->whereDate('created_at', today()->subDays($days))
+                        ->count();
+                })
                 ->toArray();
         });
-    }
-
-    protected function getCategoryServicesStats(): Stat
-    {
-        $currentCount = \App\Models\CategoryService::count();
-        $lastMonthCount = \App\Models\CategoryService::where('created_at', '<', Carbon::now()->subMonth())->count();
-
-        $increase = $currentCount - $lastMonthCount;
-
-        return Stat::make(__('dashboard.category_services'), $currentCount)
-            ->description($this->getTrendDescription($increase))
-            ->descriptionIcon($this->getTrendIcon($increase))
-            ->chart($this->getWeeklyData(\App\Models\CategoryService::class))
-            ->color($this->getTrendColor($increase));
     }
 }

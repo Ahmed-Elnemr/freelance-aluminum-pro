@@ -3,10 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RatingResource\Pages\ListRatings;
+use App\Models\Maintenance;
 use App\Models\Rating;
-use App\Models\User;
-use App\Models\Service;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -16,16 +14,20 @@ use Illuminate\Database\Eloquent\Builder;
 class RatingResource extends Resource
 {
     protected static ?string $model = Rating::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-star';
+
     public static function getNavigationSort(): ?int
     {
         return 6;
     }
-    public static function getNavigationGroup( ): ?string
+
+    public static function getNavigationGroup(): ?string
     {
-        return __('Management' );
+        return __('Management');
 
     }
+
     public static function getNavigationLabel(): string
     {
         return __('Ratings');
@@ -45,10 +47,10 @@ class RatingResource extends Resource
     {
         return parent::getEloquentQuery()
             ->where(function ($query) {
-                $query->where('rateable_type', '!=', Service::class)
+                $query->where('rateable_type', '!=', Maintenance::class)
                     ->orWhereHasMorph(
                         'rateable',
-                        [Service::class],
+                        [Maintenance::class],
                         function (Builder $query) {
                             $query->whereNull('deleted_at');
                         }
@@ -79,10 +81,9 @@ class RatingResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')
                     ->label(__('User'))
                     ->searchable()
-                    ->url(fn($record) => route('filament.admin.resources.users.edit', ['record' => $record->user_id]))
+                    ->url(fn ($record) => route('filament.admin.resources.users.edit', ['record' => $record->user_id]))
                     ->openUrlInNewTab()
-                    ->color('primary')
-                ,
+                    ->color('primary'),
                 Tables\Columns\TextColumn::make('rating')
                     ->label(__('Rating'))
                     ->sortable(),
@@ -90,14 +91,14 @@ class RatingResource extends Resource
                 Tables\Columns\TextColumn::make('rateable_type')
                     ->label(__('Rateable Name'))
                     ->formatStateUsing(function ($state, $record) {
-                        if ($state === Service::class) {
-                            $service = $record->rateable;
+                        if ($state === Maintenance::class) {
+                            $maintenance = $record->rateable;
 
-                            if ($service && !$service->trashed()) {
-                                return $service->name;
+                            if ($maintenance && ! $maintenance->trashed()) {
+                                return $maintenance->name;
                             }
 
-                            return null; // لا تعرض شيء إذا كانت الخدمة ممسوحة
+                            return null;
                         }
 
                         return $state;
@@ -105,8 +106,8 @@ class RatingResource extends Resource
 
             ])
             ->actions([
-//                Tables\Actions\EditAction::make(),
-//                Tables\Actions\DeleteAction::make(),
+                //                Tables\Actions\EditAction::make(),
+                //                Tables\Actions\DeleteAction::make(),
             ]);
     }
 }

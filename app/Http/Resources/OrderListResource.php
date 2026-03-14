@@ -17,11 +17,15 @@ class OrderListResource extends JsonResource
         return [
             'id' => $this->id,
             'user_name' => (string) $this->user?->name,
-            'service_name' => (string) $this->service?->getTranslation('name', app()->getLocale()),
+            'service_name' => (string) $this->maintenance?->getTranslation('name', app()->getLocale()),
+            'maintenance_id' => (int) $this->maintenance?->id,
+            'price' => (float) $this->maintenance?->price,
+            'final_price' => (float) $this->maintenance?->final_price,
             'location' => (string) $this->location_name,
             'latitude' => (float) $this->latitude,
             'longitude' => (float) $this->longitude,
             'description' => (string) $this->description,
+            'internal_note' => (string) $this->internal_note,
             'status' => (string) $this->status->value,
             'status_label' => (string) $this->status->label(),
             'date' => (string) $this->date?->format('Y-m-d'),
@@ -34,7 +38,12 @@ class OrderListResource extends JsonResource
                     'type' => $media->mime_type,
                 ];
             }),
-
+            'sounds' => $this->getMedia('sounds')->map(function ($media) {
+                return [
+                    'url' => $media->getUrl(),
+                    'type' => $media->mime_type,
+                ];
+            }),
         ];
     }
 }
