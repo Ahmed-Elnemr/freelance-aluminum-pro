@@ -12,52 +12,62 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('maintenances', function (Blueprint $table) {
-            $table->id();
-            $table->json('name');
-            $table->json('content')->nullable();
-            $table->decimal('price', 8, 2);
-            $table->decimal('final_price', 8, 2);
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-            $table->softDeletes();
-        });
-
-        Schema::create('maintenance_inspections', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('maintenance_id')->constrained()->cascadeOnDelete();
-            $table->timestamps();
-        });
-
-        DB::table('orders')->delete();
-
-        $driver = Schema::getConnection()->getDriverName();
-        if ($driver === 'mysql') {
-            $tableName = Schema::getConnection()->getTablePrefix().'orders';
-            $fk = DB::selectOne(
-                "SELECT CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE 
-                 WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME = 'service_id' 
-                 AND REFERENCED_TABLE_NAME IS NOT NULL LIMIT 1",
-                [Schema::getConnection()->getDatabaseName(), $tableName]
-            );
-            if ($fk && ! empty($fk->CONSTRAINT_NAME)) {
-                DB::statement("ALTER TABLE `{$tableName}` DROP FOREIGN KEY `{$fk->CONSTRAINT_NAME}`");
-            }
-        } else {
-            Schema::table('orders', function (Blueprint $table) {
-                $table->dropForeign(['service_id']);
+        if (! Schema::hasTable('maintenances')) {
+            Schema::create('maintenances', function (Blueprint $table) {
+                $table->id();
+                $table->json('name');
+                $table->json('content')->nullable();
+                $table->decimal('price', 8, 2);
+                $table->decimal('final_price', 8, 2);
+                $table->boolean('is_active')->default(true);
+                $table->timestamps();
+                $table->softDeletes();
             });
         }
 
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('service_id');
-        });
+        if (! Schema::hasTable('maintenance_inspections')) {
+            Schema::create('maintenance_inspections', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+                $table->foreignId('maintenance_id')->constrained()->cascadeOnDelete();
+                $table->timestamps();
+            });
+        }
 
-        Schema::table('orders', function (Blueprint $table) {
-            $table->unsignedBigInteger('maintenance_id')->after('user_id');
-            $table->foreign('maintenance_id')->references('id')->on('maintenances')->cascadeOnDelete();
-        });
+        if (Schema::hasTable('orders')) {
+            DB::table('orders')->delete();
+
+            if (Schema::hasColumn('orders', 'service_id')) {
+                $driver = Schema::getConnection()->getDriverName();
+                if ($driver === 'mysql') {
+                    $tableName = Schema::getConnection()->getTablePrefix().'orders';
+                    $fk = DB::selectOne(
+                        "SELECT CONSTRAINT_NAME FROM information_schema.KEY_COLUMN_USAGE 
+                         WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME = 'service_id' 
+                         AND REFERENCED_TABLE_NAME IS NOT NULL LIMIT 1",
+                        [Schema::getConnection()->getDatabaseName(), $tableName]
+                    );
+                    if ($fk && ! empty($fk->CONSTRAINT_NAME)) {
+                        DB::statement("ALTER TABLE `{$tableName}` DROP FOREIGN KEY `{$fk->CONSTRAINT_NAME}`");
+                    }
+                } else {
+                    Schema::table('orders', function (Blueprint $table) {
+                        $table->dropForeign(['service_id']);
+                    });
+                }
+
+                Schema::table('orders', function (Blueprint $table) {
+                    $table->dropColumn('service_id');
+                });
+            }
+
+            if (! Schema::hasColumn('orders', 'maintenance_id')) {
+                Schema::table('orders', function (Blueprint $table) {
+                    $table->unsignedBigInteger('maintenance_id')->after('user_id');
+                    $table->foreign('maintenance_id')->references('id')->on('maintenances')->cascadeOnDelete();
+                });
+            }
+        }
 
         Schema::dropIfExists('service_inspections');
         Schema::dropIfExists('service_payment_methods');
@@ -119,14 +129,16 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropForeign(['maintenance_id']);
-            $table->dropColumn('maintenance_id');
-        });
+        if (Schema::hasColumn('orders', 'maintenance_id')) {
+            Schema::table('orders', function (Blueprint $table) {
+                $table->dropForeign(['maintenance_id']);
+                $table->dropColumn('maintenance_id');
+            });
 
-        Schema::table('orders', function (Blueprint $table) {
-            $table->foreignId('service_id')->after('user_id')->constrained()->cascadeOnDelete();
-        });
+            Schema::table('orders', function (Blueprint $table) {
+                $table->foreignId('service_id')->after('user_id')->constrained()->cascadeOnDelete();
+            });
+        }
 
         Schema::dropIfExists('maintenance_inspections');
         Schema::dropIfExists('maintenances');
