@@ -1,6 +1,5 @@
 <?php
 
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -9,11 +8,11 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::group(['prefix' => 'v1'], function () {
-    require __DIR__ . '/v1/auth.php';
-    require __DIR__ . '/v1/slider.php';
-    require __DIR__ . '/v1/home.php';
-    require __DIR__ . '/v1/service.php';
-    require __DIR__ . '/v1/order.php';
-    require __DIR__ . '/v1/setting.php';
-    require __DIR__ . '/v1/notification.php';
+    require __DIR__.'/v1/auth.php';
+    require __DIR__.'/v1/slider.php';
+    require __DIR__.'/v1/home.php';
+    require __DIR__.'/v1/maintenance.php';
+    require __DIR__.'/v1/order.php';
+    require __DIR__.'/v1/setting.php';
+    require __DIR__.'/v1/notification.php';
 });

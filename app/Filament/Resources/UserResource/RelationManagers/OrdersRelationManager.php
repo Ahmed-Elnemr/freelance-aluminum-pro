@@ -3,22 +3,21 @@
 namespace App\Filament\Resources\UserResource\RelationManagers;
 
 use App\Enum\OrderStatusEnum;
-use App\Enum\UserTypeEnum;
+use App\Models\Maintenance;
 use App\Models\Order;
-use App\Models\Service;
-use App\Models\User;
 use App\Notifications\OrderCompletedNotification;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class OrdersRelationManager extends RelationManager
 {
     protected static string $relationship = 'orders';
+
     public static function getNavigationLabel(): string
     {
         return __('dashboard.orders');
@@ -33,6 +32,7 @@ class OrdersRelationManager extends RelationManager
     {
         return __('dashboard.orders');
     }
+
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
         return __('orders connected');
@@ -44,32 +44,48 @@ class OrdersRelationManager extends RelationManager
             ->schema([
                 Forms\Components\Section::make(__('dashboard.order_information'))
                     ->schema([
-                        Forms\Components\Select::make('user_id')
-                            ->label(__('dashboard.user'))
-                            ->options(User::where('type', UserTypeEnum::CLIENT->value)
-                                ->active()
+                        Forms\Components\Select::make('maintenance_id')
+                            ->label(__('dashboard.maintenance'))
+                            ->options(Maintenance::active()
                                 ->pluck('name', 'id')
-                                ->filter(fn ($label) => !is_null($label)))
+                                ->filter(fn ($label) => ! is_null($label)))
                             ->searchable()
                             ->required(),
 
-                        Forms\Components\Select::make('service_id')
-                            ->label(__('dashboard.service'))
-                            ->options(Service::active()
-                                ->pluck('name', 'id')
-                                ->filter(fn ($label) => !is_null($label)))
-                            ->searchable()
-                            ->required(),
+                        Forms\Components\DatePicker::make('scheduled_date')
+                            ->label(__('dashboard.date'))
+                            ->required()
+                            ->native(false)
+                            ->displayFormat('Y-m-d'),
+
+                        Forms\Components\TimePicker::make('scheduled_time')
+                            ->label(__('dashboard.time'))
+                            ->required()
+                            ->native(false)
+                            ->displayFormat('H:i'),
                     ])->columns(3),
 
                 Forms\Components\Section::make(__('dashboard.location'))
                     ->schema([
-                        Forms\Components\TextInput::make('google_maps_url')
-                            ->label(__('dashboard.location_url'))
-                            ->placeholder('https://maps.app.goo.gl/...')
-                            ->columnSpanFull()
-                            ->required(),
-                    ]),
+                        Forms\Components\TextInput::make('latitude')
+                            ->label(__('dashboard.latitude'))
+                            ->numeric()
+                            ->required()
+                            ->minValue(-90)
+                            ->maxValue(90),
+
+                        Forms\Components\TextInput::make('longitude')
+                            ->label(__('dashboard.longitude'))
+                            ->numeric()
+                            ->required()
+                            ->minValue(-180)
+                            ->maxValue(180),
+
+                        Forms\Components\TextInput::make('location_name')
+                            ->label(__('dashboard.location_name'))
+                            ->required()
+                            ->maxLength(255),
+                    ])->columns(3),
 
                 Forms\Components\Section::make(__('dashboard.additional_info'))
                     ->schema([
@@ -79,6 +95,11 @@ class OrdersRelationManager extends RelationManager
 
                         Forms\Components\Textarea::make('description.en')
                             ->label(__('dashboard.english_description'))
+                            ->columnSpanFull(),
+
+                        Forms\Components\Textarea::make('internal_note')
+                            ->label(__('dashboard.internal_note'))
+                            ->rows(4)
                             ->columnSpanFull(),
 
                         Forms\Components\Select::make('status')
@@ -98,6 +119,46 @@ class OrdersRelationManager extends RelationManager
                             ->onColor('success')
                             ->offColor('danger'),
                     ]),
+
+                Forms\Components\Section::make(__('media'))
+                    ->schema([
+                        SpatieMediaLibraryFileUpload::make('media')
+                            ->label(__('images and videos'))
+                            ->collection('media')
+                            ->multiple()
+                            ->reorderable()
+                            ->downloadable()
+                            ->openable()
+                            ->image()
+                            ->maxSize(256 * 10240)
+                            ->maxFiles(10)
+                            ->acceptedFileTypes([
+                                'image/jpeg',
+                                'image/png',
+                                'image/webp',
+                                'video/mp4',
+                                'video/quicktime',
+                            ])
+                            ->columnSpanFull(),
+
+                        SpatieMediaLibraryFileUpload::make('sounds')
+                            ->label(__('dashboard.audio_records'))
+                            ->collection('sounds')
+                            ->multiple()
+                            ->reorderable()
+                            ->downloadable()
+                            ->maxSize(10240)
+                            ->maxFiles(10)
+                            ->acceptedFileTypes([
+                                'audio/mpeg',
+                                'audio/wav',
+                                'audio/x-wav',
+                                'audio/x-m4a',
+                                'audio/ogg',
+                            ])
+                            ->columnSpanFull(),
+                    ])
+                    ->collapsible(),
             ]);
     }
 
@@ -106,13 +167,8 @@ class OrdersRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('id')
             ->columns([
-                Tables\Columns\TextColumn::make('user.name')
-                    ->label(__('dashboard.user'))
-                    ->sortable()
-                    ->searchable(),
-
-                Tables\Columns\TextColumn::make('service.name')
-                    ->label(__('dashboard.service'))
+                Tables\Columns\TextColumn::make('maintenance.name')
+                    ->label(__('dashboard.maintenance'))
                     ->sortable()
                     ->searchable(),
 
@@ -132,9 +188,9 @@ class OrdersRelationManager extends RelationManager
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('service_id')
-                    ->label(__('dashboard.service'))
-                    ->options(Service::all()->pluck('name', 'id')->filter())
+                Tables\Filters\SelectFilter::make('maintenance_id')
+                    ->label(__('dashboard.maintenance'))
+                    ->options(Maintenance::all()->pluck('name', 'id')->filter())
                     ->searchable(),
 
                 Tables\Filters\SelectFilter::make('status')
@@ -150,7 +206,12 @@ class OrdersRelationManager extends RelationManager
                     ]),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->mutateFormDataUsing(function (array $data): array {
+                        $data['user_id'] = $this->getOwnerRecord()->id;
+
+                        return $data;
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

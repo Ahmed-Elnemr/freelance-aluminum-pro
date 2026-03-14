@@ -29,8 +29,8 @@ class OrderCreatedNotification extends Notification
         ];
 
         $this->data['body'] = [
-            'ar' => __('notification_new_order_body', ['service_name' => $order->service?->getTranslation('name', 'ar')], 'ar'),
-            'en' => __('notification_new_order_body', ['service_name' => $order->service?->getTranslation('name', 'en')], 'en'),
+            'ar' => __('notification_new_order_body', ['service_name' => $order->maintenance?->getTranslation('name', 'ar')], 'ar'),
+            'en' => __('notification_new_order_body', ['service_name' => $order->maintenance?->getTranslation('name', 'en')], 'en'),
         ];
 
         $this->data['type'] = 'order';

@@ -4,23 +4,20 @@ namespace App\Models;
 
 use App\Enum\OrderStatusEnum;
 use App\Traits\HasActiveScope;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Translatable\HasTranslations;
-use GuzzleHttp\Client;
-use Illuminate\Support\Str;
 
 class Order extends Model implements HasMedia
 {
-
-    use InteractsWithMedia, HasTranslations, SoftDeletes, HasActiveScope;
+    use HasActiveScope, HasTranslations, InteractsWithMedia, SoftDeletes;
 
     public array $translatable = ['description'];
+
     protected $fillable = [
-        'service_id',
+        'maintenance_id',
         'user_id',
         'latitude',
         'longitude',
@@ -50,7 +47,7 @@ class Order extends Model implements HasMedia
 
     public function getFormattedTimeAttribute(): ?string
     {
-        if (!$this->scheduled_time) {
+        if (! $this->scheduled_time) {
             return null;
         }
 
@@ -60,9 +57,8 @@ class Order extends Model implements HasMedia
 
     public function getServiceTypeNameAttribute(): ?string
     {
-        return $this->service?->getTranslation('name', app()->getLocale());
+        return $this->maintenance?->getTranslation('name', app()->getLocale());
     }
-
 
     public function registerMediaCollections(): void
     {
@@ -70,21 +66,20 @@ class Order extends Model implements HasMedia
         $this->addMediaCollection('sounds')->useDisk('public');
 
     }
-//todo:api method end #
+    // todo:api method end #
 
-    //todo:api method end #
+    // todo:api method end #
 
-
-    //todo:relation
+    // todo:relation
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function service(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function maintenance(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsTo(Maintenance::class);
     }
 
-    //todo: # end relation  #
+    // todo: # end relation  #
 }
