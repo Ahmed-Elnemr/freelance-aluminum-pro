@@ -78,6 +78,7 @@ class OrderCompletedNotification extends Notification
                     ->label(__('dashboard.view'))
                     ->url(\App\Filament\Resources\OrderResource::getUrl('view', ['record' => $this->order])),
             ])
+            ->data(['type' => 'order', 'model_id' => $this->order->id])
             ->getDatabaseMessage();
     }
 

@@ -14,11 +14,24 @@ class NotificationDataResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $title = $this['title'] ?? '';
+        if (is_array($title)) {
+            $title = $title[app()->getLocale()] ?? $title['en'] ?? array_values($title)[0] ?? '';
+        }
+
+        $body = $this['body'] ?? $this['message'] ?? '';
+        if (is_array($body)) {
+            $body = $body[app()->getLocale()] ?? $body['en'] ?? array_values($body)[0] ?? '';
+        }
+
+        $type = $this['type'] ?? $this['data']['type'] ?? '';
+        $modelId = $this['model_id'] ?? $this['data']['model_id'] ?? 0;
+
         return [
-            'title' => (string) @$this['title'][app()->getLocale()],
-            'message' => (string) @$this['body'][app()->getLocale()],
-            'type' => @$this['type'] ?? '',
-            'model_id' => (int) @$this['model_id'],
+            'title' => (string) $title,
+            'message' => (string) $body,
+            'type' => (string) $type,
+            'model_id' => (int) $modelId,
         ];
     }
 }
