@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Enum\PaymentMethodEnum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreOrderRequest extends FormRequest
@@ -30,14 +29,11 @@ class StoreOrderRequest extends FormRequest
             'description' => 'nullable|string|max:1000',
             'internal_note' => 'nullable|string|max:1000',
             'date' => 'required|date_format:Y-m-d',
-            'time' => 'required|date_format:H:i',
+            'time' => 'required|string',
             'images' => 'nullable|array',
-            'images.*' => 'nullable|mimes:jpg,jpeg,png,gif,webp,avi,mkv|max:10240',
+            'images.*' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:10240',
             'sounds' => 'nullable|array',
-            'sounds.*' => 'nullable|mimes:mp3,wav,ogg,m4a|max:10240',
-
-            'paymentmethod' => 'required|integer|in:'.PaymentMethodEnum::moyasar->value,
-
+            'sounds.*' => 'nullable|mimes:mp3,wav,ogg,m4a,mp4,avi,mkv|max:10240',
         ];
     }
 }

@@ -28,6 +28,9 @@ class Order extends Model implements HasMedia
         'is_active',
         'scheduled_date',
         'scheduled_time',
+        'end_time',
+        'reminder_sent',
+        'finish_notified',
     ];
 
     protected $casts = [
@@ -35,12 +38,12 @@ class Order extends Model implements HasMedia
         'scheduled_date' => 'date',
     ];
 
-    public function getDateAttribute()
+    public function getDateAttribute(): mixed
     {
         return $this->scheduled_date;
     }
 
-    public function getTimeAttribute()
+    public function getTimeAttribute(): ?string
     {
         return $this->scheduled_time;
     }
@@ -55,6 +58,16 @@ class Order extends Model implements HasMedia
             ->translatedFormat('h:i A');
     }
 
+    public function getFormattedEndTimeAttribute(): ?string
+    {
+        if (! $this->end_time) {
+            return null;
+        }
+
+        return \Illuminate\Support\Carbon::createFromFormat('H:i:s', $this->end_time)
+            ->translatedFormat('h:i A');
+    }
+
     public function getServiceTypeNameAttribute(): ?string
     {
         return $this->maintenance?->getTranslation('name', app()->getLocale());
@@ -64,13 +77,9 @@ class Order extends Model implements HasMedia
     {
         $this->addMediaCollection('media')->useDisk('public');
         $this->addMediaCollection('sounds')->useDisk('public');
-
     }
-    // todo:api method end #
 
-    // todo:api method end #
-
-    // todo:relation
+    // todo: # end relation  #
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -80,6 +89,4 @@ class Order extends Model implements HasMedia
     {
         return $this->belongsTo(Maintenance::class);
     }
-
-    // todo: # end relation  #
 }

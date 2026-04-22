@@ -8,6 +8,7 @@ use App\Filament\Resources\OrderResource\Pages;
 use App\Models\Maintenance;
 use App\Models\Order;
 use App\Models\User;
+use App\Models\WorkingDaySetting;
 use App\Notifications\OrderCompletedNotification;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
@@ -15,9 +16,9 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -33,17 +34,17 @@ class OrderResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::active()->where('status', OrderStatusEnum::CURRENT->value)->count() ?? 0;
+        return static::getModel()::active()->where('status', OrderStatusEnum::New->value)->count() ?? 0;
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return static::getModel()::active()->where('status', OrderStatusEnum::CURRENT->value)->count() > 10 ? 'warning' : 'primary';
+        return static::getModel()::active()->where('status', OrderStatusEnum::New->value)->count() > 10 ? 'warning' : 'primary';
     }
 
     public static function getNavigationBadgeTooltip(): ?string
     {
-        return __('Current Orders');
+        return __('New Orders');
     }
 
     public static function getNavigationGroup(): ?string
@@ -100,13 +101,79 @@ class OrderResource extends Resource
                             ->label(__('dashboard.date'))
                             ->required()
                             ->native(false)
-                            ->displayFormat('Y-m-d'),
+                            ->displayFormat('Y-m-d')
+                            ->live(),
 
-                        Forms\Components\TimePicker::make('scheduled_time')
-                            ->label(__('dashboard.time'))
+                        Forms\Components\Select::make('scheduled_time')
+                            ->label(__('dashboard.start_time'))
+                            ->options(function ($get) {
+                                $date = $get('scheduled_date');
+                                if (! $date) {
+                                    return [];
+                                }
+
+                                $dayName = strtolower(\Carbon\Carbon::parse($date)->format('l'));
+                                $setting = \App\Models\WorkingDaySetting::where('day', $dayName)->first();
+                                if (! $setting) {
+                                    return [];
+                                }
+
+                                $blockedSlots = \App\Models\WorkingHourBlockedSlot::where('day', $dayName)
+                                    ->pluck('slot_time')
+                                    ->map(fn ($t) => substr($t, 0, 5))
+                                    ->toArray();
+
+                                $slots = $setting->generateSlots();
+                                $options = [];
+                                foreach ($slots as $slot) {
+                                    if (! in_array($slot['time'], $blockedSlots)) {
+                                        $options[$slot['time']] = $slot['time'].' '.$slot['period'];
+                                    }
+                                }
+
+                                return $options;
+                            })
                             ->required()
                             ->native(false)
-                            ->displayFormat('H:i'),
+                            ->live(),
+
+                        Forms\Components\Select::make('end_time')
+                            ->label(__('dashboard.end_time'))
+                            ->options(function ($get) {
+                                $date = $get('scheduled_date');
+                                $startTime = $get('scheduled_time');
+                                if (! $date || ! $startTime) {
+                                    return [];
+                                }
+
+                                $dayName = strtolower(\Carbon\Carbon::parse($date)->format('l'));
+                                $setting = \App\Models\WorkingDaySetting::where('day', $dayName)->first();
+                                if (! $setting) {
+                                    return [];
+                                }
+
+                                $blockedSlots = \App\Models\WorkingHourBlockedSlot::where('day', $dayName)
+                                    ->pluck('slot_time')
+                                    ->map(fn ($t) => substr($t, 0, 5))
+                                    ->toArray();
+
+                                $slots = $setting->generateSlots();
+                                $options = [];
+                                foreach ($slots as $slot) {
+                                    if ($slot['time'] >= $startTime) {
+                                        if (in_array($slot['time'], $blockedSlots)) {
+                                            break;
+                                        }
+
+                                        $endTime = \Carbon\Carbon::createFromFormat('H:i', $slot['time'])->addMinutes(30);
+                                        $endTimeStr = $endTime->format('H:i');
+                                        $options[$endTimeStr] = $endTimeStr.' '.$endTime->format('A');
+                                    }
+                                }
+
+                                return $options;
+                            })
+                            ->native(false),
                     ])->columns(2),
 
                 Section::make(__('location info'))
@@ -168,8 +235,12 @@ class OrderResource extends Resource
                             ->required()
                             ->native(false)
                             ->afterStateUpdated(function ($state, $set, $get, ?Order $record) {
-                                if ($record && $state === 'expired') {
-                                    $record->user->notify(new OrderCompletedNotification($record));
+                                if ($record) {
+                                    $record->user->notify(new \App\Notifications\OrderStatusChangedNotification($record));
+
+                                    if ($state === OrderStatusEnum::Completed->value) {
+                                        $record->user->notify(new OrderCompletedNotification($record));
+                                    }
                                 }
                             }),
 
@@ -267,31 +338,18 @@ class OrderResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('formatted_time')
-                    ->label(__('dashboard.time'))
+                    ->label(__('dashboard.start_time'))
                     ->sortable(['scheduled_time']),
 
-                Tables\Columns\TextColumn::make('location_name')
-                    ->label(__('dashboard.location_name'))
-                    ->limit(30)
-                    ->tooltip(fn ($record) => $record->location_name),
-
-                SpatieMediaLibraryImageColumn::make('media')
-                    ->label(__('media'))
-                    ->collection('media')
-                    ->circular()
-                    ->stacked()
-                    ->limit(3)
-                    ->limitedRemainingText()
-                    ->extraImgAttributes(['class' => 'object-cover']),
+                Tables\Columns\TextColumn::make('formatted_end_time')
+                    ->label(__('dashboard.end_time'))
+                    ->sortable(['end_time']),
 
                 Tables\Columns\TextColumn::make('status')
                     ->label(__('dashboard.status'))
                     ->badge()
                     ->formatStateUsing(fn (OrderStatusEnum $state) => $state->label())
-                    ->color(fn (OrderStatusEnum $state): string => match ($state) {
-                        OrderStatusEnum::CURRENT => 'success',
-                        OrderStatusEnum::EXPIRED => 'danger',
-                    })
+                    ->color(fn (OrderStatusEnum $state): string => $state->color())
                     ->sortable()
                     ->searchable(),
 
@@ -329,6 +387,59 @@ class OrderResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
+                Tables\Actions\Action::make('approve')
+                    ->label(__('dashboard.status_approved'))
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn (Order $record) => $record->status === OrderStatusEnum::New)
+                    ->form([
+                        Forms\Components\Select::make('end_time')
+                            ->label(__('dashboard.end_time'))
+                            ->options(function (Order $record) {
+                                $dayName = strtolower($record->scheduled_date->format('l'));
+                                $setting = WorkingDaySetting::where('day', $dayName)->first();
+                                if (! $setting) {
+                                    return [];
+                                }
+
+                                $blockedSlots = \App\Models\WorkingHourBlockedSlot::where('day', $dayName)
+                                    ->pluck('slot_time')
+                                    ->map(fn ($t) => substr($t, 0, 5))
+                                    ->toArray();
+
+                                $slots = $setting->generateSlots();
+                                $options = [];
+                                $startTime = substr($record->scheduled_time, 0, 5);
+
+                                foreach ($slots as $slot) {
+                                    if ($slot['time'] >= $startTime) {
+                                        if (in_array($slot['time'], $blockedSlots)) {
+                                            break;
+                                        }
+
+                                        $endTime = \Carbon\Carbon::createFromFormat('H:i', $slot['time'])->addMinutes(30);
+                                        $endTimeStr = $endTime->format('H:i');
+                                        $options[$endTimeStr] = $endTimeStr.' '.$endTime->format('A');
+                                    }
+                                }
+
+                                return $options;
+                            })
+                            ->required(),
+                    ])
+                    ->action(function (Order $record, array $data) {
+                        $record->update([
+                            'status' => OrderStatusEnum::Approved,
+                            'end_time' => $data['end_time'],
+                        ]);
+
+                        $record->user->notify(new \App\Notifications\OrderStatusChangedNotification($record));
+
+                        Notification::make()
+                            ->title(__('Order Approved Successfully'))
+                            ->success()
+                            ->send();
+                    }),
                 Tables\Actions\Action::make('chat')
                     ->label(__('dashboard.chat'))
                     ->icon('heroicon-o-chat-bubble-left-right')

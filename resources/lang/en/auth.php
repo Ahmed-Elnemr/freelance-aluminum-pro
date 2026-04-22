@@ -24,12 +24,12 @@ return [
     'Registration successful' => 'Registration successful',
     'Name created successfully' => 'Name created successfully',
     'Logged out successfully' => 'Logged out successfully',
-    
+
     // Profile
     'Profile updated successfully' => 'Profile updated successfully',
     'current_password_required' => 'Current password is required',
     'current_password_incorrect' => 'Current password is incorrect',
-    
+
     // Account
     'Your account has been successfully deleted' => 'Your account has been successfully deleted',
 
@@ -41,14 +41,6 @@ return [
     'Email Verification OTP' => 'Email Verification OTP',
     'Your OTP for email verification is: :otp' => 'Your OTP for email verification is: :otp',
     'This OTP is used to verify your new email address.' => 'This OTP is used to verify your new email address.',
-    
-    // Registration & Account Activation
-    'verification_code_sent' => 'Verification code sent to your email',
-    'account_not_verified' => 'Account not verified. Please check your email',
-    'account_activated_successfully' => 'Your account has been activated successfully',
-    'email_already_verified' => 'Email already verified',
-    
-    // Service Messages
     'user_not_found' => 'User not found',
     'failed_to_send_email' => 'Failed to send email',
     'otp_sent_successfully' => 'OTP sent successfully',
