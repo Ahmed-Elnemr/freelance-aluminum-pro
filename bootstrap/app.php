@@ -3,7 +3,6 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use App\Http\Middleware\SetLocaleFromHeader;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -26,10 +25,15 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->is('api/*') || $request->is('broadcasting/*')) {
                 return null;
             }
+
             return route('login');
         });
     })
 
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create();
+    })
+    ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
+        $schedule->command('app:process-orders')->everyMinute();
+    })
+    ->create();

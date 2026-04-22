@@ -175,120 +175,13 @@ return [
     */
 
     'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
-        ],
-        'service_id' => [
-            'required' => 'Service is required.',
-            'exists' => 'The selected service is invalid or inactive.',
-        ],
-        'latitude' => [
-            'required' => 'Latitude is required.',
-            'numeric' => 'Latitude must be a number.',
-        ],
-        'longitude' => [
-            'required' => 'Longitude is required.',
-            'numeric' => 'Longitude must be a number.',
-        ],
-        'location_name' => [
-            'required' => 'Location name is required.',
-            'string' => 'Location name must be a string.',
-            'max' => 'Location name must not exceed 255 characters.',
-        ],
-        'description' => [
-            'required' => 'Description is required.',
-            'string' => 'Description must be a string.',
-            'max' => 'Description must not exceed 1000 characters.',
-        ],
-        'internal_note' => [
-            'string' => 'Internal note must be a string.',
-            'max' => 'Internal note must not exceed 1000 characters.',
-        ],
-        'images' => [
-            'array' => 'Images must be an array.',
-        ],
-        'images.*' => [
-            'mimes' => 'Each image must be a file of type: jpg, jpeg, png, gif, webp, avi, mkv.',
-            'max' => 'Each image must not exceed 10MB.',
-        ],
-        'sounds' => [
-            'array' => 'Sounds must be an array.',
-        ],
-        'sounds.*' => [
-            'mimes' => 'Each sound must be a file of type: mp3, wav, ogg, m4a.',
-            'max' => 'Each sound must not exceed 10MB.',
-        ],
-        'paymentmethod' => [
-            'required' => 'Payment method is required.',
-            'integer' => 'Payment method must be a number.',
-            'in' => 'The selected payment method is invalid.',
-        ],
-        'service_id' => [
-            'required' => 'Service is required.',
-            'exists' => 'The selected service is invalid.',
-        ],
-        'paymentmethod' => [
-            'integer' => 'Payment method must be a number.',
-            'in' => 'The selected payment method is invalid.',
-        ],
-        'user_name' => [
-            'string' => 'User name must be a string.',
-            'max' => 'User name must not exceed 255 characters.',
-        ],
-        'rating' => [
-            'required' => 'The rating field is required.',
-            'integer' => 'The rating must be a number.',
-            'min' => 'The minimum allowed rating is 1.',
-            'max' => 'The maximum allowed rating is 5.',
-        ],
         'mobile' => [
-            'required' => 'Mobile number is required.',
-            'regex' => 'Mobile number format is invalid. It must start with 05 and be 10 digits long.',
-            'max' => 'Mobile number must not exceed 15 characters.',
-        ],
-        'uuid' => [
-            'required' => 'UUID is required.',
-            'string' => 'UUID must be a string.',
-        ],
-        'device_token' => [
-            'required' => 'Device token is required.',
-        ],
-        'device_type' => [
-            'required' => 'Device type is required.',
-            'string' => 'Device type must be a string.',
-        ],
-        'mobile' => [
-            'required' => 'Mobile number is required.',
-            'regex' => 'Mobile number format is invalid. It must start with 05 and be 10 digits long.',
-            'max' => 'Mobile number must not exceed 15 characters.',
-            'string' => 'Mobile number must be a string.',
-            'unique' => 'This mobile number is already in use.',
+            'required' => 'The mobile number is required.',
             'exists' => 'This mobile number is not registered.',
         ],
-        'uuid' => [
-            'required' => 'UUID is required.',
-            'string' => 'UUID must be a string.',
-        ],
-        'device_token' => [
-            'required' => 'Device token is required.',
-        ],
-        'device_type' => [
-            'required' => 'Device type is required.',
-            'string' => 'Device type must be a string.',
-        ],
-
-        'name' => [
-            'required' => 'Name is required.',
-            'string' => 'Name must be a string.',
-            'max' => 'Name must not exceed 25 characters.',
-            'min' => 'Name must be at least 2 characters.',
-        ],
-
         'code' => [
-            'required' => 'Verification code is required.',
-            'string' => 'Verification code must be a string.',
-            'digits' => 'The verification code must be exactly 4 digits.',
-
+            'required' => 'The verification code is required.',
+            'digits' => 'The verification code must be 4 digits.',
         ],
     ],
 
@@ -304,36 +197,19 @@ return [
     */
 
     'attributes' => [
-        'service_id' => 'service',
-        'paymentmethod' => 'payment method',
-        'user_name' => 'username',
-        'rating' => 'rating',
         'name' => 'name',
-        'email' => 'email',
+        'email' => 'email address',
         'mobile' => 'mobile number',
         'password' => 'password',
         'password_confirmation' => 'password confirmation',
         'current_password' => 'current password',
-        'login' => 'email or mobile number',
+        'otp' => 'verification code',
+        'login' => 'email or mobile',
         'uuid' => 'device identifier',
         'device_token' => 'device token',
         'device_type' => 'device type',
-        'otp' => 'verification code',
-        'code' => 'verification code',
     ],
 
-
-    'mobile_required' => 'Mobile number is required.',
-    'mobile_exists' => 'This mobile number is not registered.',
-    'uuid_required' => 'Device UUID is required.',
-    'uuid_string' => 'Device UUID must be a string.',
-    'device_token_required' => 'Device token is required.',
-    'device_type_required' => 'Device type is required.',
-    'device_type_string' => 'Device type must be a string.',
-    'Activation code is not correct'=>'Activation code is not correct',
-    'Your account activated successfully'=>'Your account activated successfully',
-    'Activation code is expired'=>'Activation code is expired',
-    'code_required' => 'OTP code is required.',
-    'code_digits' => 'OTP code must be exactly 4 digits.',
+    'mobile_format' => 'Mobile number must start with 05 followed by 8 digits',
 
 ];

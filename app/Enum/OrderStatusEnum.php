@@ -2,26 +2,40 @@
 
 namespace App\Enum;
 
-enum OrderStatusEnum :string
+enum OrderStatusEnum: string
 {
-    case CURRENT = 'current';
-    case EXPIRED = 'expired';
-
+    case New = 'new';
+    case Approved = 'approved';
+    case Cancelled = 'cancelled';
+    case Completed = 'completed';
 
     public function label(): string
     {
         return match ($this) {
-            self::CURRENT => __('dashboard.current'),
-            self::EXPIRED => __('dashboard.expired'),
-
+            self::New => __('dashboard.status_new'),
+            self::Approved => __('dashboard.status_approved'),
+            self::Cancelled => __('dashboard.status_cancelled'),
+            self::Completed => __('dashboard.status_completed'),
         };
     }
 
     public static function options(): array
     {
         return [
-            self::CURRENT->value => self::CURRENT->label(),
-            self::EXPIRED->value => self::EXPIRED->label(),
+            self::New->value => self::New->label(),
+            self::Approved->value => self::Approved->label(),
+            self::Cancelled->value => self::Cancelled->label(),
+            self::Completed->value => self::Completed->label(),
         ];
+    }
+
+    public function color(): string
+    {
+        return match ($this) {
+            self::New => 'info',
+            self::Approved => 'success',
+            self::Cancelled => 'danger',
+            self::Completed => 'gray',
+        };
     }
 }

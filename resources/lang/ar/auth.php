@@ -13,25 +13,34 @@ return [
     |
     */
 
-    'failed' => 'بيانات التسجيل هذه غير متطابقة مع سجلاتنا.',
-    'password' => 'كلمة المرور المستخدمة غير صحيحة.',
-    'throttle' => 'عدد كبير جدا من محاولات الدخول. يرجى المحاولة مرة أخرى بعد :seconds ثانية.',
+    'failed' => 'بيانات الاعتماد هذه لا تطابق سجلاتنا.',
+    'password' => 'كلمة المرور المقدمة غير صحيحة.',
+    'throttle' => 'عدد محاولات تسجيل الدخول كبير جدًا. يرجى المحاولة مرة أخرى بعد :seconds ثانية.',
 
-    'This mobile number is already registered' => 'رقم هاتفك مسجل مسبقا',
-    'you are not allowed to do this action'=>'لا يجوز لك القيام بهذا الفعل',
-    'Your account is blocked'=>'تم حظر حسابك',
-    'Verification code sent to your mobile'=>'تم إرسال رمز التحقق إلى هاتفك المحمول',
-    'Logged out successfully'=>'تم تسجيل الخروج بنجاح',
-    'Name created successfully'=>'تم انشاء الاسم بنجاح',
-
+    // Login & Registration
+    'invalid_credentials' => 'البريد الإلكتروني/رقم الهاتف أو كلمة المرور غير صحيحة',
+    'Your account is blocked' => 'حسابك محظور',
     'Logged in successfully' => 'تم تسجيل الدخول بنجاح',
-    'Registration successful' => 'تم التسجيل بنجاح',
-    'invalid_credentials' => 'بيانات التسجيل غير صحيحة',
+    'Registration successful' => 'تم إنشاء الحساب بنجاح',
+    'Name created successfully' => 'تم إنشاء الاسم بنجاح',
+    'Logged out successfully' => 'تم تسجيل الخروج بنجاح',
+
+    // Profile
     'Profile updated successfully' => 'تم تحديث الملف الشخصي بنجاح',
     'current_password_required' => 'كلمة المرور الحالية مطلوبة',
     'current_password_incorrect' => 'كلمة المرور الحالية غير صحيحة',
-    
-    // Auth Service & OTP Messages
+
+    // Account
+    'Your account has been successfully deleted' => 'تم حذف حسابك بنجاح',
+
+    // Password Reset & OTP
+    'Reset Password OTP' => 'رمز استعادة كلمة المرور',
+    'Your OTP for password reset is: :otp' => 'رمز التحقق لاستعادة كلمة المرور هو: :otp',
+    'This OTP acts as your temporary password.' => 'هذا الرمز يستخدم للتحقق من هويتك.',
+    'It will expire in 15 minutes.' => 'ستنتهي صلاحية الرمز خلال 15 دقيقة.',
+    'Email Verification OTP' => 'رمز التحقق من البريد الإلكتروني',
+    'Your OTP for email verification is: :otp' => 'رمز التحقق الخاص بك هو: :otp',
+    'This OTP is used to verify your new email address.' => 'يستخدم هذا الرمز للتحقق من بريدك الإلكتروني الجديد.',
     'user_not_found' => 'المستخدم غير موجود',
     'failed_to_send_email' => 'فشل إرسال البريد الإلكتروني',
     'otp_sent_successfully' => 'تم إرسال رمز التحقق بنجاح',
@@ -42,20 +51,4 @@ return [
     'password_changed_successfully' => 'تم تغيير كلمة المرور بنجاح',
     'email_verified_successfully' => 'تم التحقق من البريد الإلكتروني وتغييره بنجاح',
     'email_verification_failed' => 'فشل التحقق من البريد الإلكتروني',
-    
-    // Registration & Account Activation
-    'verification_code_sent' => 'تم إرسال كود التحقق على بريدك الإلكتروني',
-    'account_not_verified' => 'الحساب غير مُفعّل. يرجى التحقق من بريدك الإلكتروني',
-    'account_activated_successfully' => 'تم تفعيل حسابك بنجاح',
-    'email_already_verified' => 'البريد الإلكتروني مُفعّل بالفعل',
-
-    // Email Notification
-    'Reset Password OTP' => 'رمز استعادة كلمة المرور',
-    'Your OTP for password reset is: :otp' => 'رمز التحقق لاستعادة كلمة المرور هو: :otp',
-    'This OTP acts as your temporary password.' => 'هذا الرمز يستخدم للتحقق من هويتك.',
-    'It will expire in 15 minutes.' => 'ستنتهي صلاحية الرمز خلال 15 دقيقة.',
-    'Email Verification OTP' => 'رمز التحقق من البريد الإلكتروني',
-    'Your OTP for email verification is: :otp' => 'رمز التحقق الخاص بك هو: :otp',
-    'This OTP is used to verify your new email address.' => 'يستخدم هذا الرمز للتحقق من بريدك الإلكتروني الجديد.',
-    'Your account has been successfully deleted' => 'تم حذف حسابك بنجاح',
 ];

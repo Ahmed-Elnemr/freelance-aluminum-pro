@@ -29,9 +29,12 @@ class OrderResource extends JsonResource
             'internal_note' => (string) $this->internal_note,
             'status' => (string) $this->status->value,
             'status_label' => (string) $this->status->label(),
+            'can_cancel' => in_array($this->status->value, ['new', 'approved']),
             'date' => (string) $this->date?->format('Y-m-d'),
             'time' => (string) $this->time,
             'formatted_time' => (string) $this->formatted_time,
+            'end_time' => (string) $this->end_time,
+            'formatted_end_time' => (string) $this->formatted_end_time,
             'created' => (string) $this->created_at?->format('d-m-Y'),
             'media' => $this->getMedia('media')->map(function ($media) {
                 return [

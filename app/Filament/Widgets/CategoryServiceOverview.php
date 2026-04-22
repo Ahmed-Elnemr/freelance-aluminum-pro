@@ -20,7 +20,9 @@ class CategoryServiceOverview extends BaseWidget
             $this->getUserStats(),
             $this->getMaintenanceStats(),
             $this->getCurrentOrdersStats(),
+            $this->getApprovedOrdersStats(),
             $this->getExpiredOrdersStats(),
+            $this->getCancelledOrdersStats(),
         ];
     }
 
@@ -57,8 +59,8 @@ class CategoryServiceOverview extends BaseWidget
 
     protected function getCurrentOrdersStats(): Stat
     {
-        $currentCount = Order::where('status', OrderStatusEnum::CURRENT->value)->count();
-        $lastMonthCount = Order::where('status', OrderStatusEnum::CURRENT->value)
+        $currentCount = Order::where('status', OrderStatusEnum::New->value)->count();
+        $lastMonthCount = Order::where('status', OrderStatusEnum::New->value)
             ->where('created_at', '<', Carbon::now()->subMonth())
             ->count();
 
@@ -67,14 +69,14 @@ class CategoryServiceOverview extends BaseWidget
         return Stat::make(__('dashboard.current_orders'), $currentCount)
             ->description($this->getTrendDescription($increase))
             ->descriptionIcon($this->getTrendIcon($increase))
-            ->chart($this->getWeeklyData(Order::class, ['status' => OrderStatusEnum::CURRENT->value]))
+            ->chart($this->getWeeklyData(Order::class, ['status' => OrderStatusEnum::New->value]))
             ->color($this->getTrendColor($increase));
     }
 
     protected function getExpiredOrdersStats(): Stat
     {
-        $currentCount = Order::where('status', OrderStatusEnum::EXPIRED->value)->count();
-        $lastMonthCount = Order::where('status', OrderStatusEnum::EXPIRED->value)
+        $currentCount = Order::where('status', OrderStatusEnum::Completed->value)->count();
+        $lastMonthCount = Order::where('status', OrderStatusEnum::Completed->value)
             ->where('created_at', '<', Carbon::now()->subMonth())
             ->count();
 
@@ -83,7 +85,39 @@ class CategoryServiceOverview extends BaseWidget
         return Stat::make(__('dashboard.expired_orders'), $currentCount)
             ->description($this->getTrendDescription($increase))
             ->descriptionIcon($this->getTrendIcon($increase))
-            ->chart($this->getWeeklyData(Order::class, ['status' => OrderStatusEnum::EXPIRED->value]))
+            ->chart($this->getWeeklyData(Order::class, ['status' => OrderStatusEnum::Completed->value]))
+            ->color($this->getTrendColor($increase));
+    }
+
+    protected function getApprovedOrdersStats(): Stat
+    {
+        $currentCount = Order::where('status', OrderStatusEnum::Approved->value)->count();
+        $lastMonthCount = Order::where('status', OrderStatusEnum::Approved->value)
+            ->where('created_at', '<', Carbon::now()->subMonth())
+            ->count();
+
+        $increase = $currentCount - $lastMonthCount;
+
+        return Stat::make(__('dashboard.approved_orders'), $currentCount)
+            ->description($this->getTrendDescription($increase))
+            ->descriptionIcon($this->getTrendIcon($increase))
+            ->chart($this->getWeeklyData(Order::class, ['status' => OrderStatusEnum::Approved->value]))
+            ->color($this->getTrendColor($increase));
+    }
+
+    protected function getCancelledOrdersStats(): Stat
+    {
+        $currentCount = Order::where('status', OrderStatusEnum::Cancelled->value)->count();
+        $lastMonthCount = Order::where('status', OrderStatusEnum::Cancelled->value)
+            ->where('created_at', '<', Carbon::now()->subMonth())
+            ->count();
+
+        $increase = $currentCount - $lastMonthCount;
+
+        return Stat::make(__('dashboard.cancelled_orders'), $currentCount)
+            ->description($this->getTrendDescription($increase))
+            ->descriptionIcon($this->getTrendIcon($increase))
+            ->chart($this->getWeeklyData(Order::class, ['status' => OrderStatusEnum::Cancelled->value]))
             ->color($this->getTrendColor($increase));
     }
 

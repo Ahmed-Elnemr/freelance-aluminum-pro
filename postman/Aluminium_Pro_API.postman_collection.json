@@ -1,0 +1,533 @@
+{
+	"info": {
+		"_postman_id": "aluminium-pro-api-001",
+		"name": "Aluminium Pro - Maintenance & Orders API",
+		"description": "API collection for Aluminium Pro app - Maintenances (with pagination) and Orders endpoints. All in English.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost"
+		},
+		{
+			"key": "access_token",
+			"value": ""
+		},
+		{
+			"key": "maintenance_id",
+			"value": "1"
+		},
+		{
+			"key": "order_id",
+			"value": "1"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 && pm.response.json().status) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.access_token) {",
+									"        pm.collectionVariables.set('access_token', jsonData.data.access_token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"login\": \"user@example.com\",\n    \"password\": \"password123\",\n    \"uuid\": \"550e8400-e29b-41d4-a716-446655440000\",\n    \"device_token\": \"fcm_device_token_example_12345\",\n    \"device_type\": \"android\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/user-auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "user-auth", "login"]
+						},
+						"description": "Login to get Bearer token. Use email in 'login' field. Saves access_token to collection variable."
+					}
+				}
+			]
+		},
+		{
+			"name": "Maintenances",
+			"item": [
+				{
+					"name": "List Maintenances (Paginated - 20 per page)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/maintenances?page=1&per_page=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "maintenances"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number (default: 1)"
+								},
+								{
+									"key": "per_page",
+									"value": "20",
+									"description": "Items per page (default: 20)"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Optional search by name or price",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get paginated list of maintenances. Returns 20 items per page by default. Use for mobile listing.\n\nExample response:\n{\n  \"status\": true,\n  \"message\": \"Loaded Successfully\",\n  \"data\": {\n    \"data\": [...],\n    \"links\": {...},\n    \"meta\": {\"current_page\": 1, \"per_page\": 20, ...}\n  }\n}"
+					}
+				},
+				{
+					"name": "Get Maintenance by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 && pm.response.json().data) {",
+									"    var data = pm.response.json().data;",
+									"    if (data.id) pm.collectionVariables.set('maintenance_id', data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/maintenances/{{maintenance_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "maintenances", "{{maintenance_id}}"]
+						},
+						"description": "Get single maintenance details by ID. Requires maintenance to be active.\n\nExample response:\n{\n  \"status\": true,\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"AC Maintenance\",\n    \"content\": \"Full AC service\",\n    \"price\": 200,\n    \"final_price\": 150,\n    \"rate\": 4.5,\n    \"ratings_count\": 10,\n    \"my_rating\": null,\n    \"is_favourite\": false,\n    \"base_image\": \"https://...\",\n    \"images\": [...]\n  }\n}"
+					}
+				},
+				{
+					"name": "Search Maintenances",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"search\": \"maintenance\",\n    \"page\": 1,\n    \"per_page\": 20\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/maintenances/search",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "maintenances", "search"]
+						},
+						"description": "Search maintenances by name or content. Paginated (20 per page)."
+					}
+				},
+				{
+					"name": "Maintenance List (IDs & Names)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/maintenances/list",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "maintenances", "list"]
+						},
+						"description": "Get simple list of maintenance id and name (for dropdowns). No pagination."
+					}
+				},
+				{
+					"name": "Toggle Favorite (Auth Required)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"maintenance_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/maintenances/favourite",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "maintenances", "favourite"]
+						},
+						"description": "Add or remove maintenance from favorites. Requires auth."
+					}
+				},
+				{
+					"name": "My Favorites (Auth Required)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/maintenances/my-favorites/get",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "maintenances", "my-favorites", "get"]
+						},
+						"description": "Get user's favorite maintenances. Requires auth."
+					}
+				},
+				{
+					"name": "Rate Maintenance (Auth Required)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 5\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/maintenances/rate/{{maintenance_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "maintenances", "rate", "{{maintenance_id}}"]
+						},
+						"description": "Rate a maintenance (1-5). Requires auth."
+					}
+				},
+				{
+					"name": "Request Inspection (Auth Required)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"maintenance_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/maintenances/request-inspection",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "maintenances", "request-inspection"]
+						},
+						"description": "Request maintenance inspection. Requires auth."
+					}
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Create Order (Auth Required)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 && pm.response.json().data) {",
+									"    var data = pm.response.json().data;",
+									"    if (data.payment_url) {",
+									"        console.log('Payment URL: ' + data.payment_url);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "maintenance_id",
+									"value": "1",
+									"description": "Maintenance ID (required)"
+								},
+								{
+									"key": "latitude",
+									"value": "24.7136",
+									"description": "Latitude -90 to 90 (required)"
+								},
+								{
+									"key": "longitude",
+									"value": "46.6753",
+									"description": "Longitude -180 to 180 (required)"
+								},
+								{
+									"key": "location_name",
+									"value": "Riyadh, Saudi Arabia",
+									"description": "Location address (required)"
+								},
+								{
+									"key": "description",
+									"value": "Need AC repair as soon as possible",
+									"description": "Order description (optional)"
+								},
+								{
+									"key": "internal_note",
+									"value": "Customer prefers morning visit",
+									"description": "Internal note (optional)"
+								},
+								{
+									"key": "date",
+									"value": "2026-03-20",
+									"description": "Scheduled date Y-m-d (required)"
+								},
+								{
+									"key": "time",
+									"value": "10:00",
+									"description": "Scheduled time H:i (required)"
+								},
+								{
+									"key": "paymentmethod",
+									"value": "1",
+									"description": "Payment method (1 = Moyasar, required)"
+								},
+								{
+									"key": "images[]",
+									"type": "file",
+									"src": [],
+									"description": "Images: jpg,jpeg,png,gif,webp,avi,mkv (optional)"
+								},
+								{
+									"key": "sounds[]",
+									"type": "file",
+									"src": [],
+									"description": "Audio: mp3,wav,ogg,m4a (optional)"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/orders",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "orders"]
+						},
+						"description": "Create new order. Returns payment_url for Moyasar. Images/sounds optional.\n\nExample (JSON for reference - use form-data for files):\n{\n  \"maintenance_id\": 1,\n  \"latitude\": 24.7136,\n  \"longitude\": 46.6753,\n  \"location_name\": \"Riyadh, Saudi Arabia\",\n  \"description\": \"Need AC repair\",\n  \"internal_note\": \"Morning preferred\",\n  \"date\": \"2026-03-20\",\n  \"time\": \"10:00\",\n  \"paymentmethod\": 1\n}"
+					}
+				},
+				{
+					"name": "Create Order - JSON Example (No Files)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"maintenance_id\": 1,\n    \"latitude\": 24.7136,\n    \"longitude\": 46.6753,\n    \"location_name\": \"Riyadh, King Fahd Road\",\n    \"description\": \"Air conditioning not cooling properly\",\n    \"internal_note\": \"Customer available in morning only\",\n    \"date\": \"2026-03-20\",\n    \"time\": \"10:00\",\n    \"paymentmethod\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/orders",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "orders"]
+						},
+						"description": "Create order without images/sounds. Use form-data when attaching files."
+					}
+				},
+				{
+					"name": "Current Orders (Auth Required)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/orders/current?page=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "orders", "current"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get user's current (active) orders. Paginated (20 per page).\n\nExample response:\n{\n  \"status\": true,\n  \"data\": {\n    \"data\": [{\n      \"id\": 1,\n      \"service_name\": \"AC Maintenance\",\n      \"location\": \"Riyadh\",\n      \"latitude\": 24.71,\n      \"longitude\": 46.67,\n      \"maintenance_id\": 1,\n      \"price\": 200,\n      \"final_price\": 150,\n      \"status\": \"current\",\n      \"date\": \"2026-03-20\",\n      \"media\": [...],\n      \"sounds\": [...]\n    }],\n    \"links\": {...},\n    \"meta\": {...}\n  }\n}"
+					}
+				},
+				{
+					"name": "Expired Orders (Auth Required)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/orders/expired?page=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "orders", "expired"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get user's expired/completed orders. Paginated (20 per page)."
+					}
+				},
+				{
+					"name": "Get Order by ID (Auth Required)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/orders/{{order_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "orders", "{{order_id}}"]
+						},
+						"description": "Get single order details. User can only access own orders.\n\nExample response:\n{\n  \"status\": true,\n  \"data\": {\n    \"id\": 1,\n    \"user_name\": \"John Doe\",\n    \"service_name\": \"AC Maintenance\",\n    \"location\": \"Riyadh\",\n    \"location_name\": \"King Fahd Road\",\n    \"latitude\": 24.71,\n    \"longitude\": 46.67,\n    \"maintenance_id\": 1,\n    \"price\": 200,\n    \"final_price\": 150,\n    \"description\": \"...\",\n    \"internal_note\": \"...\",\n    \"status\": \"current\",\n    \"status_label\": \"Current\",\n    \"date\": \"2026-03-20\",\n    \"time\": \"10:00\",\n    \"formatted_time\": \"10:00 AM\",\n    \"media\": [{\"url\": \"...\", \"type\": \"image/jpeg\"}],\n    \"sounds\": [{\"url\": \"...\", \"type\": \"audio/mpeg\"}]\n  }\n}"
+					}
+				}
+			]
+		}
+	]
+}
