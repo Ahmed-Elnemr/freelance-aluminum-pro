@@ -35,6 +35,10 @@ class AppServiceProvider extends ServiceProvider
             return 1;
         });
 
+        \Filament\Notifications\Notification::macro('data', function (array $data) {
+            return $this->viewData($data);
+        });
+
         Schema::defaultStringLength(191);
         date_default_timezone_set('Asia/Riyadh');
     }
