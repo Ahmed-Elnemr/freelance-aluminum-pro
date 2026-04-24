@@ -27,8 +27,8 @@ class WorkingDaySetting extends Model
     public function generateSlots(): array
     {
         $slots = [];
-        $current = \Carbon\Carbon::createFromFormat('H:i:s', $this->start_time);
-        $end = \Carbon\Carbon::createFromFormat('H:i:s', $this->end_time);
+        $current = \Carbon\Carbon::parse($this->start_time);
+        $end = \Carbon\Carbon::parse($this->end_time);
 
         while ($current < $end) {
             $slots[] = [

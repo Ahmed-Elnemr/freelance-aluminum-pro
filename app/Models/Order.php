@@ -54,7 +54,7 @@ class Order extends Model implements HasMedia
             return null;
         }
 
-        return \Illuminate\Support\Carbon::createFromFormat('H:i:s', $this->scheduled_time)
+        return \Illuminate\Support\Carbon::parse($this->scheduled_time)
             ->translatedFormat('h:i A');
     }
 
@@ -64,7 +64,7 @@ class Order extends Model implements HasMedia
             return null;
         }
 
-        return \Illuminate\Support\Carbon::createFromFormat('H:i:s', $this->end_time)
+        return \Illuminate\Support\Carbon::parse($this->end_time)
             ->translatedFormat('h:i A');
     }
 

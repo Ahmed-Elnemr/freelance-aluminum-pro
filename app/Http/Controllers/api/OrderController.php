@@ -83,7 +83,7 @@ class OrderController extends Controller
         $admins = User::where('type', UserTypeEnum::ADMIN->value)->active()->get();
         \Illuminate\Support\Facades\Notification::send($admins, new AdminOrderNotification($order, 'created'));
 
-        return ApiResponder::loaded(OrderResource::make($order), __('dashboard.order_created_successfully'));
+        return ApiResponder::created(OrderResource::make($order), __('dashboard.order_created_successfully'));
     }
 
     public function cancel(Order $order)
