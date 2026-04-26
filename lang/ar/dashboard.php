@@ -58,4 +58,8 @@ return [
     'approved_orders' => 'الطلبات المعتمدة',
     'cancelled_orders' => 'الطلبات الملغاة',
     'working_day_settings' => 'إعدادات مواعيد العمل',
+    'maintenance' => 'الصيانة',
+    'service_inspection' => 'معاينة خدمة',
+    'service_inspections' => 'معاينات الخدمات',
+    'inspected_at' => 'تاريخ المعاينة',
 ];
