@@ -58,4 +58,8 @@ return [
     'approved_orders' => 'Approved Orders',
     'cancelled_orders' => 'Cancelled Orders',
     'working_day_settings' => 'Working Day Settings',
+    'maintenance' => 'Maintenance',
+    'service_inspection' => 'Service Inspection',
+    'service_inspections' => 'Service Inspections',
+    'inspected_at' => 'Inspected At',
 ];
