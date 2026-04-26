@@ -16,8 +16,8 @@ class QuickOrderController extends Controller
             'message' => $request->message,
         ]);
 
-        if ($request->hasFile('sound')) {
-            foreach ($request->file('sound') as $file) {
+        if ($request->hasFile('sounds')) {
+            foreach ($request->file('sounds') as $file) {
                 $quickOrder->addMedia($file)->toMediaCollection('sounds');
             }
         }

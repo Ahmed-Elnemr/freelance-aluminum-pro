@@ -23,8 +23,8 @@ class QuickOrderRequest extends FormRequest
     {
         return [
             'message' => ['nullable', 'string', 'max:5000'],
-            'sound' => ['nullable', 'array'],
-            'sound.*' => ['file', 'mimes:mp3,wav,ogg,mpga,audio/mpeg,audio/mp4', 'max:10240'], // Max 10MB
+            'sounds' => ['nullable', 'array'],
+            'sounds.*' => ['file', 'mimes:mp3,wav,ogg,mpga,audio/mpeg,audio/mp4', 'max:10240'], // Max 10MB
         ];
     }
 
@@ -32,9 +32,9 @@ class QuickOrderRequest extends FormRequest
     {
         return [
             'message.string' => __('validation.string', ['attribute' => __('dashboard.message')]),
-            'sound.array' => __('validation.array', ['attribute' => __('dashboard.sounds')]),
-            'sound.*.file' => __('validation.file', ['attribute' => __('dashboard.sounds')]),
-            'sound.*.mimes' => __('validation.mimes', ['attribute' => __('dashboard.sounds'), 'values' => 'mp3, wav, ogg']),
+            'sounds.array' => __('validation.array', ['attribute' => __('dashboard.sounds')]),
+            'sounds.*.file' => __('validation.file', ['attribute' => __('dashboard.sounds')]),
+            'sounds.*.mimes' => __('validation.mimes', ['attribute' => __('dashboard.sounds'), 'values' => 'mp3, wav, ogg']),
         ];
     }
 }
