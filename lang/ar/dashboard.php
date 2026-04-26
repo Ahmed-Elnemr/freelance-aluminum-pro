@@ -62,4 +62,12 @@ return [
     'service_inspection' => 'معاينة خدمة',
     'service_inspections' => 'معاينات الخدمات',
     'inspected_at' => 'تاريخ المعاينة',
+    'quick_order' => 'طلب سريع',
+    'quick_orders' => 'الطلبات السريعة',
+    'message' => 'الرسالة',
+    'sounds' => 'التسجيلات الصوتية',
+    'quick_order_created_successfully' => 'تم إرسال طلبك السريع بنجاح.',
+    'mobile' => 'رقم الجوال',
+    'from' => 'من',
+    'to' => 'إلى',
 ];

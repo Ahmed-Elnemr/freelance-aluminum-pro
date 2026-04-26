@@ -62,4 +62,12 @@ return [
     'service_inspection' => 'Service Inspection',
     'service_inspections' => 'Service Inspections',
     'inspected_at' => 'Inspected At',
+    'quick_order' => 'Quick Order',
+    'quick_orders' => 'Quick Orders',
+    'message' => 'Message',
+    'sounds' => 'Audio Recordings',
+    'quick_order_created_successfully' => 'Your quick order has been sent successfully.',
+    'mobile' => 'Mobile',
+    'from' => 'From',
+    'to' => 'To',
 ];

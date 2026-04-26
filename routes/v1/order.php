@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\OrderController;
+use App\Http\Controllers\api\QuickOrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -12,4 +13,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('orders/available-days', [OrderController::class, 'availableDays']);
     Route::post('orders/{order}/cancel', [OrderController::class, 'cancel']);
     Route::get('orders/{order}', [OrderController::class, 'show']);
+
+    // Quick Orders
+    Route::post('quick-orders', [QuickOrderController::class, 'store']);
 });
