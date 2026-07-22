@@ -90,7 +90,7 @@ class OrderController extends Controller
     {
         $user = auth('sanctum')->user();
 
-        if ($order->user_id !== $user->id) {
+        if ((int) $order->user_id !== (int) $user->id) {
             return ApiResponder::failed('Unauthorized', 403);
         }
 
@@ -157,7 +157,7 @@ class OrderController extends Controller
     public function show(Order $order)
     {
         $authUser = auth('sanctum')->user();
-        if ((int) $order->user_id !== $authUser->id) {
+        if ((int) $order->user_id !== (int) $authUser->id) {
             return ApiResponder::failed('Unauthorized', 403);
         }
 
