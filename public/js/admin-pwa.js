@@ -1,11 +1,22 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
-import { getMessaging, getToken, onMessage, isSupported } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging.js';
+import { deleteToken, getMessaging, getToken, onMessage, isSupported } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging.js';
 
 const config = window.AluminumProPwa;
+const PROJECT_CACHE_KEY = 'aluminum_pro_firebase_project';
+const TOKEN_CACHE_KEY = 'aluminum_pro_fcm_token';
 
 async function ensureServiceWorkers() {
     if (!('serviceWorker' in navigator)) {
         return null;
+    }
+
+    const previousProject = localStorage.getItem(PROJECT_CACHE_KEY);
+    const currentProject = config?.firebase?.projectId ?? null;
+
+    if (previousProject && currentProject && previousProject !== currentProject) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map((registration) => registration.unregister()));
+        localStorage.removeItem(TOKEN_CACHE_KEY);
     }
 
     await navigator.serviceWorker.register('/sw.js').catch(() => null);
@@ -28,7 +39,7 @@ function browserUuid() {
 }
 
 async function registerDeviceToken(token) {
-    await fetch(config.deviceTokenUrl, {
+    const response = await fetch(config.deviceTokenUrl, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -43,6 +54,10 @@ async function registerDeviceToken(token) {
             uuid: browserUuid(),
         }),
     });
+
+    if (!response.ok) {
+        console.error('[PWA] Failed to save device token', response.status);
+    }
 }
 
 async function boot() {
@@ -71,6 +86,8 @@ async function boot() {
     const permission = await Notification.requestPermission();
 
     if (permission !== 'granted') {
+        console.warn('[PWA] Notification permission not granted');
+
         return;
     }
 
@@ -84,12 +101,24 @@ async function boot() {
     });
 
     const messaging = getMessaging(app);
+
+    try {
+        await deleteToken(messaging);
+    } catch (_) {
+        // Ignore when there is no existing token.
+    }
+
     const token = await getToken(messaging, {
         vapidKey: config.firebase.vapidKey,
         serviceWorkerRegistration: registration,
     });
 
     if (token) {
+        localStorage.setItem(PROJECT_CACHE_KEY, config.firebase.projectId);
+        localStorage.setItem(TOKEN_CACHE_KEY, token);
+        console.log('[PWA] Firebase project:', config.firebase.projectId);
+        console.log('[PWA] Sender ID:', config.firebase.messagingSenderId);
+        console.log('[PWA] Device token (use this in /pwa-test/...):', token);
         await registerDeviceToken(token);
     }
 
@@ -107,4 +136,6 @@ async function boot() {
     });
 }
 
-boot().catch(() => {});
+boot().catch((error) => {
+    console.error('[PWA] boot failed', error);
+});
