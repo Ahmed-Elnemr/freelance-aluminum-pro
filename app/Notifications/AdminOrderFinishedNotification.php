@@ -2,7 +2,9 @@
 
 namespace App\Notifications;
 
+use App\Actions\FCMAction;
 use App\Models\Order;
+use App\Notifications\Channels\FcmChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
@@ -25,12 +27,12 @@ class AdminOrderFinishedNotification extends Notification
         ];
 
         $this->data['type'] = 'order';
-        $this->data['model_id'] = $order->id;
+        $this->data['model_id'] = (string) $order->id;
     }
 
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', FcmChannel::class];
     }
 
     public function toArray(object $notifiable): array
@@ -50,5 +52,17 @@ class AdminOrderFinishedNotification extends Notification
             ])
             ->data(['type' => 'order', 'model_id' => $this->order->id])
             ->getDatabaseMessage();
+    }
+
+    public function toFcm($notifiable): void
+    {
+        $url = \App\Filament\Resources\OrderResource::getUrl('view', ['record' => $this->order]);
+
+        FCMAction::new($notifiable)
+            ->withData($this->data)
+            ->withTitle($this->data['title'][app()->getLocale()] ?? '')
+            ->withBody($this->data['body'][app()->getLocale()] ?? '')
+            ->withClickAction($url)
+            ->sendMessage('tokens');
     }
 }

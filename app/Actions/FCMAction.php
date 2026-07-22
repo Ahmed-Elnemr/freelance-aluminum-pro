@@ -8,10 +8,12 @@ use Kreait\Firebase\Messaging\AndroidConfig;
 use Kreait\Firebase\Messaging\ApnsConfig;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
+use Kreait\Firebase\Messaging\WebPushConfig;
 
 class FCMAction
 {
-    protected ?string  $firebaseToken = '';
+    /** @var list<string> */
+    protected array $firebaseTokens = [];
 
     protected ?string $messageType = 'default';
 
@@ -19,20 +21,28 @@ class FCMAction
 
     protected ?Messaging $messaging;
 
-    protected ?array $data = ['fcmData' => 'Start data'];
+    protected array $data = ['fcmData' => 'Start data'];
 
-    private ?string $title = '';
+    private string $title = '';
 
-    private ?string $body = '';
+    private string $body = '';
 
-    private ?string $imageUrl = '';
+    private string $imageUrl = '';
+
+    private ?string $clickAction = null;
 
     public function __construct(?Model $user = null)
     {
-
         $this->messaging = app('firebase.messaging');
-        $this->firebaseToken = @$user?->devices()?->orderBy("id",'desc')->first()?->token ?? "" ;
-
+        $this->firebaseTokens = $user
+            ? $user->devices()
+                ->whereNotNull('token')
+                ->pluck('token')
+                ->filter()
+                ->unique()
+                ->values()
+                ->all()
+            : [];
     }
 
     public static function new(?Model $user): self
@@ -65,12 +75,15 @@ class FCMAction
     public function withTopic(string $topic): static
     {
         $this->topic = $topic;
+
         return $this;
     }
 
     public function withClickAction(string $clickAction): static
     {
         $this->clickAction = $clickAction;
+        $this->data['url'] = $clickAction;
+        $this->data['click_action'] = $clickAction;
 
         return $this;
     }
@@ -92,44 +105,54 @@ class FCMAction
     public function withBody(string $body): static
     {
         $this->body = $body;
+
         return $this;
     }
 
-    public function sendMessage($type = 'topic')
+    public function sendMessage($type = 'topic'): void
     {
+        $message = $this->createMessage()
+            ->withHighestPossiblePriority()
+            ->withApnsConfig(ApnsConfig::fromArray([
+                'payload' => [
+                    'aps' => [
+                        'sound' => 'note.mp3',
+                    ],
+                ],
+                'fcm_options' => [],
+                'headers' => [],
+            ]))
+            ->withAndroidConfig(
+                AndroidConfig::fromArray([
+                    'notification' => [
+                        'sound' => 'note.mp3',
+                    ],
+                ])
+            );
 
-        $message = $this->createMessage()->withHighestPossiblePriority()->withApnsConfig(ApnsConfig::fromArray([
-            'payload' => [
-                'aps' => [
-                    'sound' => 'note.mp3',
+        if ($this->clickAction) {
+            $message = $message->withWebPushConfig(WebPushConfig::fromArray([
+                'fcm_options' => [
+                    'link' => $this->clickAction,
                 ],
-            ],
-            'fcm_options' => [],
-            'headers' => [],
-        ]))->withAndroidConfig(
-            AndroidConfig::fromArray([
-                'notification' => [
-                    'sound' => 'note.mp3',
-                ],
-            ])
-        );
+            ]));
+        }
+
         if ($type === 'tokens') {
-            if (! empty($this->firebaseToken)) {
-                $this->messaging->sendMulticast($message, $this->firebaseToken);
-
+            if ($this->firebaseTokens !== []) {
+                $this->messaging->sendMulticast($message, $this->firebaseTokens);
             }
         }
 
         if ($type === 'topic') {
             $this->messaging->send($message);
         }
-
     }
 
-    private function createMessage()
+    private function createMessage(): CloudMessage
     {
         return CloudMessage::withTarget('topic', $this->topic)
-            ->withNotification(Notification::create($this->title, $this->body, $this->imageUrl))
+            ->withNotification(Notification::create($this->title, $this->body, $this->imageUrl ?: null))
             ->withData($this->data);
     }
 }

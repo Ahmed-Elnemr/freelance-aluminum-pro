@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\Service;
-use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('service_payment_methods', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(Service::class)->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('service_id')->constrained()->cascadeOnDelete();
             $table->integer('paymentmethod');
             $table->timestamps();
         });

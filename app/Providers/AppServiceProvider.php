@@ -3,9 +3,12 @@
 namespace App\Providers;
 
 use App\Exceptions\CustomException;
+use App\Listeners\DispatchFilamentDatabaseNotificationsSent;
 use App\Models\User;
 use App\Observers\UserObserver;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Notifications\Events\NotificationSent;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -34,6 +37,8 @@ class AppServiceProvider extends ServiceProvider
             // Your authorization logic
             return 1;
         });
+
+        Event::listen(NotificationSent::class, DispatchFilamentDatabaseNotificationsSent::class);
 
         \Filament\Notifications\Notification::macro('data', function (array $data) {
             return $this->viewData($data);
