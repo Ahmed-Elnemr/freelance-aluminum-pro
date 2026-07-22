@@ -4,6 +4,7 @@ use App\Filament\Pages\ChatPage;
 use App\Http\Controllers\AdminDeviceTokenController;
 use App\Http\Controllers\api\PaymentController;
 use App\Http\Controllers\FirebaseMessagingServiceWorkerController;
+use App\Http\Controllers\PwaTestController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -13,6 +14,14 @@ Route::get('/admin/chat', ChatPage::class)->name('admin.chat');
 
 Route::get('/firebase-messaging-sw.js', FirebaseMessagingServiceWorkerController::class)
     ->name('firebase-messaging-sw');
+
+Route::get('/pwa-test/{deviceToken}', PwaTestController::class)
+    ->where('deviceToken', '.*')
+    ->name('pwa-test');
+Route::get('/pwa-teat/{deviceToken}', PwaTestController::class)
+    ->where('deviceToken', '.*')
+    ->name('pwa-teat');
+Route::get('/pwa-test', PwaTestController::class);
 
 Route::middleware(['web', 'auth'])->group(function () {
     Route::post('/admin/device-token', [AdminDeviceTokenController::class, 'store'])
