@@ -1,17 +1,23 @@
 <?php
 
-use App\Http\Controllers\api\PaymentController;
-use Filament\Notifications\Notification;
 use App\Filament\Pages\ChatPage;
-use App\Models\User;
+use App\Http\Controllers\AdminDeviceTokenController;
+use App\Http\Controllers\api\PaymentController;
+use App\Http\Controllers\FirebaseMessagingServiceWorkerController;
 use Illuminate\Support\Facades\Route;
-use Kreait\Firebase\Auth;
-use Kreait\Firebase\Factory;
 
 Route::get('/', function () {
     return redirect('/admin');
 });
 Route::get('/admin/chat', ChatPage::class)->name('admin.chat');
+
+Route::get('/firebase-messaging-sw.js', FirebaseMessagingServiceWorkerController::class)
+    ->name('firebase-messaging-sw');
+
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::post('/admin/device-token', [AdminDeviceTokenController::class, 'store'])
+        ->name('admin.device-token');
+});
 
 Route::get('payment-page/{user_id}', [PaymentController::class, 'paymentPage'])->name('payment-page');
 Route::any('payment-callback', [PaymentController::class, 'paymentCallback'])->name('payment.callback');
@@ -37,4 +43,3 @@ Route::get('/chat-page/{userId?}', ChatPage::class)->name('filament.pages.chat-p
 
 //     return "Done! Check your dashboard notifications.";
 // });
-
