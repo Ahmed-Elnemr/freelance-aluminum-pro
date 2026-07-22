@@ -49,9 +49,22 @@ class PwaTestController extends Controller
                 'token_preview' => substr($token, 0, 20).'...',
             ]);
         } catch (Throwable $e) {
+            $message = $e->getMessage();
+            $hint = null;
+
+            if (str_contains(strtolower($message), 'senderid mismatch')) {
+                $hint = 'This device_token belongs to a different Firebase project than the server. '
+                    .'Server project: '.config('services.firebase_web.project_id')
+                    .' (senderId: '.config('services.firebase_web.messaging_sender_id').'). '
+                    .'Open /admin, allow notifications again to register a new token from this project, then test with that new token.';
+            }
+
             return response()->json([
                 'status' => false,
-                'message' => $e->getMessage(),
+                'message' => $message,
+                'hint' => $hint,
+                'server_project' => config('services.firebase_web.project_id'),
+                'server_sender_id' => config('services.firebase_web.messaging_sender_id'),
             ], 500);
         }
     }
