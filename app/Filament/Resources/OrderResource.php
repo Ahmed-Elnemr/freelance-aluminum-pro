@@ -9,6 +9,7 @@ use App\Models\Maintenance;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\WorkingDaySetting;
+use App\Notifications\AdminOrderStatusChangedNotification;
 use App\Notifications\OrderCompletedNotification;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
@@ -22,6 +23,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Notification as NotificationFacade;
 
 class OrderResource extends Resource
 {
@@ -241,6 +243,16 @@ class OrderResource extends Resource
                                     if ($state === OrderStatusEnum::Completed->value) {
                                         $record->user->notify(new OrderCompletedNotification($record));
                                     }
+
+                                    $admins = User::query()
+                                        ->where('type', UserTypeEnum::ADMIN->value)
+                                        ->active()
+                                        ->get();
+
+                                    NotificationFacade::send(
+                                        $admins,
+                                        new AdminOrderStatusChangedNotification($record, $state)
+                                    );
                                 }
                             }),
 
@@ -434,6 +446,16 @@ class OrderResource extends Resource
                         ]);
 
                         $record->user->notify(new \App\Notifications\OrderStatusChangedNotification($record));
+
+                        $admins = User::query()
+                            ->where('type', UserTypeEnum::ADMIN->value)
+                            ->active()
+                            ->get();
+
+                        NotificationFacade::send(
+                            $admins,
+                            new AdminOrderStatusChangedNotification($record, OrderStatusEnum::Approved)
+                        );
 
                         Notification::make()
                             ->title(__('Order Approved Successfully'))

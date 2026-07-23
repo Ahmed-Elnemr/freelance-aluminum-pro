@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Enum\UserTypeEnum;
 use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
 use App\Models\Maintenance;
 use App\Models\Order;
+use App\Models\User;
+use App\Notifications\AdminOrderNotification;
 use App\Notifications\OrderCreatedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Notification;
 
 class PaymentController extends Controller
 {
@@ -72,11 +76,12 @@ class PaymentController extends Controller
 
             $order->user->notify(new OrderCreatedNotification($order));
 
-            // Notify Admin
-            $admin = \App\Models\User::where('type', 'admin')->first();
-            if ($admin) {
-                $admin->notify(new OrderCreatedNotification($order));
-            }
+            $admins = User::query()
+                ->where('type', UserTypeEnum::ADMIN->value)
+                ->active()
+                ->get();
+
+            Notification::send($admins, new AdminOrderNotification($order, 'created'));
 
             return ApiResponder::success('The service has been booked successfully.');
         }

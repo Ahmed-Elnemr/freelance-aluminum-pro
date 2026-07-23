@@ -3,18 +3,19 @@
 namespace App\Http\Controllers\api;
 
 use App\Enum\MessageTypeEnum;
+use App\Enum\UserTypeEnum;
 use App\Events\MessageSentEvent;
+use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MessageResource;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
-use Filament\Notifications\Notification;
+use App\Notifications\NewMessageFromClientNotification;
 use Illuminate\Http\Request;
-use App\Helpers\Response\ApiResponder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ChatController extends Controller
 {
@@ -78,33 +79,26 @@ class ChatController extends Controller
 
             $conversation->update(['last_message_at' => now()]);
             event(new MessageSentEvent($message));
-            //todo: send notification
-            $senderName = $sender->name;
-            $previewText = '';
 
-            if ($request->filled('message')) {
-                $previewText = Str::limit(strip_tags($request->message), 100);
-            }
+            $admins = User::query()
+                ->where('type', UserTypeEnum::ADMIN->value)
+                ->active()
+                ->get();
 
-            $notificationBody = "لديك رسالة جديدة من المستخدم: <strong>{$senderName}</strong>";
-            if ($previewText) {
-                $notificationBody .= "<br>{$previewText}";
-            }
+            Notification::send(
+                $admins,
+                new NewMessageFromClientNotification(
+                    $sender,
+                    $request->filled('message') ? $request->message : null,
+                )
+            );
 
-            Notification::make()
-                ->title('رسالة جديدة')
-                ->body($notificationBody)
-                ->actions([
-                    \Filament\Notifications\Actions\Action::make('view')
-                        ->label(__('dashboard.chat'))
-                        ->url(\App\Filament\Pages\ChatPage::getUrl(['userId' => $sender->id])),
-                ])
-                ->sendToDatabase($receiver);
             DB::commit();
 
             return ApiResponder::success('Message sent successfully', $message->load('sender', 'attachments'));
         } catch (\Exception $e) {
             DB::rollBack();
+
             return ApiResponder::failed($e->getMessage(), 422);
         }
     }
@@ -114,13 +108,13 @@ class ChatController extends Controller
     {
         $user = auth()->user();
 
-        $conversations = Conversation::with(['messages' => function($query) {
+        $conversations = Conversation::with(['messages' => function ($query) {
             $query->latest()->limit(1);
         }, 'client', 'admin'])
             ->forUser($user->id)
             ->latest('last_message_at')
             ->get()
-            ->map(function($conversation) use ($user) {
+            ->map(function ($conversation) use ($user) {
                 $otherParticipant = ($user->id === $conversation->client_id)
                     ? $conversation->admin
                     : $conversation->client;
@@ -147,26 +141,24 @@ class ChatController extends Controller
 
     // todo: getMessages
 
-
-
     public function getMessages(Request $request)
     {
         $user = auth()->user();
 
         $admin = User::where('type', 'admin')->first();
 
-        if (!$admin) {
+        if (! $admin) {
             return ApiResponder::failed('No admin found', 404);
         }
 
         $conversation = Conversation::firstBetween($user->id, $admin->id);
-        if (!$conversation) {
+        if (! $conversation) {
             return ApiResponder::loaded([
                 'conversation' => '',
                 'messages' => [],
             ]);
         }
-        if (!$conversation) {
+        if (! $conversation) {
             return ApiResponder::failed('Conversation not found', 404);
         }
 
@@ -194,6 +186,7 @@ class ChatController extends Controller
             ->where('receiver_id', $user->id)
             ->whereNull('seen_at')
             ->update(['seen_at' => now()]);
+
         return ApiResponder::success('Messages marked as read');
     }
 }

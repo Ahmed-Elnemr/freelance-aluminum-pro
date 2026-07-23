@@ -70,4 +70,6 @@ return [
     'mobile' => 'Mobile',
     'from' => 'From',
     'to' => 'To',
+    'notification_order_status_changed_admin_title' => 'Order status updated',
+    'notification_order_status_changed_admin_body' => 'Order #:order_id for :user_name was changed to :status.',
 ];

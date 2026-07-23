@@ -3,8 +3,10 @@
 namespace App\Filament\Resources\MaintenanceResource\RelationManagers;
 
 use App\Enum\OrderStatusEnum;
+use App\Enum\UserTypeEnum;
 use App\Models\Order;
 use App\Models\User;
+use App\Notifications\AdminOrderStatusChangedNotification;
 use App\Notifications\OrderCompletedNotification;
 use Filament\Forms;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -13,6 +15,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Notification;
 
 class OrdersRelationManager extends RelationManager
 {
@@ -109,9 +112,23 @@ class OrdersRelationManager extends RelationManager
                             ->required()
                             ->native(false)
                             ->afterStateUpdated(function ($state, $set, $get, ?Order $record) {
-                                if ($record && $state === 'expired') {
+                                if (! $record) {
+                                    return;
+                                }
+
+                                if ($state === 'expired' || $state === OrderStatusEnum::Completed->value) {
                                     $record->user->notify(new OrderCompletedNotification($record));
                                 }
+
+                                $admins = User::query()
+                                    ->where('type', UserTypeEnum::ADMIN->value)
+                                    ->active()
+                                    ->get();
+
+                                Notification::send(
+                                    $admins,
+                                    new AdminOrderStatusChangedNotification($record, $state)
+                                );
                             }),
 
                         Forms\Components\Toggle::make('is_active')
