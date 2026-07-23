@@ -70,4 +70,6 @@ return [
     'mobile' => 'رقم الجوال',
     'from' => 'من',
     'to' => 'إلى',
+    'notification_order_status_changed_admin_title' => 'تحديث حالة طلب',
+    'notification_order_status_changed_admin_body' => 'تم تغيير حالة طلب #:order_id للعميل :user_name إلى :status.',
 ];
