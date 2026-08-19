@@ -32,10 +32,12 @@ class MaintenanceController extends Controller
     {
         $maintenances = Maintenance::active()
             ->latest()
-            ->get(['id', 'name'])
+            ->get(['id', 'name', 'price', 'final_price'])
             ->map(fn ($maintenance) => [
                 'id' => $maintenance->id,
                 'name' => $maintenance->getTranslation('name', app()->getLocale()),
+                'price' => (float) $maintenance->price,
+                'final_price' => (float) $maintenance->final_price,
             ])
             ->values()
             ->toArray();
