@@ -76,7 +76,10 @@ class WorkingDaySettingResource extends Resource
                     ->schema([
                         Forms\Components\CheckboxList::make('blocked_slots')
                             ->label('')
-                            ->options(function (WorkingDaySetting $record) {
+                            ->options(function (?WorkingDaySetting $record) {
+                                if (! $record) {
+                                    return [];
+                                }
                                 $slots = $record->generateSlots();
                                 $options = [];
                                 foreach ($slots as $slot) {
@@ -85,14 +88,20 @@ class WorkingDaySettingResource extends Resource
 
                                 return $options;
                             })
-                            ->formatStateUsing(function (WorkingDaySetting $record) {
+                            ->formatStateUsing(function (?WorkingDaySetting $record) {
+                                if (! $record) {
+                                    return [];
+                                }
                                 return WorkingHourBlockedSlot::where('day', $record->day)
                                     ->pluck('slot_time')
                                     ->map(fn ($time) => substr($time, 0, 5))
                                     ->toArray();
                             })
                             ->dehydrated(false)
-                            ->afterStateUpdated(function ($state, WorkingDaySetting $record) {
+                            ->afterStateUpdated(function ($state, ?WorkingDaySetting $record) {
+                                if (! $record) {
+                                    return;
+                                }
                                 WorkingHourBlockedSlot::where('day', $record->day)->delete();
                                 foreach ($state as $time) {
                                     WorkingHourBlockedSlot::create([

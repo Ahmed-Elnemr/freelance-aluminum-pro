@@ -18,6 +18,8 @@ class Order extends Model implements HasMedia
 
     protected $fillable = [
         'maintenance_id',
+        'price',
+        'final_price',
         'user_id',
         'latitude',
         'longitude',

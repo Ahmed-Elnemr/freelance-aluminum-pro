@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\OrderListResource;
 use App\Http\Resources\OrderResource;
+use App\Models\Maintenance;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\WorkingDaySetting;
@@ -54,9 +55,13 @@ class OrderController extends Controller
             return ApiResponder::failed(__('dashboard.slot_already_booked_error'));
         }
 
+        $maintenance = Maintenance::findOrFail($request->maintenance_id);
+
         $order = Order::create([
             'user_id' => $user->id,
-            'maintenance_id' => $request->maintenance_id,
+            'maintenance_id' => $maintenance->id,
+            'price' => $maintenance->price,
+            'final_price' => $maintenance->final_price,
             'latitude' => $request->latitude,
             'longitude' => $request->longitude,
             'location_name' => $request->location_name,
