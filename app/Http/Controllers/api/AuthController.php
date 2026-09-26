@@ -4,30 +4,29 @@ namespace App\Http\Controllers\api;
 
 use App\Helpers\Response\ApiResponder;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\auth\ChangePasswordRequest;
+use App\Http\Requests\auth\ForgotPasswordRequest;
 use App\Http\Requests\auth\RegisterRequest;
+use App\Http\Requests\auth\ResendOtpRequest;
+use App\Http\Requests\auth\ResetPasswordRequest;
 use App\Http\Requests\auth\StoreUserNameRequest;
 use App\Http\Requests\auth\UserEditeProfile;
 use App\Http\Requests\auth\UserLoginRequest;
+use App\Http\Requests\auth\VerifyOtpRequest;
 use App\Http\Resources\user\UserResource;
+use App\Models\Otp;
 use App\Models\User;
-use App\Notifications\WelcomeNotification;
+use App\Service\AuthService;
 use App\Service\UserService;
+use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Models\Otp;
-use Carbon\Carbon;
-use App\Notifications\ResetPasswordOtpNotification;
-use Illuminate\Support\Facades\DB;
-use App\Service\AuthService;
-use App\Http\Requests\auth\ForgotPasswordRequest;
-use App\Http\Requests\auth\VerifyOtpRequest;
-use App\Http\Requests\auth\ResetPasswordRequest;
-use App\Http\Requests\auth\ResendOtpRequest;
-use App\Http\Requests\auth\ChangePasswordRequest;
 
 class AuthController extends Controller
 {
     protected $userService;
+
     protected $authService;
 
     public function __construct(UserService $userService, AuthService $authService)
@@ -36,9 +35,7 @@ class AuthController extends Controller
         $this->authService = $authService;
     }
 
-
-
-    //todo:login
+    // todo:login
     public function login(UserLoginRequest $request)
     {
         $validatedData = $request->validated();
@@ -53,7 +50,7 @@ class AuthController extends Controller
         $user = User::where($loginField, $validatedData['login'])
             ->first();
 
-        if (!$user) {
+        if (! $user) {
             return ApiResponder::failed(__('auth.invalid_credentials'), 200);
         }
 
@@ -62,10 +59,9 @@ class AuthController extends Controller
             // Send Verification OTP
             $this->authService->sendVerificationOtp($user);
 
-
             return ApiResponder::failed(__('auth.account_not_verified'), 200, [
                 'need_token' => true,
-                'user' => UserResource::make($user)
+                'user' => UserResource::make($user),
             ]);
         }
 
@@ -75,7 +71,7 @@ class AuthController extends Controller
         }
 
         // Verify password
-        if (!Hash::check($validatedData['password'], $user->password)) {
+        if (! Hash::check($validatedData['password'], $user->password)) {
             return ApiResponder::failed(__('auth.invalid_credentials'), 200);
         }
 
@@ -94,71 +90,92 @@ class AuthController extends Controller
         ]);
     }
 
-    //todo:register
-    public function register(RegisterRequest $request)
+    // todo:register
+    public function register(RegisterRequest $request): JsonResponse
     {
         $validatedData = $request->validated();
 
-        // Check if email already exists
-        $existingUser = User::where('email', $validatedData['email'])->first();
+        $existingUser = User::withTrashed()
+            ->where('email', $validatedData['email'])
+            ->first();
 
         if ($existingUser) {
-            // If user exists and is verified (email_verified_at is not null)
-            if ($existingUser->email_verified_at !== null) {
-                return ApiResponder::failed(__('validation.unique', ['attribute' => __('validation.attributes.email')]), 422);
-            }
-
-            // If user exists but NOT verified, resend OTP
-            // Update user data in case they changed name/mobile/password
-            $existingUser->update([
-                'name' => $validatedData['name'],
-                'mobile' => $validatedData['mobile'],
-                'password' => Hash::make($validatedData['password']),
-            ]);
-
-            // Update device info
-            $this->userService->addDevice($existingUser);
-
-            // Send OTP
-            $this->authService->sendVerificationOtp($existingUser);
-
-            return ApiResponder::success(__('auth.verification_code_sent'), [
-                'need_token' => true,
-                'user' => UserResource::make($existingUser)
-            ]);
+            return $this->resumeExistingRegistration($existingUser, $validatedData);
         }
 
-        // Create new user (inactive by default)
-        $user = User::create([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'mobile' => $validatedData['mobile'],
-            'password' => Hash::make($validatedData['password']),
-            'status' => 1,
-            'is_active' => 0, // Inactive until email is verified
-            'email_verified_at' => null, // Not verified yet
-        ]);
+        try {
+            $user = User::create([
+                'name' => $validatedData['name'],
+                'email' => $validatedData['email'],
+                'mobile' => $validatedData['mobile'],
+                'password' => Hash::make($validatedData['password']),
+                'status' => 1,
+                'is_active' => 0,
+                'email_verified_at' => null,
+            ]);
+        } catch (UniqueConstraintViolationException $exception) {
+            $existingUser = User::withTrashed()
+                ->where('email', $validatedData['email'])
+                ->first();
 
-        // Add device
+            if ($existingUser) {
+                return $this->resumeExistingRegistration($existingUser, $validatedData);
+            }
+
+            throw $exception;
+        }
+
         $this->userService->addDevice($user);
-
-        // Send OTP for email verification
         $this->authService->sendVerificationOtp($user);
 
         return ApiResponder::success(__('auth.verification_code_sent'), [
             'need_token' => true,
-            'user' => UserResource::make($user)
+            'user' => UserResource::make($user),
         ]);
     }
 
-//todo::storeName
+    /**
+     * @param  array<string, mixed>  $validatedData
+     */
+    private function resumeExistingRegistration(User $existingUser, array $validatedData): JsonResponse
+    {
+        $wasDeleted = $existingUser->trashed();
+
+        if ($wasDeleted) {
+            $existingUser->restore();
+        }
+
+        if (! $wasDeleted && $existingUser->email_verified_at !== null) {
+            return ApiResponder::failed(__('validation.unique', ['attribute' => __('validation.attributes.email')]), 422);
+        }
+
+        $existingUser->update([
+            'name' => $validatedData['name'],
+            'mobile' => $validatedData['mobile'],
+            'password' => Hash::make($validatedData['password']),
+            'status' => 1,
+            'is_active' => 0,
+            'email_verified_at' => null,
+        ]);
+
+        $this->userService->addDevice($existingUser);
+        $this->authService->sendVerificationOtp($existingUser);
+
+        return ApiResponder::success(__('auth.verification_code_sent'), [
+            'need_token' => true,
+            'user' => UserResource::make($existingUser),
+        ]);
+    }
+
+    // todo::storeName
     public function storeName(StoreUserNameRequest $request)
     {
         $user = auth()->user();
         $user->update([
-            'name' => $request->name
+            'name' => $request->name,
         ]);
-        return ApiResponder::success( __('auth.Name created successfully'),[
+
+        return ApiResponder::success(__('auth.Name created successfully'), [
             'user' => UserResource::make($user),
         ]);
     }
@@ -168,17 +185,20 @@ class AuthController extends Controller
         $user = auth('sanctum')->user();
         $user->devices()->whereUuid($request->uuid)->delete();
         auth('sanctum')->user()->currentAccessToken()->delete();
+
         return ApiResponder::success(__('auth.Logged out successfully'));
     }
-    ####
-//
+
+    // ###
+    //
     public function profile(): \Illuminate\Http\JsonResponse
     {
         // Data is null because the user is already in the top-level 'user' key
         return ApiResponder::loaded();
     }
-////
-    //todo: user editeProfile
+
+    // //
+    // todo: user editeProfile
     public function editeProfile(UserEditeProfile $request)
     {
         $user = auth('sanctum')->user();
@@ -196,12 +216,12 @@ class AuthController extends Controller
         }
 
         // If password is being changed, verify current password
-        if (!empty($validatedData['password'])) {
+        if (! empty($validatedData['password'])) {
             if (empty($validatedData['current_password'])) {
                 return ApiResponder::failed(__('auth.current_password_required'), 422);
             }
 
-            if (!Hash::check($validatedData['current_password'], $user->password)) {
+            if (! Hash::check($validatedData['current_password'], $user->password)) {
                 return ApiResponder::failed(__('auth.current_password_incorrect'), 422);
             }
 
@@ -218,7 +238,7 @@ class AuthController extends Controller
         $user->update($validatedData);
 
         $responseData = [
-            'need_token' => $needOtp
+            'need_token' => $needOtp,
         ];
 
         if ($needOtp) {
@@ -233,10 +253,12 @@ class AuthController extends Controller
     {
         $user = auth('sanctum')->user();
         $user->delete();
+
         return ApiResponder::deleted(200, __('Your account has been successfully deleted'));
     }
-    //todo: forgot password & otp
-    //todo: forgot password & otp
+
+    // todo: forgot password & otp
+    // todo: forgot password & otp
     public function forgotPassword(ForgotPasswordRequest $request)
     {
         return $this->authService->forgotPassword($request->email);
