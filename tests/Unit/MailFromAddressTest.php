@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Mail\MailFromAddress;
+use App\Mail\MailSmtpHost;
 use PHPUnit\Framework\TestCase;
 
 class MailFromAddressTest extends TestCase
@@ -29,5 +30,17 @@ class MailFromAddressTest extends TestCase
         $address = MailFromAddress::resolve(null, 'hello@example.com');
 
         $this->assertSame('hello@example.com', $address);
+    }
+
+    public function test_unresolvable_online_mail_host_uses_the_net_domain(): void
+    {
+        $this->assertSame('aluminumpro.net', MailSmtpHost::resolve('aluminumpro.online'));
+        $this->assertSame('aluminumpro.net', MailSmtpHost::resolve('mail.aluminumpro.online'));
+    }
+
+    public function test_other_mail_hosts_stay_unchanged(): void
+    {
+        $this->assertSame('127.0.0.1', MailSmtpHost::resolve('127.0.0.1'));
+        $this->assertSame('127.0.0.1', MailSmtpHost::resolve(null));
     }
 }

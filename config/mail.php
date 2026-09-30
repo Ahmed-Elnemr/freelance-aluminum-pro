@@ -1,6 +1,7 @@
 <?php
 
 use App\Mail\MailFromAddress;
+use App\Mail\MailSmtpHost;
 
 return [
 
@@ -47,7 +48,7 @@ return [
                 default => null,
             },
             'url' => env('MAIL_URL'),
-            'host' => env('MAIL_HOST', '127.0.0.1'),
+            'host' => MailSmtpHost::resolve(env('MAIL_HOST', '127.0.0.1')),
             'port' => env('MAIL_PORT', 2525),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
