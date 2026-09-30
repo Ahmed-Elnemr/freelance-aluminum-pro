@@ -56,8 +56,11 @@ class AuthController extends Controller
 
         // Check if email is verified
         if ($user->email_verified_at === null) {
-            // Send Verification OTP
-            $this->authService->sendVerificationOtp($user);
+            $mailFailure = $this->authService->sendVerificationOtp($user);
+
+            if ($mailFailure) {
+                return $mailFailure;
+            }
 
             return ApiResponder::failed(__('auth.account_not_verified'), 200, [
                 'need_token' => true,
@@ -126,7 +129,12 @@ class AuthController extends Controller
         }
 
         $this->userService->addDevice($user);
-        $this->authService->sendVerificationOtp($user);
+
+        $mailFailure = $this->authService->sendVerificationOtp($user);
+
+        if ($mailFailure) {
+            return $mailFailure;
+        }
 
         return ApiResponder::success(__('auth.verification_code_sent'), [
             'need_token' => true,
@@ -159,7 +167,12 @@ class AuthController extends Controller
         ]);
 
         $this->userService->addDevice($existingUser);
-        $this->authService->sendVerificationOtp($existingUser);
+
+        $mailFailure = $this->authService->sendVerificationOtp($existingUser);
+
+        if ($mailFailure) {
+            return $mailFailure;
+        }
 
         return ApiResponder::success(__('auth.verification_code_sent'), [
             'need_token' => true,
@@ -242,7 +255,11 @@ class AuthController extends Controller
         ];
 
         if ($needOtp) {
-            $this->authService->sendVerificationOtp($user);
+            $mailFailure = $this->authService->sendVerificationOtp($user);
+
+            if ($mailFailure) {
+                return $mailFailure;
+            }
         }
 
         return ApiResponder::success(__('auth.Profile updated successfully'), $responseData);
