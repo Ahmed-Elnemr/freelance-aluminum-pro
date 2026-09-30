@@ -16,7 +16,7 @@ return [
     'failed' => 'بيانات الاعتماد هذه لا تطابق سجلاتنا.',
     'password' => 'كلمة المرور المقدمة غير صحيحة.',
     'throttle' => 'عدد محاولات تسجيل الدخول كبير جدًا. يرجى المحاولة مرة أخرى بعد :seconds ثانية.',
-    
+
     // Login & Registration
     'invalid_credentials' => 'البريد الإلكتروني/رقم الهاتف أو كلمة المرور غير صحيحة',
     'Your account is blocked' => 'حسابك محظور',
@@ -24,12 +24,12 @@ return [
     'Registration successful' => 'تم إنشاء الحساب بنجاح',
     'Name created successfully' => 'تم إنشاء الاسم بنجاح',
     'Logged out successfully' => 'تم تسجيل الخروج بنجاح',
-    
+
     // Profile
     'Profile updated successfully' => 'تم تحديث الملف الشخصي بنجاح',
     'current_password_required' => 'كلمة المرور الحالية مطلوبة',
     'current_password_incorrect' => 'كلمة المرور الحالية غير صحيحة',
-    
+
     // Account
     'Your account has been successfully deleted' => 'تم حذف حسابك بنجاح',
 
@@ -38,6 +38,9 @@ return [
     'Your OTP for password reset is: :otp' => 'رمز التحقق لاستعادة كلمة المرور هو: :otp',
     'This OTP acts as your temporary password.' => 'هذا الرمز يستخدم للتحقق من هويتك.',
     'It will expire in 15 minutes.' => 'ستنتهي صلاحية الرمز خلال 15 دقيقة.',
+    'otp_email_intro_verify' => 'استخدم الرمز التالي لتأكيد بريدك الإلكتروني.',
+    'otp_email_intro_reset' => 'استخدم الرمز التالي لإعادة تعيين كلمة المرور.',
+    'otp_email_ignore' => 'إذا لم تطلب هذا الرمز، يمكنك تجاهل هذه الرسالة.',
     'Email Verification OTP' => 'رمز التحقق من البريد الإلكتروني',
     'Your OTP for email verification is: :otp' => 'رمز التحقق الخاص بك هو: :otp',
     'This OTP is used to verify your new email address.' => 'يستخدم هذا الرمز للتحقق من بريدك الإلكتروني الجديد.',

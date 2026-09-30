@@ -24,12 +24,12 @@ return [
     'Registration successful' => 'Registration successful',
     'Name created successfully' => 'Name created successfully',
     'Logged out successfully' => 'Logged out successfully',
-    
+
     // Profile
     'Profile updated successfully' => 'Profile updated successfully',
     'current_password_required' => 'Current password is required',
     'current_password_incorrect' => 'Current password is incorrect',
-    
+
     // Account
     'Your account has been successfully deleted' => 'Your account has been successfully deleted',
 
@@ -37,7 +37,10 @@ return [
     'Reset Password OTP' => 'Reset Password OTP',
     'Your OTP for password reset is: :otp' => 'Your OTP for password reset is: :otp',
     'This OTP acts as your temporary password.' => 'This OTP acts as your temporary password.',
-    'It will expire in 15 minutes.' => 'It will expire in 15 minutes.',
+    'It will expire in 15 minutes.' => 'This code expires in 15 minutes.',
+    'otp_email_intro_verify' => 'Use the code below to confirm your email address.',
+    'otp_email_intro_reset' => 'Use the code below to reset your password.',
+    'otp_email_ignore' => 'If you did not request this code, you can ignore this email.',
     'Email Verification OTP' => 'Email Verification OTP',
     'Your OTP for email verification is: :otp' => 'Your OTP for email verification is: :otp',
     'This OTP is used to verify your new email address.' => 'This OTP is used to verify your new email address.',
