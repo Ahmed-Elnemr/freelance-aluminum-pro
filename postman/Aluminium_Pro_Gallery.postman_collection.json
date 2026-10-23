@@ -1,0 +1,262 @@
+{
+	"info": {
+		"_postman_id": "aluminium-pro-gallery-001",
+		"name": "Aluminium Pro - Gallery",
+		"description": "Gallery feature for the Aluminium Pro mobile app.\n\nNo auth token is required.\nImport this collection, then import the environment file `Aluminium_Pro_Gallery.postman_environment.json` and select **Aluminium Pro - Production**.\n\n`type` is either `image` or `video`.\nFor images use `url` or `thumbnail`.\nFor videos play `url`. `thumbnail` is null.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://aluminumpro.net"
+		}
+	],
+	"item": [
+		{
+			"name": "Gallery",
+			"item": [
+				{
+					"name": "1. List gallery (all)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const json = pm.response.json();",
+									"",
+									"pm.test('status is true', function () {",
+									"    pm.expect(json.status).to.eql(true);",
+									"});",
+									"",
+									"pm.test('data is an array', function () {",
+									"    pm.expect(json.data).to.be.an('array');",
+									"});",
+									"",
+									"pm.test('pagination exists', function () {",
+									"    pm.expect(json.pagination).to.be.an('object');",
+									"    pm.expect(json.pagination).to.have.keys('total', 'lastPage', 'total_pages', 'perPage', 'currentPage', 'next_page_url', 'prev_page_url');",
+									"});",
+									"",
+									"if (json.data.length > 0) {",
+									"    const item = json.data[0];",
+									"    pm.test('item has required keys', function () {",
+									"        pm.expect(item).to.have.keys('id', 'title', 'type', 'url', 'mime_type', 'thumbnail');",
+									"        pm.expect(item.type).to.be.oneOf(['image', 'video']);",
+									"        pm.expect(item.url).to.be.a('string').and.to.have.lengthOf.at.least(1);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/gallery",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gallery"]
+						},
+						"description": "Returns active gallery items ordered by sort_order.\nNo token required.\nAccept-Language: ar or en changes the title language."
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept-Language",
+										"value": "ar"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/v1/gallery",
+									"host": ["{{base_url}}"],
+									"path": ["api", "v1", "gallery"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"body": "{\n  \"status\": true,\n  \"message\": \"Loaded Successfully\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"title\": \"واجهة المكتب\",\n      \"type\": \"image\",\n      \"url\": \"https://aluminumpro.net/storage/1/photo.png\",\n      \"mime_type\": \"image/png\",\n      \"thumbnail\": \"https://aluminumpro.net/storage/1/photo.png\"\n    },\n    {\n      \"id\": 2,\n      \"title\": \"فيديو المشروع\",\n      \"type\": \"video\",\n      \"url\": \"https://aluminumpro.net/storage/2/work.mp4\",\n      \"mime_type\": \"video/mp4\",\n      \"thumbnail\": null\n    }\n  ],\n  \"pagination\": {\n    \"total\": 2,\n    \"lastPage\": 1,\n    \"total_pages\": 1,\n    \"perPage\": 15,\n    \"currentPage\": 1,\n    \"next_page_url\": null,\n    \"prev_page_url\": null\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "2. List images only",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const json = pm.response.json();",
+									"pm.test('every item is an image', function () {",
+									"    json.data.forEach(function (item) {",
+									"        pm.expect(item.type).to.eql('image');",
+									"        pm.expect(item.thumbnail).to.be.a('string').and.to.have.lengthOf.at.least(1);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/gallery?type=image",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gallery"],
+							"query": [
+								{
+									"key": "type",
+									"value": "image"
+								}
+							]
+						},
+						"description": "Filter: type=image\nUse url or thumbnail in ImageView."
+					}
+				},
+				{
+					"name": "3. List videos only",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status is 200', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"const json = pm.response.json();",
+									"pm.test('every item is a video', function () {",
+									"    json.data.forEach(function (item) {",
+									"        pm.expect(item.type).to.eql('video');",
+									"        pm.expect(item.thumbnail).to.eql(null);",
+									"        pm.expect(item.url).to.be.a('string').and.to.have.lengthOf.at.least(1);",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/gallery?type=video",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gallery"],
+							"query": [
+								{
+									"key": "type",
+									"value": "video"
+								}
+							]
+						},
+						"description": "Filter: type=video\nPlay url in VideoPlayer. thumbnail is null."
+					}
+				},
+				{
+					"name": "4. List gallery page 2",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "ar"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/gallery?page=2",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gallery"],
+							"query": [
+								{
+									"key": "page",
+									"value": "2"
+								}
+							]
+						},
+						"description": "Pagination. Default per_page is 15.\nUse pagination.next_page_url when it is not null."
+					}
+				},
+				{
+					"name": "5. List gallery in English",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept-Language",
+								"value": "en"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/gallery",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "gallery"]
+						},
+						"description": "Same endpoint with Accept-Language: en. Title comes back in English."
+					}
+				}
+			]
+		}
+	]
+}
