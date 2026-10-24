@@ -103,6 +103,25 @@ class GalleryApiTest extends TestCase
             ->assertJsonPath('data.0.type', 'video');
     }
 
+    public function test_gallery_title_is_a_localized_string_not_an_array(): void
+    {
+        $gallery = $this->makeGalleryItem('photo.jpg', GalleryTypeEnum::Image, 1, true);
+        $gallery->update([
+            'title' => [
+                'ar' => 'واجهة المكتب',
+                'en' => 'Office facade',
+            ],
+        ]);
+
+        $this->getJson('/api/v1/gallery', ['Accept-Language' => 'ar'])
+            ->assertOk()
+            ->assertJsonPath('data.0.title', 'واجهة المكتب');
+
+        $this->getJson('/api/v1/gallery', ['Accept-Language' => 'en'])
+            ->assertOk()
+            ->assertJsonPath('data.0.title', 'Office facade');
+    }
+
     public function test_gallery_endpoint_rejects_invalid_type(): void
     {
         $this->getJson('/api/v1/gallery?type=audio')

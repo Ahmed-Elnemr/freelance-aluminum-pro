@@ -17,8 +17,8 @@ class GalleryResource extends JsonResource
 
         return [
             'id' => (int) $this->id,
-            'title' => (string) $this->title,
-            'type' => (string) ($this->type?->value ?? 'image'),
+            'title' => $this->localizedTitle(),
+            'type' => $this->resolvedType()->value,
             'url' => (string) $url,
             'mime_type' => (string) ($media?->mime_type ?? ''),
             'thumbnail' => $this->isImage() ? (string) $url : null,

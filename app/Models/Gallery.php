@@ -39,12 +39,33 @@ class Gallery extends Model implements HasMedia
 
     public function isImage(): bool
     {
-        return $this->type === GalleryTypeEnum::Image;
+        return $this->resolvedType() === GalleryTypeEnum::Image;
     }
 
     public function isVideo(): bool
     {
-        return $this->type === GalleryTypeEnum::Video;
+        return $this->resolvedType() === GalleryTypeEnum::Video;
+    }
+
+    public function resolvedType(): GalleryTypeEnum
+    {
+        if ($this->type instanceof GalleryTypeEnum) {
+            return $this->type;
+        }
+
+        return GalleryTypeEnum::tryFrom((string) $this->type) ?? GalleryTypeEnum::Image;
+    }
+
+    public function localizedTitle(?string $locale = null): string
+    {
+        $locale ??= app()->getLocale();
+        $title = $this->getTranslation('title', $locale, true);
+
+        if (is_array($title)) {
+            return (string) ($title[$locale] ?? $title['ar'] ?? $title['en'] ?? '');
+        }
+
+        return (string) $title;
     }
 
     public function syncTypeFromMedia(): void
