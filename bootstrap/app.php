@@ -35,5 +35,6 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
         $schedule->command('app:process-orders')->everyMinute();
+        $schedule->command('telescope:prune --hours=48')->daily();
     })
     ->create();
