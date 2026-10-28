@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Traits\HasActiveScope;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,10 +13,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasActiveScope, SoftDeletes, HasApiTokens;
+    use HasActiveScope, HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -57,7 +59,7 @@ class User extends Authenticatable
         ];
     }
 
-    //todo:scope
+    // todo:scope
     public function isClient(): bool
     {
         return $this->type === 'client';
@@ -73,11 +75,15 @@ class User extends Authenticatable
     {
         return $this->type === 'admin';
     }
-    //todo:scope # end
 
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->isAdmin() && (bool) $this->is_active;
+    }
+    // todo:scope # end
 
-    //todo:relation
-        public function devices(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    // todo:relation
+    public function devices(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(UserDevice::class, 'user', 'user_type', 'user_id')->latest();
     }
@@ -108,6 +114,6 @@ class User extends Authenticatable
         return $this->hasMany(Favorite::class);
     }
 
-    //todo: # end relation  #
+    // todo: # end relation  #
 
 }
