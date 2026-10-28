@@ -30,6 +30,7 @@ class OrderResource extends JsonResource
             'status' => (string) $this->status->value,
             'status_label' => (string) $this->status->label(),
             'can_cancel' => in_array($this->status->value, ['new', 'approved']),
+            ...$this->ratingApiPayload($request->user('sanctum') ?? $request->user()),
             'date' => (string) $this->date?->format('Y-m-d'),
             'time' => (string) $this->time,
             'formatted_time' => (string) $this->formatted_time,

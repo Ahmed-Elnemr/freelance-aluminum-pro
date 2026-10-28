@@ -7,6 +7,7 @@ use App\Enum\UserTypeEnum;
 use App\Models\Order;
 use App\Models\User;
 use App\Notifications\AdminOrderFinishedNotification;
+use App\Notifications\OrderCompletedNotification;
 use App\Notifications\OrderReminderNotification;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
@@ -52,6 +53,24 @@ class ProcessOrders extends Command
                 $order->update(['finish_notified' => true]);
                 $this->info("Finish notification sent for order #{$order->id}");
             }
+        }
+
+        $ordersAwaitingRating = Order::query()
+            ->with(['user', 'maintenance'])
+            ->where('status', OrderStatusEnum::Completed)
+            ->where('rating_reminder_sent', false)
+            ->whereNotNull('completed_at')
+            ->where('completed_at', '<=', $now->copy()->subDay())
+            ->whereDoesntHave('rating')
+            ->get();
+
+        foreach ($ordersAwaitingRating as $order) {
+            if ($order->user) {
+                $order->user->notify(new OrderCompletedNotification($order));
+            }
+
+            $order->update(['rating_reminder_sent' => true]);
+            $this->info("Rating reminder sent for order #{$order->id}");
         }
     }
 }

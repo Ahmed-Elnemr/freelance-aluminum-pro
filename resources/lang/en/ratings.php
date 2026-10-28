@@ -1,0 +1,32 @@
+<?php
+
+return [
+    'thanks' => 'Thanks for your rating!',
+    'already_rated' => 'You have already rated this order',
+    'not_ratable' => 'This order can\'t be rated',
+    'stars_between' => 'The rating must be between 1 and 5',
+    'comment_max' => 'The comment may not be greater than 500 characters',
+    'tags_invalid' => 'One of the rating tags is invalid',
+    'notification_title' => 'Your order was completed successfully 🎉',
+    'notification_body' => 'How was your experience? Rate the service in seconds',
+    'order_ratings' => 'Order ratings',
+    'order_rating' => 'Order rating',
+    'stars' => 'Stars',
+    'tags' => 'Tags',
+    'comment' => 'Comment',
+    'hide_comment' => 'Hide comment',
+    'average' => 'Average rating',
+    'count' => 'Ratings count',
+    'tags_list' => [
+        'on_time' => 'On time',
+        'quality' => 'Quality work',
+        'professional' => 'Professional team',
+        'clean' => 'Left it clean',
+        'fair_price' => 'Fair price',
+        'late' => 'Arrived late',
+        'poor_quality' => 'Below expectations',
+        'unprofessional' => 'Poor attitude',
+        'messy' => 'Left a mess',
+        'expensive' => 'Too expensive',
+    ],
+];

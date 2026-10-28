@@ -52,7 +52,9 @@ class MaintenanceController extends Controller
         }
 
         $maintenance->loadCount('ratings')
-            ->loadAvg('ratings', 'rating');
+            ->loadAvg('ratings', 'rating')
+            ->loadCount('orderRatings')
+            ->loadAvg('orderRatings', 'stars');
 
         return ApiResponder::loaded(MaintenanceResource::make($maintenance));
     }

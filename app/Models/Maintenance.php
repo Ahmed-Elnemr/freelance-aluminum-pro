@@ -62,6 +62,31 @@ class Maintenance extends Model implements HasMedia
         return $this->hasMany(Order::class);
     }
 
+    public function orderRatings(): HasMany
+    {
+        return $this->hasMany(OrderRating::class);
+    }
+
+    public function combinedRatingCount(): int
+    {
+        return (int) ($this->ratings_count ?? 0) + (int) ($this->order_ratings_count ?? 0);
+    }
+
+    public function combinedRatingAverage(): float
+    {
+        $legacyCount = (int) ($this->ratings_count ?? 0);
+        $legacyAverage = (float) ($this->ratings_avg_rating ?? 0);
+        $orderCount = (int) ($this->order_ratings_count ?? 0);
+        $orderAverage = (float) ($this->order_ratings_avg_stars ?? 0);
+        $total = $legacyCount + $orderCount;
+
+        if ($total === 0) {
+            return 0.0;
+        }
+
+        return round((($legacyAverage * $legacyCount) + ($orderAverage * $orderCount)) / $total, 1);
+    }
+
     public function ratings(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->morphMany(Rating::class, 'rateable');

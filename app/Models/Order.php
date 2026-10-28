@@ -33,11 +33,15 @@ class Order extends Model implements HasMedia
         'end_time',
         'reminder_sent',
         'finish_notified',
+        'completed_at',
+        'rating_reminder_sent',
     ];
 
     protected $casts = [
         'status' => OrderStatusEnum::class,
         'scheduled_date' => 'date',
+        'completed_at' => 'datetime',
+        'rating_reminder_sent' => 'boolean',
     ];
 
     public function getDateAttribute(): mixed
@@ -90,5 +94,41 @@ class Order extends Model implements HasMedia
     public function maintenance(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Maintenance::class);
+    }
+
+    public function rating(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(OrderRating::class);
+    }
+
+    public function canBeRatedBy(?User $user): bool
+    {
+        if ($user === null) {
+            return false;
+        }
+
+        return (int) $this->user_id === (int) $user->id
+            && $this->status === OrderStatusEnum::Completed
+            && $this->rating === null;
+    }
+
+    /**
+     * @return array{can_rate: bool, rating: array{id: int, stars: int, comment: ?string, tags: list<string>, created_at: ?string}|null}
+     */
+    public function ratingApiPayload(?User $user): array
+    {
+        return [
+            'can_rate' => $this->canBeRatedBy($user),
+            'rating' => $this->rating?->toApiArray(),
+        ];
+    }
+
+    protected static function booted(): void
+    {
+        static::updating(function (Order $order): void {
+            if ($order->isDirty('status') && $order->status === OrderStatusEnum::Completed && $order->completed_at === null) {
+                $order->completed_at = now();
+            }
+        });
     }
 }

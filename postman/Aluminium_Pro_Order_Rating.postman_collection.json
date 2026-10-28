@@ -1,0 +1,479 @@
+{
+  "info": {
+    "_postman_id": "aluminium-pro-order-rating-001",
+    "name": "Aluminium Pro - Order Rating",
+    "description": "Order rating APIs for the Aluminium Pro mobile app.\n\nImport this collection, then import `Aluminium_Pro_Order_Rating.postman_environment.json` and select **Aluminium Pro - Order Rating**.\n\n1. Fill `login` and `password` in the environment.\n2. Run **Login** so `access_token` is saved.\n3. Run **List completed orders**. If a completed unrated order exists, `order_id` is saved.\n4. Run **Rate order**.\n\n`can_rate` is true only for a completed order that belongs to the customer and has not been rated.\nRating body is `application/x-www-form-urlencoded`.\n`lang` is `ar` or `en`.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://aluminumpro.net"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "order_id",
+      "value": "1"
+    },
+    {
+      "key": "lang",
+      "value": "ar"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Login succeeded', function () {",
+              "    pm.expect(pm.response.code).to.eql(200);",
+              "    pm.expect(json.status).to.eql(true);",
+              "});",
+              "const token = json.data && (json.data.access_token || (json.data.user && json.data.user.access_token));",
+              "if (token) {",
+              "    pm.collectionVariables.set('access_token', token);",
+              "    pm.environment.set('access_token', token);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "lang",
+            "value": "{{lang}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"login\": \"{{login}}\",\n  \"password\": \"{{password}}\",\n  \"uuid\": \"{{uuid}}\",\n  \"device_token\": \"{{device_token}}\",\n  \"device_type\": \"{{device_type}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/user-auth/login",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "user-auth", "login"]
+        },
+        "description": "Saves access_token into the environment. Fill login and password in the environment first."
+      }
+    },
+    {
+      "name": "2. List completed orders",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Status is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "    pm.expect(json.status).to.eql(true);",
+              "});",
+              "const orders = Array.isArray(json.data) ? json.data : ((json.data && json.data.data) || []);",
+              "if (orders.length > 0) {",
+              "    pm.test('order has can_rate and rating', function () {",
+              "        pm.expect(orders[0]).to.have.property('can_rate');",
+              "        pm.expect(orders[0]).to.have.property('rating');",
+              "    });",
+              "    const ratable = orders.find(order => order.can_rate === true);",
+              "    if (ratable) {",
+              "        pm.collectionVariables.set('order_id', String(ratable.id));",
+              "        pm.environment.set('order_id', String(ratable.id));",
+              "    }",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "lang",
+            "value": "{{lang}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/orders?status=completed&page=1",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "orders"],
+          "query": [
+            {
+              "key": "status",
+              "value": "completed"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            }
+          ]
+        },
+        "description": "Completed orders. Each order includes can_rate and rating. A ratable order id is saved to order_id."
+      },
+      "response": [
+        {
+          "name": "Completed and not rated",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders?status=completed&page=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "completed"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\n  \"status\": true,\n  \"message\": \"Loaded Successfully\",\n  \"data\": [\n    {\n      \"id\": 123,\n      \"status\": \"completed\",\n      \"status_label\": \"منتهي\",\n      \"can_rate\": true,\n      \"rating\": null\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "3. List current orders",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "lang",
+            "value": "{{lang}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/orders?status=current&page=1",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "orders"],
+          "query": [
+            {
+              "key": "status",
+              "value": "current"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            }
+          ]
+        },
+        "description": "Current orders. can_rate is false and rating is null."
+      }
+    },
+    {
+      "name": "4. Order details",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "lang",
+            "value": "{{lang}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/orders/{{order_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "orders", "{{order_id}}"]
+        },
+        "description": "Order details. Show the rating button only when can_rate is true."
+      },
+      "response": [
+        {
+          "name": "Rated order",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/{{order_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders", "{{order_id}}"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\n  \"status\": true,\n  \"message\": \"Loaded Successfully\",\n  \"data\": {\n    \"id\": 123,\n    \"status\": \"completed\",\n    \"status_label\": \"منتهي\",\n    \"can_rate\": false,\n    \"rating\": {\n      \"id\": 31,\n      \"stars\": 4,\n      \"comment\": \"الفني محترم وشغله نضيف\",\n      \"tags\": [\"on_time\", \"quality\"],\n      \"created_at\": \"2026-10-28T15:30:00+00:00\"\n    }\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "5. Rate order",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Created or already rated', function () {",
+              "    pm.expect([201, 409]).to.include(pm.response.code);",
+              "});",
+              "if (pm.response.code === 201) {",
+              "    pm.test('rating payload', function () {",
+              "        pm.expect(json.status).to.eql(true);",
+              "        pm.expect(json.data.stars).to.eql(4);",
+              "        pm.expect(json.data.tags).to.eql(['on_time', 'quality']);",
+              "        pm.expect(json.data).to.not.have.property('user');",
+              "    });",
+              "}",
+              "if (pm.response.code === 409) {",
+              "    pm.test('already rated', function () {",
+              "        pm.expect(json.code).to.eql('order_already_rated');",
+              "        pm.expect(json.data).to.be.an('object');",
+              "    });",
+              "}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "lang",
+            "value": "{{lang}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "stars",
+              "value": "4",
+              "description": "Required. Integer from 1 to 5."
+            },
+            {
+              "key": "comment",
+              "value": "الفني محترم وشغله نضيف",
+              "description": "Optional. Max 500 characters. Omit when empty."
+            },
+            {
+              "key": "tags[0]",
+              "value": "on_time",
+              "description": "Optional tag key."
+            },
+            {
+              "key": "tags[1]",
+              "value": "quality",
+              "description": "Optional tag key."
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/orders/{{order_id}}/rate",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "orders", "{{order_id}}", "rate"]
+        },
+        "description": "Rate a completed order once.\n201: data is the rating object.\n409 code order_already_rated: data is the existing rating.\n403 or 422 code order_not_ratable: order is not the customer's or is not completed.\n422 without code: validation error, errors object is present."
+      },
+      "response": [
+        {
+          "name": "201 Created",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/{{order_id}}/rate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders", "{{order_id}}", "rate"]
+            }
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\n  \"status\": true,\n  \"message\": \"شكراً لتقييمك!\",\n  \"data\": {\n    \"id\": 31,\n    \"stars\": 4,\n    \"comment\": \"الفني محترم وشغله نضيف\",\n    \"tags\": [\"on_time\", \"quality\"],\n    \"created_at\": \"2026-10-28T15:30:00+00:00\"\n  }\n}"
+        },
+        {
+          "name": "409 Already rated",
+          "originalRequest": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/orders/{{order_id}}/rate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "orders", "{{order_id}}", "rate"]
+            }
+          },
+          "status": "Conflict",
+          "code": 409,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\n  \"status\": false,\n  \"code\": \"order_already_rated\",\n  \"message\": \"لقد قمت بتقييم هذا الطلب مسبقاً\",\n  \"data\": {\n    \"id\": 31,\n    \"stars\": 4,\n    \"comment\": \"الفني محترم وشغله نضيف\",\n    \"tags\": [\"on_time\", \"quality\"],\n    \"created_at\": \"2026-10-28T15:30:00+00:00\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "6. Rate order with stars only",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "lang",
+            "value": "{{lang}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "stars",
+              "value": "5"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/v1/orders/{{order_id}}/rate",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "orders", "{{order_id}}", "rate"]
+        },
+        "description": "Stars only. Success data has comment null and tags []."
+      }
+    },
+    {
+      "name": "7. Notifications",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{access_token}}"
+          },
+          {
+            "key": "lang",
+            "value": "{{lang}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/v1/notifications",
+          "host": ["{{base_url}}"],
+          "path": ["api", "v1", "notifications"]
+        },
+        "description": "A completed-order rating notification has data.type = order_rating and data.model_id = the order id. Open the rating screen only for that type."
+      },
+      "response": [
+        {
+          "name": "Rating notification",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/notifications",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "notifications"]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": "{\n  \"status\": true,\n  \"message\": \"Loaded Successfully\",\n  \"data\": {\n    \"notifications\": {\n      \"data\": [\n        {\n          \"id\": \"uuid\",\n          \"data\": {\n            \"title\": \"تم تنفيذ طلبك بنجاح 🎉\",\n            \"message\": \"كيف كانت تجربتك؟ قيّم الخدمة في ثوانٍ\",\n            \"type\": \"order_rating\",\n            \"model_id\": 123\n          },\n          \"is_read\": false\n        }\n      ]\n    }\n  }\n}"
+        }
+      ]
+    }
+  ]
+}

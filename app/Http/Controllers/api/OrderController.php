@@ -137,7 +137,7 @@ class OrderController extends Controller
             $query->where('status', OrderStatusEnum::Cancelled);
         }
 
-        $orders = $query->latest()->paginate(20);
+        $orders = $query->with('rating')->latest()->paginate(20);
 
         return ApiResponder::loaded(OrderListResource::collection($orders));
     }
@@ -152,6 +152,7 @@ class OrderController extends Controller
         // For backward compatibility, but index is preferred
         $user = auth('sanctum')->user();
         $orders = $user->orders()
+            ->with('rating')
             ->whereIn('status', [OrderStatusEnum::Completed, OrderStatusEnum::Cancelled])
             ->latest()
             ->paginate(20);
@@ -165,6 +166,8 @@ class OrderController extends Controller
         if ((int) $order->user_id !== (int) $authUser->id) {
             return ApiResponder::failed('Unauthorized', 403);
         }
+
+        $order->load('rating');
 
         return ApiResponder::loaded(OrderResource::make($order));
     }

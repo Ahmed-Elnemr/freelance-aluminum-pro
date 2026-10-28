@@ -6,40 +6,34 @@ use App\Actions\FCMAction;
 use App\Models\Order;
 use App\Notifications\Channels\FcmChannel;
 use Illuminate\Bus\Queueable;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 
 class OrderCompletedNotification extends Notification
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    protected $data;
+    use Queueable;
 
     /**
-     * Create a new notification instance.
+     * @var array{title: array{ar: string, en: string}, body: array{ar: string, en: string}, type: string, model_id: int}
      */
+    protected array $data;
+
     public function __construct(public Order $order)
     {
-        $this->data['title'] = [
-            'ar' => __('notification_order_completed_title', [], 'ar'),
-            'en' => __('notification_order_completed_title', [], 'en'),
+        $this->data = [
+            'title' => [
+                'ar' => __('ratings.notification_title', [], 'ar'),
+                'en' => __('ratings.notification_title', [], 'en'),
+            ],
+            'body' => [
+                'ar' => __('ratings.notification_body', [], 'ar'),
+                'en' => __('ratings.notification_body', [], 'en'),
+            ],
+            'type' => 'order_rating',
+            'model_id' => $order->id,
         ];
-
-        $this->data['body'] = [
-            'ar' => __('notification_order_completed_body', ['service_name' => $order->maintenance?->getTranslation('name', 'ar')], 'ar'),
-            'en' => __('notification_order_completed_body', ['service_name' => $order->maintenance?->getTranslation('name', 'en')], 'en'),
-        ];
-
-        $this->data['type'] = 'order';
-        $this->data['model_id'] = $order->id;
     }
 
     /**
-     * Get the notification's delivery channels.
-     *
      * @return array<int, string>
      */
     public function via(object $notifiable): array
@@ -48,47 +42,32 @@ class OrderCompletedNotification extends Notification
     }
 
     /**
-     * Get the mail representation of the notification.
-     */
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
-    }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
+     * @return array{title: array{ar: string, en: string}, body: array{ar: string, en: string}, type: string, model_id: int}
      */
     public function toArray(object $notifiable): array
     {
         return $this->data;
     }
 
+    /**
+     * @return array{title: array{ar: string, en: string}, body: array{ar: string, en: string}, type: string, model_id: int}
+     */
     public function toDatabase(object $notifiable): array
     {
-        return \Filament\Notifications\Notification::make()
-            ->title($this->data['title'][app()->getLocale()] ?? '')
-            ->body($this->data['body'][app()->getLocale()] ?? '')
-            ->actions([
-                \Filament\Notifications\Actions\Action::make('view')
-                    ->label(__('dashboard.view'))
-                    ->url(\App\Filament\Resources\OrderResource::getUrl('view', ['record' => $this->order])),
-            ])
-            ->data(['type' => 'order', 'model_id' => $this->order->id])
-            ->getDatabaseMessage();
+        return $this->data;
     }
 
-    public function toFcm($notifiable)
+    public function toFcm(object $notifiable): void
     {
+        $locale = app()->getLocale();
 
         FCMAction::new($notifiable)
-            ->withData($this->data)
-            ->withTitle($this->data['title'][app()->getLocale()] ?? '')
-            ->withBody($this->data['body'][app()->getLocale()] ?? '')
+            ->withData([
+                'type' => 'order_rating',
+                'model_id' => (string) $this->order->id,
+            ])
+            ->withTitle($this->data['title'][$locale] ?? $this->data['title']['ar'])
+            ->withBody($this->data['body'][$locale] ?? $this->data['body']['ar'])
             ->sendMessage('tokens');
     }
 }

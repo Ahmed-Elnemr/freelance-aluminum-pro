@@ -143,6 +143,14 @@ class MaintenanceResource extends Resource
                     ->money('SAR')
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('service_rating_average')
+                    ->label(__('ratings.average'))
+                    ->state(fn (Maintenance $record): string => number_format($record->combinedRatingAverage(), 1)),
+
+                Tables\Columns\TextColumn::make('service_ratings_count')
+                    ->label(__('ratings.count'))
+                    ->state(fn (Maintenance $record): int => $record->combinedRatingCount()),
+
                 Tables\Columns\BooleanColumn::make('is_active')
                     ->label(__('dashboard.active'))
                     ->sortable(),
@@ -189,6 +197,11 @@ class MaintenanceResource extends Resource
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
-            ])->latest();
+            ])
+            ->withCount('ratings')
+            ->withAvg('ratings', 'rating')
+            ->withCount('orderRatings')
+            ->withAvg('orderRatings', 'stars')
+            ->latest();
     }
 }
