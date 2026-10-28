@@ -2,9 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\User;
-use Filament\Facades\Filament;
-use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\Telescope;
 use Laravel\Telescope\TelescopeApplicationServiceProvider;
 
@@ -35,18 +32,12 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     }
 
     /**
-     * Register the Telescope gate.
-     *
-     * This gate determines who can access Telescope in non-local environments.
+     * Open the dashboard whenever Telescope is enabled.
      */
-    protected function gate(): void
+    protected function authorization(): void
     {
-        Gate::define('viewTelescope', function (?User $user): bool {
-            if (! config('telescope.enabled') || ! $user instanceof User) {
-                return false;
-            }
-
-            return $user->canAccessPanel(Filament::getPanel('admin'));
+        Telescope::auth(function (): bool {
+            return (bool) config('telescope.enabled');
         });
     }
 }
