@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\User;
 use App\Notifications\AdminOrderStatusChangedNotification;
 use App\Notifications\Channels\FcmChannel;
+use App\Notifications\NewMessageFromAdminNotification;
 use App\Notifications\NewMessageFromClientNotification;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Notification;
@@ -77,6 +78,21 @@ class AdminChatAndOrderNotificationsTest extends TestCase
                     && in_array(FcmChannel::class, $channels, true);
             }
         );
+    }
+
+    public function test_admin_message_notification_targets_the_sender_chat(): void
+    {
+        $admin = new User;
+        $admin->id = 9;
+        $admin->name = 'Admin';
+
+        $notification = new NewMessageFromAdminNotification($admin, 'Hello from admin');
+        $data = $notification->toArray(new User);
+
+        $this->assertSame('chat', $data['type']);
+        $this->assertSame(9, $data['model_id']);
+        $this->assertStringContainsString('Hello from admin', $data['body']['ar']);
+        $this->assertSame(['database', FcmChannel::class], $notification->via(new User));
     }
 
     public function test_admin_order_status_changed_notification_uses_database_and_fcm_channels(): void

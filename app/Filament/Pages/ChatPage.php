@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Filament\Pages;
 
 use App\Events\MessageSentEvent;
@@ -61,7 +62,7 @@ class ChatPage extends Page
         $this->loadConversations();
 
         if ($userId) {
-            $user         = User::findOrFail($userId);
+            $user = User::findOrFail($userId);
             $conversation = Conversation::firstOrCreateBetween(Auth::id(), $user->id);
             $this->showConversation($conversation->id);
         }
@@ -75,8 +76,8 @@ class ChatPage extends Page
     public function showConversation($id): void
     {
         $this->selectedConversationId = $id;
-        $this->selectedConversation   = Conversation::with('client', 'admin')->findOrFail($id);
-        $this->page                   = 1;
+        $this->selectedConversation = Conversation::with('client', 'admin')->findOrFail($id);
+        $this->page = 1;
         $this->loadMessages();
 
         Message::where('conversation_id', $id)
@@ -109,39 +110,54 @@ class ChatPage extends Page
             return;
         }
 
-        $senderId   = Auth::id();
+        $senderId = Auth::id();
         $receiverId = $this->selectedConversation->client_id === $senderId
             ? $this->selectedConversation->admin_id
             : $this->selectedConversation->client_id;
 
         $message = Message::create([
-            'id'              => Str::uuid(),
-            'message'         => $this->newMessage,
-            'sender_id'       => $senderId,
-            'receiver_id'     => $receiverId,
+            'id' => Str::uuid(),
+            'message' => $this->newMessage,
+            'sender_id' => $senderId,
+            'receiver_id' => $receiverId,
             'conversation_id' => $this->selectedConversation->id,
         ]);
 
         foreach ($this->attachments as $attachment) {
-            $fileName = Str::uuid() . '.' . $attachment->getClientOriginalExtension();
+            $fileName = Str::uuid().'.'.$attachment->getClientOriginalExtension();
 
             $path = match (true) {
                 str_starts_with($attachment->getMimeType(), 'image/') => $attachment->storeAs('attachments/images', $fileName, 'public'),
                 str_starts_with($attachment->getMimeType(), 'video/') => $attachment->storeAs('attachments/videos', $fileName, 'public'),
-                default                                               => $attachment->storeAs('attachments/others', $fileName, 'public'),
+                default => $attachment->storeAs('attachments/others', $fileName, 'public'),
             };
 
             ChatAttachment::create([
                 'message_id' => $message->id,
-                'file_path'  => Storage::url($path),
-                'mime_type'  => $attachment->getMimeType(),
+                'file_path' => Storage::url($path),
+                'mime_type' => $attachment->getMimeType(),
             ]);
         }
 
-        broadcast(new MessageSentEvent($message));
-        $this->selectedConversation->client?->notify(new NewMessageFromAdminNotification);
+        $this->selectedConversation->update(['last_message_at' => now()]);
 
-        $this->newMessage  = '';
+        $sender = Auth::user();
+        $receiver = User::query()->find($receiverId);
+
+        if ($sender instanceof User && $receiver) {
+            $receiver->notify(new NewMessageFromAdminNotification(
+                $sender,
+                $this->newMessage !== '' ? $this->newMessage : null,
+            ));
+        }
+
+        try {
+            broadcast(new MessageSentEvent($message));
+        } catch (\Throwable $exception) {
+            report($exception);
+        }
+
+        $this->newMessage = '';
         $this->attachments = [];
         $this->showConversation($this->selectedConversation->id);
     }
@@ -154,7 +170,7 @@ class ChatPage extends Page
             ->with('client', 'admin')
             ->when($search !== '', function ($query) use ($search) {
                 $query->whereHas('client', function ($query) use ($search) {
-                    $query->where('name', 'like', '%' . $search . '%');
+                    $query->where('name', 'like', '%'.$search.'%');
                 });
             })
             ->orderByDesc('last_message_at')

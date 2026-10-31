@@ -2,11 +2,14 @@
 
 namespace App\Actions;
 
+use App\Models\UserDevice;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Contract\Messaging;
 use Kreait\Firebase\Messaging\AndroidConfig;
 use Kreait\Firebase\Messaging\ApnsConfig;
 use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\MulticastSendReport;
 use Kreait\Firebase\Messaging\Notification;
 use Kreait\Firebase\Messaging\WebPushConfig;
 
@@ -140,12 +143,41 @@ class FCMAction
 
         if ($type === 'tokens') {
             if ($this->firebaseTokens !== []) {
-                $this->messaging->sendMulticast($message, $this->firebaseTokens);
+                $report = $this->messaging->sendMulticast($message, $this->firebaseTokens);
+                $this->forgetRejectedTokens($report);
             }
         }
 
         if ($type === 'topic') {
             $this->messaging->send($message);
+        }
+    }
+
+    private function forgetRejectedTokens(MulticastSendReport $report): void
+    {
+        $invalidTokens = [];
+
+        foreach ($report->failures()->getItems() as $item) {
+            if (! $item->messageTargetWasInvalid() && ! $item->messageWasSentToUnknownToken()) {
+                continue;
+            }
+
+            $token = $item->target()->value();
+
+            if ($token !== '') {
+                $invalidTokens[] = $token;
+            }
+        }
+
+        if ($invalidTokens !== []) {
+            UserDevice::query()->whereIn('token', $invalidTokens)->delete();
+        }
+
+        if ($report->failures()->count() > 0) {
+            Log::warning('FCM send rejected some device tokens.', [
+                'sent' => $report->successes()->count(),
+                'failed' => $report->failures()->count(),
+            ]);
         }
     }
 
